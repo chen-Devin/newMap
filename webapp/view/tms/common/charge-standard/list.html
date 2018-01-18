@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>收费标准 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <body>
+    <!--start:表格列表-->
+    <table class="layui-hide" id="table_list"></table>
+    <!--end:表格列表-->
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/tms_common/utils.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['layer', 'table'], function(){
+    var layer = layui.layer,
+        table = layui.table,
+        $ = layui.jquery;
+
+    var options = {
+      "tableOptions": {
+        cols: [[
+          {field:'code', title: '收费标准代码', width:140, sort: true},
+          {field:'nameCn', title: '收费标准', width:120},
+          {field:'remark', title: '收费说明', width:400},
+          {field:'status', title: '状态', width:120, templet:"#statusTpl"}
+        ]],
+        url: '/ucenter/code/common/common/getHingStandard.shtml',
+        page: false
+      }   
+    }
+
+    tmsCommonTable.init(options, table);
+  });
+  </script>
+  <script type="text/html" id="statusTpl">
+    {{#  if(d.status == '0'){ }}
+      未激活
+    {{#  } else if(d.status == '1'){ }}
+      启用
+    {{#  } else if(d.status == '2'){ }}
+      停用
+    {{#  } else { }}
+      锁定
+    {{#  } }}
+  </script>
+</html>

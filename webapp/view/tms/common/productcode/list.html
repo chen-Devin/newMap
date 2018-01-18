@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>商品编码 - TMS</title>
+  <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+  <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  <style type="text/css">
+    tr.add th {
+      text-align: center;
+      background: #965f5f;
+      color: #fff;
+      border-right: none;
+    }
+
+    tr.add>td {
+      padding: 0 !important;
+    }
+
+    tr.add tr td {
+      padding-left: 10px !important;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+  <!--start: 搜索-->
+  <div class="panel-handle search-bar"/ >
+    <form class="layui-form layui-form-pane">
+      <div class="layui-inline">
+        <div class="layui-input-inline">
+          <select name="exact">
+            <option value="0" selected="selected">模糊查询</option>
+            <option value="1">精确查询</option>
+          </select>
+        </div>
+      </div>
+      <div class="layui-inline">
+        <div class="layui-input-inline">
+          <select name="type">
+            <option value="0" selected="selected">商品编码</option>
+            <option value="1">商品名称</option>
+          </select>
+        </div>
+      </div>
+      <div class="layui-inline">
+        <div class="layui-input-inline">
+          <input type="text" name="name" style="width:300px;" lay-verify="title" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+      </div>
+      <button type="button" class="layui-btn layui-btn-danger" lay-submit lay-filter="search">
+        <i class="layui-icon">&#xe615;</i>查询</button>
+    </form>
+  </div>
+  <!--end: 搜索-->
+
+  <!--start:表格列表-->
+  <table class="layui-hide" id="table_list" lay-filter="tbar"></table>
+  <!--end:表格列表-->
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<script charset="utf-8" src="/view/frame/static/js/tms_common/utils.js?v=1.0"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+  layui.use(['form', 'layer', 'table'], function () {
+    var $form = layui.form,
+      $layer = layui.layer,
+      $table = layui.table,
+      $ = layui.jquery;
+
+    var options = {
+      "seachOptions": {
+        "rely": $form,
+        "condition": ["exact", "type", "name"],
+        "getParameter": ""
+      },
+
+      "tableOptions": {
+        cols: [[
+          { field: 'id', title: '序号', width: 80, templet: '#idTpl' },
+          { field: 'hsCode', title: '商品编码', width: 120, templet: '#codeTpl' },
+          { field: 'gname', title: '商品名称', width: 200 },
+          { field: 'unit1', title: '法定第一单位', width: 120 },
+          { field: 'unit2', title: '法定第二单位', width: 120 },
+          { field: 'controlMark', title: '监管条件代码', width: 120 },
+          { field: 'licensed', title: '禁限类型', width: 120, templet: '#typeTpl' }
+        ]],
+        url: '/ucenter/code/common/hs/page.shtml',
+        where: { "exact": false, "code": "" }
+      }
+    }
+
+    tmsCommonTable.init(options, $table);
+
+    var getType = (function () {
+        var typeMap = {
+          "1": "禁止类",
+          "2": "限制类"
+        }
+
+      return function getType(type) {
+        return typeMap[type] || "非";
+      };
+    })();
+
+    var formatStr = function(str) {
+      return str !== null ? str : "";
+    }
+
+    //监听工具条
+    $table.on('tool(tbar)', function (obj) {
+      var data = obj.data;
+      if (obj.event === 'detail') {
+        if (typeof $('#b' + data.hsCode).html() == 'undefined') {
+          var elements = "",
+            licensed = "";
+          $.ajax({
+            url: "/ucenter/code/common/hsElements/searchElement.shtml",
+            type: "get",
+            data: "hsCode=" + data.hsCode,
+            dataType: "json",
+            async: false,
+            success: function (d) {
+              elements = d.objects.elements;
+            }
+          });
+          $.ajax({
+            url: "/ucenter/code/common/hs/" + data.hsCode + ".shtml",
+            type: "get",
+            dataType: "json",
+            async: false,
+            success: function (d) {
+              licensed = d.objects.licensed;
+            }
+          });
+
+          var trAdd = '<tr id="b' + formatStr(data.hsCode) + '" class="add">' +
+            '<td colspan="20">' +
+            '<table style="width:100%;" class="layui-table">' +
+            '<tr><th colspan="4">商品详细信息</th></tr>' +
+            '<tr><td>商品编码：' + formatStr(data.hsCode) + '</td><td colspan="2">商品名称：' + formatStr(data.gname) + '</td><td>禁止/限制商品：' + (getType(data.type)) + '</td></tr>' +
+            '<tr><td>法定第一单位：' + formatStr(data.unit1) + '</td><td>法定第二单位：' + formatStr(data.unit2) + '</td><td>最惠国税率：' + formatStr(data.lowRate) + '</td><td>普通进口税率：' + formatStr(data.highRate) + '</td></tr>' +
+            '<tr><td>出口税率：' + formatStr(data.outRate) + '</td><td>消费税率：' + formatStr(data.regRate) + '</td><td colspan="2">增值税率：' + formatStr(data.taxRate) + '</td></tr>' +
+            '<tr><td colspan="4">海关监管条件：' + formatStr(licensed) + '</td></tr>' +
+            '<tr><td colspan="4" style="border-bottom: none;">申报要素：' + formatStr(elements) + '</td></tr>' +
+            '</table>' +
+            '</td>' +
+            '</tr>';
+          $(this).parent().parent().parent().after(trAdd);
+        } else {
+          $('#b' + data.hsCode).remove();
+        }
+      }
+    });
+  });
+</script>
+<script type="text/html" id="idTpl">
+    {{d.LAY_TABLE_INDEX+1}}
+  </script>
+<script type="text/html" id="typeTpl">
+    {{#  if(d.type == '1'){ }}
+      禁止类
+    {{#  } else if(d.type == '2'){ }}
+      限制类
+    {{#  } else { }}
+      
+    {{#  } }}
+  </script>
+
+<script type="text/html" id="codeTpl">
+    <a lay-event="detail" style="color:#f60;">{{ d.hsCode }}</a>
+  </script>
+
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>导入供应商 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+    </style>
+  </head>
+  <body>
+    <div>系统检查到，你已有以下进入平台且你还没把他们添加为你的供应商，详情如下：</div>
+    <table id="tableList" lay-filter="test" style="margin-top:10px"></table>
+    <div class="layui-form-item" style="margin:20px 0; text-align:center;">
+      <button class="layui-btn layui-btn-normal" id="vsubmit" lay-submit lay-filter="submit">是，立即导入</button>
+      <button class="layui-btn layui-btn-primary" id="cancelS">否，以后再导</button> 
+    </div>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['table', 'layer'], function(){
+    var table = layui.table,
+        layer = layui.layer,
+        $ = layui.jquery;
+        tmsTab = layui.tms_tab;
+
+    setTableData();
+
+    function setTableData(){
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/crm/supplier/supplier/searchImportList.shtml',
+        response: {
+          statusCode: 'SUCCESS',
+          dataName: 'objects'
+        },
+        cols: [[
+          {field:'coName', title: '公司名称', width:280, align: 'center'},
+          {field:'usc', title: '统一社会代码/身份证', width:220, align: 'center'},
+          {field:'regAddress', title: '所在地', width:350, align: 'center'}
+        ]],
+        id: 'dataReload',
+        page: false,
+        height: 'full-150',
+        even: true
+      });
+    }
+
+    var $layId = $('.layui-tab-title li.layui-this', window.parent.document).attr('lay-id');
+    $('#vsubmit').on('click', function(){
+      $.post('/ucenter/crm/supplier/supplier/insertImportList.shtml', function(d){
+        var $code = d.code,
+            $msg = d.msg,
+            $objects = d.objects;
+            
+        var promptMsg = '导入成功，返回供应商管理！';
+        if($code==='SUCCESS'){
+          parent.layer.alert(promptMsg, {
+            yes: function(index){
+              window.parent.layer.close(index);
+              window.parent['f1'].location.reload();
+              tmsTab.del($layId);
+            }
+          });
+        }else{
+          parent.layer.msg('导入失败！');
+        }               
+      })
+      return false;
+    });
+    $('#cancelS').on('click', function(){
+      tmsTab.del($layId);
+    });
+  });
+  </script>
+</html>

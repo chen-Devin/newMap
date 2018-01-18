@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>申请账单付款 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+    <style>
+        .layui-form-item {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane" autocomplete="off">
+            <h3 style="margin-bottom:10px;">请选择所要申请付款的账单</h3>
+            <div class="layui-row layui-col-space5">
+                <div class="layui-col-sm1" style="width:35%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">结算单位</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="targetName" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="layui-col-sm1" style="width:25%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">单位属性</label>
+                        <div class="layui-input-block">
+                            <select name="tagetType">
+                                <option value="" selected="selected">全部</option>
+                                <option value="1">供应商</option>
+                                <option value="2">员工</option>
+                                <option value="3">客户</option>
+                            </select>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="layui-col-sm1" style="width:35%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">账期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="billMonth" id="billMonth" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:30%;">
+                    <div class="layui-form-item">
+                        <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                        <button class="layui-btn layui-btn-primary" type="reset" style="margin-left:2px; line-height:36px;">重置</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar" style="text-align:center; margin:20px 0 30px;">
+        <button class="layui-btn layui-btn-normal" data-type="apply" style="min-width:130px;">立即申请</button>
+        <button class="layui-btn layui-btn-primary" data-type="cancel" style="min-width:130px;">取消</button>
+        <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+</body>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'laydate', 'table', 'tms_tab'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            laydate = layui.laydate,
+            tmsTab = layui.tms_tab,
+            $ = layui.jquery;
+
+        laydate.render({
+            elem: '#billMonth',
+            type: 'month'
+        });
+        setTableData({});
+
+        //监听提交
+        form.on('submit(search)', function(data) {
+            var $saveData = data.field;
+            setTableData($saveData);
+            return false;
+        });
+
+        //方法级渲染
+        function setTableData($searchData) {
+            var $pageSize = 15;
+
+            table.render({
+                elem: '#tableList',
+                url: '/ucenter/general/finance/handleBills/queryAsk.shtml',
+                method: 'post',
+                where: $searchData,
+                response: {
+                    statusCode: 'SUCCESS',
+                    countName: 'objects.total', //数据总数的字段名称，默认：count
+                    dataName: 'objects.list'
+                },
+                request: {
+                    pageName: 'pageNum', //页码的参数名称，默认：page
+                    limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                },
+                cols: [
+                    [{
+                        checkbox: true,
+                        fixed: true
+                    }, {
+                        field: 'targetName',
+                        title: '结算单位',
+                        width: 200
+                    }, {
+                        field: 'targetType',
+                        title: '单位属性',
+                        width: 100,
+                        align: 'center',
+                        templet: '#targetTypeTpl'
+                    }, {
+                        field: 'billNo',
+                        title: '账单号',
+                        width: 150,
+                        align: 'center'
+                    }, {
+                        field: 'billMonth',
+                        title: '月份',
+                        width: 100,
+                        align: 'center',
+                        templet: '#billMonthTpl'
+                    }, {
+                        field: 'orderCount',
+                        title: '运输单量',
+                        width: 90,
+                        align: 'center'
+                    }, {
+                        field: 'arkCount',
+                        title: '运输柜量',
+                        width: 90,
+                        align: 'center'
+                    }, {
+                        field: 'transportCost',
+                        title: '运费',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'extraCost',
+                        title: '异常费',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'totalCost',
+                        title: '合计',
+                        width: 120,
+                        align: 'center'
+                    }, {
+                        field: 'handleCost',
+                        title: '实应付金额',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'handledCost',
+                        title: '已付金额',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'unpaidAmount',
+                        title: '未付金额',
+                        width: 120,
+                        align: 'center'
+                    }]
+                ],
+                id: 'dataReload',
+                page: true,
+                limits: [15, 30, 50, 100],
+                limit: $pageSize,
+                height: 'full-200',
+                even: true
+            });
+        }
+
+        var active = {
+            //立即申请
+            apply: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '你还未选中账单');
+                } else if (data.length > 1) {
+                    setLayerAlert(parent.layer, '只能选择一条账单');
+                } else {
+                    $.ajax({
+                        type: "GET",
+                        url: "/ucenter/general/finance/askPrice/askPrice.shtml?billId=" + data[0].id,
+                        dataType: "json",
+                        contentType: "application/json",
+                        success: function(d) {
+                            var $code = d.code,
+                                $msg = d.msg,
+                                $objects = d.objects;
+
+                            if ($code === 'SUCCESS') {
+                                setLayerAlert(parent.layer, "申请成功", {
+                                    yes: function(index) {
+                                        parent.layer.close(index);
+                                        $(window.parent['f1'].document).find('.btn-search').click();
+                                        tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+                                    }
+                                });
+                            } else {
+                                setLayerAlert(parent.layer, '申请失败');
+                                return false;
+                            }
+                        }
+                    });
+                }
+            },
+            //取消
+            cancel: function() {
+                tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+            }
+        };
+
+        $('.btns-bar .layui-btn').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>
+<script type="text/html" id="targetTypeTpl">
+    {{setUnitAttr(d.targetType)}}
+</script>
+<script type="text/html" id="billMonthTpl">
+    {{new Date(d.billMonth).format("yyyy-MM")}}
+</script>
+
+</html>

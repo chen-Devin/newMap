@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>查找收入记录 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+       <!--start: 搜索-->
+       <div class="panel-handle search-bar">
+            <form class="layui-form layui-form-pane" autocomplete="off">
+                <div class="layui-row layui-col-space5">
+                <div class="layui-col-sm1" style="width:25%;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">收款日期</label>
+                            <div class="layui-input-block">
+                                <div class="layui-col-sm6">
+                                    <input type="text" name="beginDate" id="beginDate" placeholder="开始时间" class="layui-input">
+                                </div>
+                                <div class="layui-col-sm6">
+                                    <input type="text" name="endDate" id="endDate" placeholder="到期时间" class="layui-input">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">账户</label>
+                        <div class="layui-input-block">
+                            <select name="account" id="account">
+                                    <option value=""></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            <select name="state" id="state">
+                                <option value="" selected="selected">全部</option>
+                                <option value="0">待审核</option>
+                                <option value="1">审核通过</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div> 
+          <!--end: 搜索-->
+      <!--start:表格列表-->
+      <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+      <!--end:表格列表-->
+      <div class="layui-form-item" style="text-align:center;">
+        <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit" style="width:150px;">确定</button>
+        <button class="layui-btn layui-btn-normal btn-cancel" lay-submit style="width:150px;">取消</button>
+      </div>
+    </form>
+  </body>
+  <script type="text/html" id="statusTpl">
+    {{#  if(d.status == '1'){ }}
+      审核通过
+    {{#  } else if(d.status == '2'){ }}
+      已作废
+    {{#  } else if(d.status == '0'){ }}
+      待审核
+    {{#  } }}
+  </script>
+  <script type="text/html" id="tradeDateTpl">
+      {{new Date(d.tradeDate).format("yyyy-MM-dd")}}
+  </script>
+  <script type="text/html" id="createDateTpl">
+    {{new Date(d.createDate).format("yyyy-MM-dd")}}
+  </script>
+  <script type="text/html" id="accountNoTpl">
+      {{ (d.accountNo +'('+ d.accountName)+')'  }}
+  </script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+        laydate.render({
+          elem: '#beginDate'
+        });
+        laydate.render({
+          elem: '#endDate'
+        });
+
+    //加载账户下拉框数据
+    $.get('/ucenter/general/finance/settlementChannel/searchSettlementChannel.shtml', function(d){
+    var $code = d.code,
+        $msg = d.msg,
+        $objects = d.objects;
+
+    if($code != 'SUCCESS') return false;
+    
+    if($objects.length > 0){
+        for(var $i = 0; $i < $objects.length; $i++){
+          // if($objects[$i].accountName != null && $objects[$i].accountNo != null && $objects[$i].status == 1){
+              $('select[name="account"]').append('<option value="'+ $objects[$i].id +'">'+ $objects[$i].accountNo + '(' + $objects[$i].accountName +')</option>');
+          // }
+        }
+        form.render('select');
+    }
+    }, 'json');
+
+    setTableData();
+
+     //监听提交
+     form.on('submit(search)', function(data){
+     $beginDate = $.trim(data.field.beginDate),
+     $endDate = $.trim(data.field.endDate),
+     $account = $.trim(data.field.account),
+     $state = $.trim(data.field.state),
+      setTableData($beginDate, $endDate, $account, $state);
+      return false;
+    });
+
+    //方法级渲染
+    function setTableData($beginDate, $endDate, $account, $state){
+      var $pageSize = 15;
+      typeof $beginDate != 'undefined' ? $beginDate = $beginDate : $beginDate = '';
+      typeof $endDate != 'undefined' ? $endDate = $endDate : $endDate = '';
+      typeof $account != 'undefined' ? $account = $account : $account = '';
+      typeof $state != 'undefined' ? $state = $state : $state = '';
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/bankFlow/searchBankFlow.shtml?payType=1&startDate=' + $beginDate + '&endDate=' + $endDate + '&settlementChannelId=' + $account + '&status=' + $state,
+        // where: {ids:$data},
+        method: 'get', 
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'tradeDate', align: 'center', title: '收支日期', width:150, templet:'#tradeDateTpl'},
+          {field:'status', align: 'center', title: '状态', width:90, templet:'#statusTpl'},
+          {field:'accountNo', align: 'center', title: '账户', width:200, templet:'#accountNoTpl'},
+          {field:'received', align: 'center', title: '收入', width:100},
+          {field:'balance', align: 'center', title: '当前余额', width:100, },
+          {field:'described', align: 'center', title: '摘要', width:200},
+          {field:'carNo', align: 'center', title: '备注', width:200},
+          {field:'createDate', align: 'center', title: '创建时间', width:200, templet:'#createDateTpl'}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-160',
+        even: true,
+        done: function(res, curr, count){}
+      });
+    }
+
+    //监听提交
+    form.on('submit(submit)', function(data){
+      var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if (data.length == 0) {
+            parent.layer.alert('请选择需核销的数据！');
+        } else if (data.length > 1) {
+            parent.layer.alert('只能选择一条数据！');
+        } else {
+          sessionStorage.setItem("collectionRecordId", data[0].id);
+          parent.layer.close(parent.layer.index);
+        }
+      return false;
+    });
+
+    $(".btn-cancel").on("click",function(){
+        parent.layer.closeAll();
+        return false;
+    });
+  });
+  </script>
+</html>

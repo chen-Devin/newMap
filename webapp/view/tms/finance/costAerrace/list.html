@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>费用设置 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <style>
+    .layui-form-item{
+        margin:0;
+    }
+</style>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+      <form class="layui-form layui-form-pane" autocomplete="off">
+          <div class="layui-row layui-col-space5">
+            <div class="layui-col-sm1" style="width:17%;">
+                <div class="layui-form-item">
+                  <label class="layui-form-label">费用名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="costName"  autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm1" style="width:17%;">
+              <div class="layui-form-item">
+                <label class="layui-form-label">费用类型</label>
+                  <div class="layui-input-block">
+                    <select name="costType">
+                      <option value="" selected="selected">全部</option>
+                    </select>
+                  </div>
+              </div>
+            </div>
+            <div class="layui-col-sm1" style="width:17%;">
+              <div class="layui-form-item">
+                <label class="layui-form-label">业务类型</label>
+                  <div class="layui-input-block">
+                    <select name="businessType">
+                      <option value="" selected="selected">全部</option>
+                    </select>
+                  </div>
+              </div>
+            </div>
+            <div class="layui-col-sm1" style="width:17%;">
+              <div class="layui-form-item">
+                <label class="layui-form-label">作业类型</label>
+                  <div class="layui-input-block">
+                    <select name="activityType">
+                      <option value="" selected="selected">全部</option>
+                    </select>
+                  </div>
+              </div>
+            </div>
+            <div class="layui-col-sm1" style="width:17%;">
+              <div class="layui-form-item">
+                <label class="layui-form-label">状态</label>
+                  <div class="layui-input-block">
+                    <select name="status">
+                      <option value="" selected="selected">全部</option>
+                    </select>
+                  </div>
+              </div>
+            </div>
+            <div class="layui-col-sm1" style="width:10%;">
+              <div class="layui-form-item">
+                <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+              </div>
+            </div>
+          </div>
+      </form>
+    </div>
+    <!--end: 搜索-->
+  
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+
+  </body>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'tms_tab'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    setTableData();
+
+    
+    //监听提交
+    form.on('submit(search)', function(data){
+      var $costName = $.trim(data.field.costName),
+      $costType = $.trim(data.field.costType);
+      $businessType = $.trim(data.field.businessType);
+      $activityType = $.trim(data.field.activityType);
+      $status = $.trim(data.field.status);
+      setTableData($costName, $costType, $businessType, $activityType, $status);
+      return false;
+    });
+    
+    //方法级渲染
+    function setTableData($costName, $costType, $businessType, $activityType, $status){
+      typeof $costName != 'undefined' ? $costName = $costName : $costName = '';
+      typeof $costType != 'undefined' ? $costType = $costType : $costType = '';
+      typeof $businessType != 'undefined' ? $businessType = $businessType : $businessType = '';
+      typeof $activityType != 'undefined' ? $activityType = $activityType : $activityType = '';
+      typeof $status != 'undefined' ? $status = $status : $status = '';
+      var $pageSize = 15;
+
+      table.render({
+        elem: '#tableList',
+        url: '',
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {field:'id', title: '费用名称', width:100, align: 'center'},
+          {field:'name', title: '费用编码', width:100, align: 'center'},
+          {field:'platformName', title: '费用类型', width:100, align: 'center'},
+          {field:'remarks', title: '业务类型', width:100, align: 'center'},
+          {field:'roleUsers', title: '作业类型', width:100, align: 'center'},
+           {field:'name', title: '会计科目', width:150, align: 'center'},
+          {field:'platformName', title: '是否交税', width:100, align: 'center'},
+          {field:'remarks', title: '状态', width:100, align: 'center'},
+          {field:'roleUsers', title: '创建人', width:100, align: 'center'},
+          {align:'center', title: '创建时间', toolbar: '#toolBar', width:200}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-82',
+        even: true,
+        done: function(res, curr, count){}
+      });
+    }
+  });
+  </script>
+</html>

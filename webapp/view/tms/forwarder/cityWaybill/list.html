@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>城配运单 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+    <style>
+        .layui-form-item {
+            margin: 0;
+        }
+        
+        .layui-layer-tips .layui-layer-content {
+            padding: 0;
+        }
+        
+        .time-btns .layui-btn-group a {
+            line-height: 36px;
+            width: 33%;
+            padding: 0 5px;
+        }
+        
+        .search-more {
+            margin-top: 7.5px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane" autocomplete="off">
+            <div class="layui-row layui-col-space5">
+                <div class="layui-col-sm1" style="width:25%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">作业日期</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <input type="text" name="jobDateStart" id="jobDateStart" readonly placeholder="起始时间" class="layui-input" style="border-right:0; border-radius:0;">
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="jobDateEnd" id="jobDateEnd" readonly placeholder="截止时间" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item time-btns">
+                        <div class="layui-btn-group">
+                            <a class="layui-btn layui-btn-primary" data-id="today">今天</a>
+                            <a class="layui-btn layui-btn-primary" data-id="tomorrow">本月</a>
+                            <a class="layui-btn layui-btn-primary" data-id="yesterday">上月</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">客户名称</label>
+                        <div class="layui-input-block">
+                            <select name="customersName">
+                                <option value="" selected>请选择</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="width:100px;">供应商/车队</label>
+                        <div class="layui-input-block" style="margin-left:100px;">
+                            <select name="carCompanyShortName">
+                                <option value="" selected>请选择</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:25%;">
+                    <div class="layui-form-item">
+                        <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                        <button class="layui-btn search-more-btn" type="button" style="margin-left:2px;">高级查询<i class="layui-icon">&#xe625;</i></button>
+                        <button class="layui-btn layui-btn-primary" id="vreset" style="margin-left:2px; line-height:36px;">重置</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row layui-col-space5 search-more">
+                <div class="layui-col-sm1" style="width:25%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">排序</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6" style="margin-right:-1px;">
+                                <select name="orderByColumn">
+                                    <option value="job_date" selected>作业日期</option>
+                                    <option value="customer_name">客户</option>
+                                    <option value="car_company_shortname">供应商</option>
+                                    <option value="status">状态</option>
+                                </select>
+                            </div>
+                            <div class="layui-col-sm6">
+                                <select name="orderByRule">
+                                    <option value="ASC">升序</option>
+                                    <option value="DESC" selected>降序</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">拖车车牌</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="carNo" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">司机</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="driverName" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="width:100px;">状态</label>
+                        <div class="layui-input-block" style="margin-left:100px;">
+                            <select name="status">
+                                <option value="" selected>请选择</option>
+                                <option value="300">已接单</option>
+                                <option value="400">已派车</option>
+                                <option value="500">作业完成</option>
+                                <option value="510">已回单</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+        <div class="layui-btn-group fl">
+            <button class="layui-btn layui-btn-normal" data-type="addData">新增</button>
+            <button class="layui-btn layui-btn-normal" data-type="editData">编辑</button>
+            <button class="layui-btn layui-btn-normal" data-type="delData">删除</button>
+            <button class="layui-btn layui-btn-normal" data-type="submitData">提交</button>
+            <button class="layui-btn layui-btn-normal" data-type="copyData">复制</button>
+            <button class="layui-btn layui-btn-normal" data-type="receipt">回单</button>
+            <button class="layui-btn layui-btn-normal" data-type="receiptCancel">取消回单</button>
+            <button class="layui-btn layui-btn-normal" data-type="dispatchChange">改派</button>
+            <button class="layui-btn layui-btn-normal" data-type="waybillCashout">运单请款</button>
+            <button class="layui-btn layui-btn-normal" data-type="billCashout">账单请款</button>
+        </div>
+        <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="table-list"></table>
+    <!--end:表格列表-->
+
+    <script type="text/html" id="statusTpl">
+        {{setCityWaybillStatus(d.status)}}
+    </script>
+    <script type="text/html" id="jobDateTpl">
+        {{setTimeFormat(d.jobDate, 'MM-dd')}}
+    </script>
+    <script type="text/html" id="jobNoTpl">
+        <a lay-event="orderDetail" style="color:#1E9FFF; text-decoration:underline;">{{d.jobNo}}</a>
+    </script>
+    <script type="text/html" id="freightTpl">
+        {{setCost(d.freight)}}
+    </script>
+    <script type="text/html" id="customerNameTpl">
+        {{setCustomerNameFormat(d.customerName, '; ')}}
+    </script>
+    <script type="text/html" id="sendPriceTpl">
+        {{setCost(d.sendPrice)}}
+    </script>
+    <script type="text/html" id="prepaidFreightTpl">
+        {{setCost(d.prepaidFreight)}}
+    </script>
+    <script type="text/html" id="wrExCostTpl">
+        {{setExcepCost(d.wrExCost, 'wrExCost')}}
+    </script>
+    <script type="text/html" id="whExCostTpl">
+        {{setExcepCost(d.whExCost, 'whExCost')}}
+    </script>
+    <script type="text/html" id="wcExCostTpl">
+        {{setExcepCost(d.wcExCost, 'whExCost')}}
+    </script>
+    <script type="text/html" id="idTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+    <script type="text/html" id="loadAddressTpl">
+        {{setGoodsAddress(d.loadAddress)}}
+    </script>
+    <script type="text/html" id="unLoadAddressTpl">
+        {{setGoodsAddress(d.unLoadAddress)}}
+    </script>
+</body>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'table', 'tms_tab', 'laydate'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            laydate = layui.laydate,
+            tmsTab = layui.tms_tab,
+            $ = layui.jquery;
+
+        //搜索参数
+        var searchOptions = {};
+
+        //初始化日期时间
+        laydate.render({
+            elem: '#jobDateStart'
+        });
+        laydate.render({
+            elem: '#jobDateEnd'
+        });
+
+        //初始化日期值
+        setSearchJobData('jobDateStart', 'jobDateEnd');
+
+        //初始化客户下拉框
+        setCustomerList();
+
+        function setCustomerList() {
+            var customerList = getCustomerList();
+            if (customerList.length > 0) {
+                for (var i = 0; i < customerList.length; i++) {
+                    $('select[name="customersName"]').append('<option value="' + customerList[i].nameShort + '">' + customerList[i].nameShort + '</option>');
+                }
+                form.render('select');
+            }
+        }
+
+        //初始化供应商/车队下拉框
+        setSupplierList();
+
+        function setSupplierList() {
+            var supplierList = getSupplierList();
+            if (supplierList.length > 0) {
+                for (var i = 0; i < supplierList.length; i++) {
+                    if (supplierList[i].typeDcode == '550' || supplierList[i].typeDcode == '553') {
+                        $('select[name="carCompanyShortName"]').append('<option value="' + supplierList[i].nameShort + '">' + supplierList[i].nameShort + '</option>');
+                    }
+                }
+                form.render('select');
+            }
+        }
+
+        //初始化表格数据
+        searchOptions = {
+            jobDateStart: $('#jobDateStart').val() || '',
+            jobDateEnd: $('#jobDateEnd').val() || ''
+        }
+        setTableData(searchOptions);
+
+        //今天，本月，上月
+        $('.time-btns a').on('click', function() {
+            $('form input').val('');
+            //setSearchJobData('jobDateStart', 'jobDateEnd');
+
+            $('.time-btns a').removeClass('time-btn-sel');
+            $(this).addClass('time-btn-sel');
+            var $dataId = $(this).attr('data-id');
+            var $date = '';
+            var $d = {};
+            var dates = getMonthDate();
+            if ($dataId == 'today') {
+                $date = new Date().format('yyyy-MM-dd');
+                $d.todayDate = $date;
+                $('input[name="jobDateStart"], input[name="jobDateEnd"]').val($date);
+            }
+            //本月
+            else if ($dataId == 'tomorrow') {
+                var nowMonthDate = new Date();
+                nowMonthDate.setDate(1);
+                $date = nowMonthDate.format('yyyy-MM-dd');
+                $d.tomorrowDate = $date;
+                $('input[name="jobDateStart"]').val(dates.nowStartDate);
+                $('input[name="jobDateEnd"]').val(dates.nowEndDate);
+            }
+            //上月
+            else if ($dataId == 'yesterday') {
+                var lastMonthDate = new Date();
+                lastMonthDate.setDate(1);
+                lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
+                $date = lastMonthDate.format('yyyy-MM-dd');
+                $d.yesterdayDate = $date;
+                $('input[name="jobDateStart"]').val(dates.lastStartDate);
+                $('input[name="jobDateEnd"]').val(dates.lastEndDate);
+            }
+            $('select[name="orderByColumn"]').val('job_date');
+            $('select[name="orderByRule"]').val('DESC');
+            form.render('select');
+            searchOptions = $d;
+            return setTableData(searchOptions);
+        });
+
+        //监听重置
+        $('#vreset').on('click', function() {
+            $('form input, form select').val('');
+            $('.time-btns a').removeClass('time-btn-sel');
+            setSearchJobData('jobDateStart', 'jobDateEnd');
+            $('select[name="orderByColumn"]').val('job_date');
+            $('select[name="orderByRule"]').val('DESC');
+            form.render('select');
+            searchOptions = {
+                jobDateStart: $('#jobDateStart').val() || '',
+                jobDateEnd: $('#jobDateEnd').val() || ''
+            }
+            return setTableData(searchOptions);
+        });
+
+        //监听查询
+        form.on('submit(search)', function(data) {
+            $('.time-btns a').removeClass('time-btn-sel');
+
+            var v1 = data.field.jobDateStart,
+                v2 = data.field.jobDateEnd;
+            if (v1.length > 0 && v2.length == 0) {
+                layer.msg('请选择截止时间');
+                return false;
+            }
+            if (v1.length == 0 && v2.length > 0) {
+                layer.msg('请选择起始时间');
+                return false;
+            }
+            if (v1.length > 0 && v2.length > 0) {
+                v1 = new Date(v1);
+                v2 = new Date(v2);
+                if (v1 > v2) {
+                    layer.msg('截止时间要大于起始时间');
+                    return false;
+                }
+            }
+
+            searchOptions = data.field;
+            return setTableData(searchOptions);
+        });
+
+        window.refreshTableList = function() {
+            //return setTableData(searchOptions);
+            $('button[lay-filter="search"]').click();
+        }
+
+        //方法级渲染表格
+        function setTableData($searchData) {
+            var $pageSize = 15;
+
+            //表格高度
+            var $tableHeight = 'full-131';
+            if (!$('.search-more').is(':hidden')) {
+                $tableHeight = 'full-179';
+            }
+
+            table.render({
+                elem: '#tableList',
+                url: '/ucenter/tms/city/cityWaybill/page.shtml',
+                method: 'post',
+                where: $searchData,
+                response: {
+                    statusCode: 'SUCCESS',
+                    countName: 'objects.total',
+                    dataName: 'objects.list'
+                },
+                request: {
+                    pageName: 'pageNum',
+                    limitName: 'pageSize'
+                },
+                cols: [
+                    [{
+                        checkbox: true,
+                        fixed: true
+                    }, {
+                        field: 'id',
+                        title: '序号',
+                        width: 60,
+                        align: 'center',
+                        templet: '#idTpl'
+                    }, {
+                        field: 'status',
+                        title: '状态',
+                        width: 100,
+                        align: 'center',
+                        templet: '#statusTpl'
+                    }, {
+                        field: 'jobNo',
+                        title: '运单号码',
+                        width: 160,
+                        align: 'center',
+                        templet: '#jobNoTpl'
+                    }, {
+                        field: 'jobDate',
+                        title: '作业日期',
+                        width: 100,
+                        align: 'center',
+                        templet: '#jobDateTpl'
+                    }, {
+                        field: 'customerName',
+                        title: '客户名称',
+                        width: 130,
+                        align: 'left',
+                        templet: '#customerNameTpl'
+                    }, {
+                        field: 'loadAddress',
+                        title: '装货地点',
+                        width: 120,
+                        align: 'left',
+                        templet: '#loadAddressTpl'
+                    }, {
+                        field: 'unLoadAddress',
+                        title: '卸货地点',
+                        width: 120,
+                        align: 'left',
+                        templet: '#unLoadAddressTpl'
+                    }, {
+                        field: 'arkType',
+                        title: '箱型',
+                        width: 80,
+                        align: 'center'
+                    }, {
+                        field: 'freight',
+                        title: '应收运费',
+                        width: 100,
+                        align: 'center',
+                        templet: '#freightTpl'
+                    }, {
+                        field: 'wrExCost',
+                        title: '应收异常费用',
+                        width: 120,
+                        align: 'center',
+                        templet: '#wrExCostTpl'
+                    }, {
+                        field: 'sendPrice',
+                        title: '应付运费',
+                        width: 100,
+                        align: 'center',
+                        templet: '#sendPriceTpl'
+                    }, {
+                        field: 'prepaidFreight',
+                        title: '预付车费',
+                        width: 100,
+                        align: 'center',
+                        templet: '#prepaidFreightTpl'
+                    }, {
+                        field: 'whExCost',
+                        title: '应付异常费用',
+                        width: 120,
+                        align: 'center',
+                        templet: '#whExCostTpl'
+                    }, {
+                        field: 'wcExCost',
+                        title: '车辆成本',
+                        width: 100,
+                        align: 'center',
+                        templet: '#wcExCostTpl'
+                    }, {
+                        field: 'carCompanyShortname',
+                        title: '供应商/车队',
+                        width: 150,
+                        align: 'left'
+                    }, {
+                        field: 'carNo',
+                        title: '拖车车牌',
+                        width: 130,
+                        align: 'center'
+                    }, {
+                        field: 'carframeNo',
+                        title: '车架车牌',
+                        width: 130,
+                        align: 'center'
+                    }, {
+                        field: 'driverName',
+                        title: '司机',
+                        width: 90,
+                        align: 'center'
+                    }, {
+                        field: 'driverMobile',
+                        title: '司机手机',
+                        width: 130,
+                        align: 'center'
+                    }, {
+                        field: 'creator',
+                        title: '调度人员',
+                        width: 120,
+                        align: 'center'
+                    }]
+                ],
+                id: 'dataReload',
+                page: true,
+                limits: [15, 30, 50, 100],
+                limit: $pageSize,
+                height: $tableHeight,
+                even: true
+            });
+
+            //添加快捷搜索
+            //var $shortBarHtml = $('#shortBar').html();
+            //$('.layui-table-tool').prepend('<div class="short-bar">' + $shortBarHtml + '</div>');
+            return false;
+        }
+
+        var active = {
+            //新增
+            addData: function() {
+                tmsTab.add($(this), '新增城配运单', 'modify.html?do=add');
+            },
+            //编辑
+            editData: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '请选择运单');
+                } else if (data.length > 1) {
+                    setLayerAlert(parent.layer, '只能选择一条运单');
+                } else {
+                    if (data[0].status > 300) {
+                        setLayerAlert(parent.layer, '只有已接单状态的运单才能编辑');
+                    } else {
+                        tmsTab.add($(this), '编辑运单（' + data[0].jobNo + '）', 'modify.html?do=edit&id=' + data[0].id);
+                    }
+                }
+            },
+            //删除
+            delData: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '请选择运单');
+                } else {
+                    var wbIds = [],
+                        unusableWbIds = [];
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].status == 300) {
+                            wbIds.push(data[i].id);
+                        } else {
+                            unusableWbIds.push(data[i].id);
+                        }
+                    }
+
+                    if (wbIds.length == 0) {
+                        setLayerAlert(parent.layer, '只有已接单状态的运单才能删除');
+                        return false;
+                    }
+                    if (unusableWbIds.length > 0) {
+                        delData('已接单状态的运单将被删除，非接单状态的运单将跳过，你确认要继续删除当前运单吗？', wbIds);
+                    } else {
+                        delData('你确认要删除当前运单吗？', wbIds);
+                    }
+                }
+                //调用删除接口
+                function delData(txt, ids) {
+                    setLayerConfirm(parent.layer, txt, function(index) {
+                        var saveData = {
+                            ids: ids
+                        };
+                        $.ajax({
+                            type: 'POST',
+                            url: '/ucenter/tms/city/cityWaybill/deleteBatch.shtml',
+                            dataType: "json",
+                            contentType: "application/json",
+                            data: JSON.stringify(saveData),
+                            success: function(d) {
+                                var $code = d.code,
+                                    $msg = d.msg,
+                                    $objects = d.objects;
+
+                                if ($code === 'SUCCESS') {
+                                    window.refreshTableList();
+                                    // return setTableData(searchOptions);
+                                    // window.location.reload();
+                                } else if ($code === 'WARNING_ORDER_PAIDANDELETE') {
+                                    setLayerAlert(parent.layer, $msg);
+                                } else {
+                                    setLayerAlert(parent.layer, '删除失败');
+                                }
+                            }
+                        });
+                        parent.layer.close(index);
+                        return false;
+                    });
+                }
+            },
+            //提交
+            submitData: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '请选择运单');
+                } else {
+                    var wbIds = [],
+                        unusableWbIds = [],
+                        isEmptyIds = [];
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].status == 300) {
+                            wbIds.push(data[i].id);
+                            //检查司机、手机号码、拖车车牌是否为空
+                            if (!data[i].carNo) {
+                                isEmptyIds.push(data[i].jobNo);
+                            }
+                        } else {
+                            unusableWbIds.push(data[i].id);
+                        }
+                    }
+
+                    if (wbIds.length == 0) {
+                        setLayerAlert(parent.layer, '只有已接单状态的运单才能提交');
+                        return false;
+                    }
+                    if (isEmptyIds.length > 0) {
+                        setLayerAlert(parent.layer, isEmptyIds.join('，') + ' 的运单中拖车车牌不能为空');
+                        return false;
+                    }
+                    if (unusableWbIds.length > 0) {
+                        submitData('已接单状态的运单将被提交，非接单状态的运单将跳过，你确认要继续提交当前运单吗？', wbIds);
+                    } else {
+                        submitData('你确认要提交当前运单吗？', wbIds);
+                    }
+                }
+                //调用提交接口
+                function submitData(txt, ids) {
+                    setLayerConfirm(parent.layer, txt, function(index) {
+                        parent.layer.close(index);
+                        var saveData = {
+                            ids: ids
+                        };
+                        $.ajax({
+                            type: 'POST',
+                            url: '/ucenter/tms/city/cityWaybill/submitJob.shtml',
+                            dataType: "json",
+                            contentType: "application/json",
+                            data: JSON.stringify(saveData),
+                            success: function(d) {
+                                var $code = d.code,
+                                    $msg = d.msg,
+                                    $objects = d.objects;
+
+                                if ($code === 'SUCCESS') {
+                                    window.refreshTableList();
+                                    // return setTableData(searchOptions);
+                                    // window.location.reload();
+                                } else if ($code === 'WARNING_DRIVER_NOTEXIST') {
+                                    setLayerAlert(parent.layer, $msg);
+                                } else {
+                                    setLayerAlert(parent.layer, '提交失败');
+                                }
+                            }
+                        });
+                        return false;
+                    });
+                }
+            },
+            //复制
+            copyData: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '请选择运单');
+                } else if (data.length > 1) {
+                    setLayerAlert(parent.layer, '只能选择一条运单');
+                } else {
+                    //调用复制接口
+                    $.ajax({
+                        type: 'GET',
+                        url: '/ucenter/tms/city/cityWaybill/copyWaybill.shtml',
+                        dataType: "json",
+                        contentType: "application/json",
+                        data: {
+                            id: data[0].id
+                        },
+                        success: function(d) {
+                            var $code = d.code,
+                                $msg = d.msg,
+                                $objects = d.objects;
+
+                            if ($code === 'SUCCESS') {
+                                window.refreshTableList();
+                                // return setTableData(searchOptions);
+                                // window.location.reload();
+                            } else {
+                                setLayerAlert(parent.layer, '复制失败');
+                            }
+                        }
+                    });
+                    return false;
+                }
+            },
+            //回单
+            receipt: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '请选择运单');
+                } else if (data.length > 1) {
+                    setLayerAlert(parent.layer, '只能选择一条运单');
+                } else {
+                    if (data[0].status != 400 && data[0].status != 500) {
+                        setLayerAlert(parent.layer, '只有已派车或作业完成状态的运单才能回单');
+                    } else {
+                        parent.layer.open({
+                            type: 2,
+                            title: '回单（' + data[0].jobNo + '）',
+                            shadeClose: true,
+                            shade: 0.8,
+                            area: ['90%', '90%'],
+                            content: 'receipt.html?id=' + data[0].id
+                        });
+                    }
+                }
+            },
+            //取消回单
+            receiptCancel: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '请选择运单');
+                } else if (data.length > 1) {
+                    setLayerAlert(parent.layer, '只能选择一条运单');
+                } else {
+                    if (data[0].status != 510) {
+                        setLayerAlert(parent.layer, '只有已回单状态的运单才能取消回单');
+                    } else {
+                        //调用取消回单接口
+                        setLayerConfirm(parent.layer, '你确认要取消回单吗？', function(index) {
+                            $.ajax({
+                                type: 'GET',
+                                url: '/ucenter/tms/city/cityWaybill/cancelReceipt.shtml',
+                                dataType: "json",
+                                contentType: "application/json",
+                                data: {
+                                    id: data[0].id
+                                },
+                                success: function(d) {
+                                    var $code = d.code,
+                                        $msg = d.msg,
+                                        $objects = d.objects;
+
+                                    if ($code === 'SUCCESS') {
+                                        window.refreshTableList();
+                                        // return setTableData(searchOptions);
+                                        // window.location.reload();
+                                    } else if ($code === 'ERROR_FINANCE_CITYWAY_NOTEXIST') {
+                                        setLayerAlert(parent.layer, $msg);
+                                    } else if ($code === 'ERROR_FINANCE_ERROR_PASS') {
+                                        setLayerAlert(parent.layer, $msg);
+                                    } else {
+                                        setLayerAlert(parent.layer, '取消回单失败');
+                                    }
+                                }
+                            });
+                            parent.layer.close(index);
+                            return false;
+                        });
+                    }
+                }
+            },
+            //改派
+            dispatchChange: function(data) {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '请选择运单');
+                } else if (data.length > 1) {
+                    setLayerAlert(parent.layer, '只能选择一条运单');
+                } else {
+                    if (data[0].status <= 300 || data[0].status >= 510) {
+                        setLayerAlert(parent.layer, '只有已派车至已回单前状态的运单才改派');
+                        return false;
+                    }
+                    parent.layer.open({
+                        type: 2,
+                        title: '改派（' + data[0].jobNo + '）',
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['700px', '460px'],
+                        content: 'dispatchChange.html?id=' + data[0].id
+                    });
+                }
+            },
+            //运单请款
+            waybillCashout: function(data) {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '请选择运单');
+                } else {
+                    var wbIds = [],
+                        unusableWbIds = [];
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].copeCostStatus == 4) {
+                            wbIds.push(data[i].id);
+                        } else {
+                            unusableWbIds.push(data[i].id);
+                        }
+                    }
+
+                    if (wbIds.length == 0) {
+                        setLayerAlert(parent.layer, '只有应付费用已确认的运单才能请款');
+                        return false;
+                    }
+                    if (unusableWbIds.length > 0) {
+                        submitData('应付费用已确认的运单将被请款，非确认的运单将跳过，你确认要继续请款吗？', wbIds);
+                    } else {
+                        submitData('你确认要请款吗？', wbIds);
+                    }
+                }
+                //调用运单请款接口
+                function submitData(txt, ids) {
+                    setLayerConfirm(parent.layer, txt, function(index) {
+                        var saveData = {
+                            ids: ids
+                        };
+                        $.ajax({
+                            type: 'POST',
+                            url: '/ucenter/tms/city/cityWaybill/forPay.shtml',
+                            dataType: "json",
+                            contentType: "application/json",
+                            data: JSON.stringify(saveData),
+                            success: function(d) {
+                                var $code = d.code,
+                                    $msg = d.msg,
+                                    $objects = d.objects;
+
+                                if ($code === 'SUCCESS') {
+                                    window.refreshTableList();
+                                    // return setTableData(searchOptions);
+                                    // window.location.reload();
+                                } else if ($code === 'ERROR_FIINANCE_DATAEMPTY') {
+                                    setLayerAlert(parent.layer, $msg);
+                                } else {
+                                    setLayerAlert(parent.layer, '请款失败');
+                                }
+                            }
+                        });
+                        parent.layer.close(index);
+                        return false;
+                    });
+                }
+            },
+            //账单请款
+            billCashout: function(data) {
+                tmsTab.add($(this), '申请账单付款', '../../../../view/tms/finance/payrollRequisition/apply.html');
+            }
+        };
+
+        $('.btns-bar .layui-btn').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //监听单元格
+        table.on('tool(table-list)', function(obj) {
+            var data = obj.data;
+            //应收异常费用
+            if (obj.event === 'wrExCost') {
+                setReceiptDetail(data.id, data.jobNo);
+                // setExCost('/ucenter/tms/city/cityWaybill/searchExDetail.shtml', data.id, data.wrExCost, 'receive', this, 3);
+            }
+            //应付异常费用
+            else if (obj.event === 'whExCost') {
+                setReceiptDetail(data.id, data.jobNo);
+                // setExCost('/ucenter/tms/city/cityWaybill/searchExDetail.shtml', data.id, data.whExCost, '', this, 3);
+            }
+            //查看运单详情
+            else if (obj.event === 'orderDetail') {
+                tmsTab.add($(this), '查看运单详情（' + data.jobNo + '）', 'modify.html?do=detail&id=' + data.id);
+            }
+        });
+
+        //查看回单
+        function setReceiptDetail(id, jobNo) {
+            parent.layer.open({
+                type: 2,
+                title: '查看回单详情（' + jobNo + '）',
+                shadeClose: true,
+                shade: 0.8,
+                area: ['90%', '90%'],
+                content: 'receiptDetail.html?id=' + id
+            });
+        }
+
+        //异常费用明细，url：接口路径，elem：当前元素，exCost：异常费用，wbId：当前运单ID，tipType：tip弹出类型（1上2右3下4左），eyType（应收、应付）
+        function setExCost(url, wbId, exCost, exType, elem, tipType) {
+            $.get(url, {
+                waybillId: wbId,
+                exType: exType
+            }, function(d) {
+                var $code = d.code,
+                    $msg = d.msg,
+                    $objects = d.objects;
+
+                if ($code === 'SUCCESS') {
+                    if ($objects == null) return false;
+                    var $trHtml = '',
+                        $crList = $objects.crList,
+                        $trRows = $crList.length,
+                        $costRemark = $objects.costRemark,
+                        $costReason = $objects.costObjection;
+
+                    if ($trRows > 0) {
+                        for (var $i = 0; $i < $trRows; $i++) {
+                            if ($i == 0) {
+                                $trHtml += '<tr><td rowspan="' + $trRows + '" align="center">运输异常费用</td><td align="center">' + $crList[$i].costName + '</td><td>' + $crList[$i].costAmount + '</td></tr>';
+                            } else {
+                                $trHtml += '<tr><td align="center">' + $crList[$i].costName + '</td><td>' + $crList[$i].costAmount + '</td></tr>';
+                            }
+                        }
+
+                        var $html = '<style>' +
+                            '.cost-table {border-collapse:collapse; color:#000; margin:7px 0; width:100%;}' +
+                            '.cost-table th, .cost-table td {border:#a0d6fe 1px solid; padding:5px; background:#fff;}' +
+                            '</style>' +
+                            '<table class="cost-table">' +
+                            '<colgroup><col width="35%"><col width="25%"><col width="40%"></colgroup>' +
+                            '<thead><tr><th colspan="3">异常费用明细</th></tr></thead><tbody>' + $trHtml +
+                            '<tr><td colspan="2" align="center">异常费用合计</td><td>' + exCost + '</td></tr>';
+                        if ($costRemark != null) {
+                            $html += '<tr><th colspan="3">费用备注</th></tr>' +
+                                '<tr><td colspan="3">' + $costRemark + '</td></tr>';
+                        }
+                        if ($costReason != null) {
+                            $html += '<tr><th colspan="3">异议原因</th></tr>' +
+                                '<tr><td colspan="3">' + $costReason + '</td></tr>';
+                        }
+                        $html += '</tbody></table>';
+
+                        layer.tips($html, elem, {
+                            tips: [tipType, '#bce1fd'],
+                            time: 1000 * 60,
+                            shadeClose: true,
+                            shade: 0.01,
+                            area: '300px'
+                        });
+                    }
+                }
+                return false;
+            }, 'JSON');
+        }
+
+        //点击高级搜索
+        clickSearchMore($('.search-more-btn'), $('.search-more'), 'dataReload', 'full-179', 'full-131', table);
+    });
+</script>
+
+</html>

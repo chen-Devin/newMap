@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>添加报关行</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+</head>
+
+<body>
+    <form class="layui-form" autocomplete="off" style="min-width:800px;">
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">报关行名字：</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="coName" class="layui-input" maxlength="255" lay-verify="required" hc-verify="companyRegex|companySize" hc-verify_field="报关行名字">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">报关员姓名：</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="uname" class="layui-input" maxlength="20" lay-verify="required" hc-verify="userName|nameSize" hc-verify_field="报关员姓名">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">报关员手机号码：</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="tel" class="layui-input" maxlength="20" lay-verify="required" hc-verify="mobile">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">是否默认：</label>
+                        <div class="layui-input-block">
+                            <input type="checkbox" name="hasDefault" lay-skin="switch" lay-text="是|否">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm12">
+                    <div class="layui-form-item layui-form-item--require" id="juryDistrict">
+                        <label class="layui-form-label">详细地址：</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="juryProvince" lay-filter="juryProvince">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="juryCity" lay-filter="juryCity">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="juryCounty" lay-filter="juryCounty">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div>
+                                    <select name="juryStreet" lay-filter="juryStreet">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm12">
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <input type="hidden" name="areaId">
+                            <input type="text" name="address" placeholder="详细地址" class="layui-input" maxlength="255" lay-verify="required">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block" id="inputEdit">
+                    <input type="checkbox" name="conAdd" value="1" title="保存后继续新增" lay-skin="primary">
+                    <input type="button" class="layui-btn layui-btn-radius layui-btn-normal hold" id="vsubmit" lay-submit lay-filter="submit" style="display:none;" value="保存">
+                    <input type="button" class="layui-btn layui-btn-radius layui-btn-normal" style="display:none;" value="取消">
+                </div>
+            </div>
+
+        </div>
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/layui.district_1.js?v=1.0"></script>
+<!-- 工具库依赖 -->
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery;
+
+        var datas,
+            $type = $.trim(getUrlParam('do')),
+            $id = $.trim(getUrlParam('id')),
+            $idD = $.trim(getUrlParam('idD')),
+            $addressId = $.trim(getUrlParam('addressId')),
+            $whether = $.trim(getUrlParam('whether')),
+            $onlyId = $.trim(getUrlParam('onlyId')),
+            $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+
+        if ($type == 'add') $('#juryDistrict').district(form);
+
+        //监听提交
+        if ($type == 'edit' || $type == 'add') {
+            form.on('submit(submit)', function(data) {
+                if (!bizUtil.validator.verifyContainer($('form'))) {
+                    return false;
+                }
+
+                var $index1 = $('#juryDistrict select').not(':disabled').length - 1,
+                    $indexVal1 = $('#juryDistrict select').eq($index1).val();
+                $('input[name="areaId"]').val($indexVal1);
+                if ($('input[name="areaId"]').val().length == 0) {
+                    parent.layer.msg('请选择城市');
+                    return false;
+                }
+
+                var $areaId = $('input[name="areaId"]').val().length > 0 ? parseInt($.trim($('input[name="areaId"]').val())) : '';
+                var $hasDefault = data.field.hasDefault != undefined ? 1 : 0;
+                var $saveDataHD = {
+                    address: $.trim(data.field.address),
+                    areaId: $areaId,
+                    coName: $.trim(data.field.coName),
+                    hasDefault: $hasDefault,
+                    tel: $.trim(data.field.tel),
+                    uname: $.trim(data.field.uname),
+                    status: 3,
+                    conAdd: parseInt($.trim(data.field.conAdd)),
+                    id: $idD
+                };
+                if ($type == 'edit') {
+                    $saveDataHD.$id = parseInt($id);
+                }
+                // data.field
+                var datas = JSON.stringify($saveDataHD);
+                console.log(datas);
+                $(window.parent['f' + $layId].document).find('.tableCB').attr('data-func', 'callbackCB(' + datas + ')');
+                if ($saveDataHD.id != '') {
+                    window.parent.frames['f' + $layId].ccc()
+                }
+                if ($saveDataHD.conAdd == 1) {
+                    $id++;
+                    $('form.layui-form')[0].reset();
+                    return false;
+                }
+            });
+        }
+
+        if ($onlyId == 'aa' && $type == 'edit') {
+            //console.log($whether);
+            $('#inputEdit').hide()
+                //$whether != 'null' ? $whether = $whether : $whether = 0;
+            $addressId != null ? $('input[name="areaId"]').val($addressId) : '';
+            $addressId != null ? $('#juryDistrict').district(form, $addressId) : $('#juryDistrict').district(form);
+            areaId = $('input[name="address"]').val();
+            $('input[name="hasDefault"]').prop('checked',
+                $whether != 'null' && $whether == 1 ? true : false
+            );
+            form.render();
+        }
+
+        //  
+        if ($type == 'edit' && $idD != '') {
+            $('#inputEdit').hide();
+            $.get('/ucenter/crm/customers/customersBroker/' + $idD + '.shtml', function(d) {
+                var $code = d.code,
+                    $msg = d.msg,
+                    $objects = d.objects;
+
+                if ($code === 'SUCCESS') {
+                    $('input[name=coName]').val($objects.coName);
+                    $('input[name=uname]').val($objects.uname);
+                    $('input[name=tel]').val($objects.tel);
+                    $('input[name="hasDefault"]').prop('checked',
+                        $objects.hasDefault != null && $objects.hasDefault == 1 ? true : false
+                    );
+                    $objects.areaId != null ? $('input[name="areaId"]').val($objects.areaId) : '';
+                    $objects.areaId != null ? $('#juryDistrict').district(form, $objects.areaId) : $('#juryDistrict').district(form);
+                    $('input[name=address]').val($objects.address);
+                    form.render();
+                }
+            })
+        };
+    });
+</script>
+
+</html>

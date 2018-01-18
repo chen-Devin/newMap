@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>控制台 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/index.css?v=1219">
+  </head>
+  <body>
+    <div id="public-frame"></div>
+    <!--start:右边内容区-->
+    <div class="sys-righter">
+      <div class="layui-tab" lay-filter="card" lay-allowclose="true">
+        <ul class="layui-tab-title">
+          <li class="layui-this" lay-id="1">
+            <span id="defaultTabTitleName">控制台</span>
+          </li>
+        </ul>
+        <div class="layui-tab-content">
+          <div class="layui-tab-item layui-show">
+            <iframe id="contentFrame" name="f1" src="/view/tms/dashboard/list.html" frameborder="0"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--end:右边内容区-->
+  </body>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+  <script>
+    var INTEGRATION_FRAME_VERSION = '0.1';
+
+    // 因为 publicFrame.html 中引用的 jquery是异步加载的，所以执行到下面代码时还不能使用jquery，需要“借用”layui的jquery模块
+    layui.use(['jquery', 'layer'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+
+        var $_contentFrame = $('#contentFrame');
+        var $_defaultTabTitleName = $('#defaultTabTitleName');
+
+        var targetPageUrlMap = {
+            '/view/tms/system/user/index.html': '/view/tms/system/user/modify.html',
+            '/view/tms/map/index.html': '/view/tms/map/modify.html',
+            '/view/index.html': '/view/tms/dashboard/list.html'
+        };
+
+        function clickSecondLevelMenu(target, url){
+             // 没有 href 的链接，暂不处理
+             if (!url) {
+                return;
+            }
+            
+            // 默认加载 列表页，需要将 index.html 替换为 list.html（暂不兼容 查询字符串中带有 .html 的情况）
+            var targetPageUrl = targetPageUrlMap[url] || url.replace(/(.*\/)(.*?)(\.html)(.*)/, function (match, $1, $2, $3, $4) {
+
+                // 如果页面地址不是 index.html或list.html 结尾，则需要给原来的页面名加上“List”（根据 /view/data/navList.json 文件的规则）
+                var pageUrlMap = {
+                    index: 'list',
+                    list: 'list'
+                };
+                var pageName = (pageUrlMap[$2]) ? pageUrlMap[$2] : ($2 + 'List');
+
+                return $1 + pageName + $3 + $4;
+            });
+            // 加载对应的 iframe
+            $_contentFrame.attr('src', targetPageUrl);
+            // 菜单高亮：先移除原来的高亮元素
+            $(target).parents('.panel-nav').find('a').removeClass('active');
+            // 将本菜单高亮
+            $(target).addClass('active');
+
+            var pageTitle = $(target).text();
+            // 将页面标题 和 内容区的tab头标题 改为 链接内容
+            document.title = pageTitle + ' - TMS';
+            $_defaultTabTitleName.text(pageTitle);
+
+            // 关闭其它tab页面
+            delAllTab();
+
+        }
+        //点击一级菜单  默认加载第一个
+        $('#public-frame').on('click', '.sys-middler .panel-left ul li', function(){
+            $.each($('.panel-nav dl'), function (i, d) {              
+                if($(this).css('display') == 'block'){
+                    var firstA = $(this).find('dt a').eq(0);
+                    clickSecondLevelMenu(firstA, $(firstA).attr('href'));
+                }                      
+            });
+        });
+
+        // 绑定 菜单按钮事件
+        $('#public-frame').on('click', '.panel-nav dl dt a, .sys-toper .panel-right a', function () {
+            var $_menuLink = $(this);
+            var menuLink = $_menuLink.attr('href');
+            clickSecondLevelMenu($_menuLink, menuLink);
+
+            return false;
+        });
+
+        // 重写 layer.open 方法，以支持 在iframe中调用时 可以使用 iframe 的相对路径
+        var layuiLayerOpen = layer.open;
+        layer.open = (function () {
+            // 获取当前（显示的）iframe的 src
+            var getCurrentIframeSrc = function () {
+                var iframeName = 'f' + $('.layui-this').attr('lay-id');
+
+                return $('iframe[name=' + iframeName + ']').attr('src');
+            };
+
+            // 处理 options 中的URL，如果需要处理，则可能会修改 options 内容
+            var processOptions = function (options) {
+                var newOptions = $.extend({}, options);
+
+                // 只处理 iframe层，别的类型不处理
+                if (newOptions.type != 2) {
+                    return;
+                }
+
+                var content = newOptions.content;
+                // 只处理 content 为 字符串或数组的情况（DOM对象 或 jQuery对象不处理）
+                if ((typeof content !== 'string') && (!$.isArray(content))) {
+                    return;
+                }
+
+                // content 有可能为数组（此时为数组的第一个元素）
+                var contentUrl = $.isArray(content) ? content[0] : content;
+
+                // 忽略绝对地址
+                if ((contentUrl.indexOf('/') === 0) || (contentUrl.indexOf('//') === 0) || (contentUrl.indexOf('http') === 0)) {
+                    return;
+                }
+
+                // 目标url（当前iframe url 不含页面的路径 + 原来的content值 替换掉开头的 “./” 之后的部分）
+                var targetUrl = getCurrentIframeSrc().replace(/(.*\/)(.*?\.html).*/, '$1') + contentUrl.replace(/^\.\//, '');
+
+                // 更新 content
+                if ($.isArray(content)) {
+                    newOptions.content[0] = targetUrl;
+                }
+                else {
+                    newOptions.content = targetUrl;
+                }
+
+                return newOptions;
+            };
+
+            return function (options) {
+                // 调用原来的 layer.open 方法，再将处理后的 options 参数传下去
+                layuiLayerOpen.call(layer, processOptions(options) || options);
+            };
+        })();
+    });
+  </script>
+</html>

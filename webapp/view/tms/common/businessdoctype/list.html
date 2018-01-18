@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>业务单证类型 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <body>
+    <!--start:表格列表-->
+    <table class="layui-hide" id="table_list"></table>
+    <!--end:表格列表-->
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/tms_common/utils.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table'], function(){
+    var $form = layui.form,
+        $layer = layui.layer,
+        $table = layui.table,
+        $ = layui.jquery;
+
+    var options = {
+      "tableOptions": {
+        cols: [[
+          {field:'sysId', title: '系统代码', width:100},
+          {field:'sysNo', title: '系统名', width:200},
+          {field:'docCode', title: '单证代码', width:200},
+          {field:'docName', title: '单证名', width:200},
+          {field:'prefix', title: '前缀', width:200},
+          {field:'timeFormat', title: '时间格式', width:200},
+          {field:'docNoLength', title: '编码长度', width:200},
+          {field:'status', title: '状态', width:120, templet:"#statusTpl"}
+        ]],
+        url: '/common/codeRule/page.shtml',
+        page: false
+      }   
+    }
+
+    tmsCommonTable.init(options, $table);
+  });
+  </script>
+  <script type="text/html" id="statusTpl">
+    {{#  if(d.status == '1'){ }}
+      启用
+    {{#  } else { }}
+      停用
+    {{#  } }}
+  </script>
+</html>

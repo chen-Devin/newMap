@@ -1,0 +1,534 @@
+<!-- 运单编辑页面 元素模版 -->
+
+
+<!-- 运单内容模版 -->
+<script id="waybillTemplate" type="text/html">
+    <!-- 主要信息 -->
+    <fieldset class="layui-elem-field" id="mainInfoContainer">
+        <!-- 运单id -->
+        <input type="hidden" name="waybillId" hc-field_type="number">
+
+        <legend>主要信息</legend>
+        <div class="layui-field-box layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">运单编号</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm8 padding-r-10">
+                                <input type="text" name="jobNo" disabled="disabled" placeholder="" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-col-sm4">
+                                <input type="text" name="statusText" disabled="disabled" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">制单时间</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="dvoucherDate" disabled="disabled" hc-field_type="timestamp" placeholder="" autocomplete="off" class="layui-input date-time" lay-verify="required" data-time_format="yyyy-MM-dd HH:mm:ss" data-time_value="now">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <!-- {{# '##注释##   isShipper用来区分角色类型： true 表示货主货代   false 表示拖车行' }} -->
+                    {{#  if (d.isShipper) {  }}
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">承运人</label>
+                        <div class="layui-input-block layui-form" lay-filter="supplierContainer">
+                            <!-- 用于保存 carrier 供应商名称 -->
+                            <input type="hidden" name="carrier">
+                            <select name="carrierId" hc-field_type="number" id="supplierList" lay-search lay-filter="supplier" hc-data_url="/ucenter/crm/supplier/supplier/searchOrderSupplier.shtml" hc-data_id_field="id" hc-data_text_field="nameShort">
+                                <option value="" selected>请选择</option>
+                                <option value="..." disabled>数据加载中...</option>
+                            </select>
+                        </div>
+                    </div>
+                    {{#  } else {  }}
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">委托人</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="customerName" disabled="disabled" hc-field_type="ignoreGetter" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    {{#  }  }}
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-row layui-col-space10">
+                        <div class="layui-col-sm8 layui-col-lg9">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">报关方式</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="brokenStyleText" disabled="disabled" hc-field_type="ignoreGetter" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-sm4 layui-col-lg3">
+                            <!-- 加 overflow 是为了 hidden掉 layui-input-inline 的长度（否则会出现横向滚动条）。但是加上 overflow 之后，部分文本也会被hidden掉，所以就要设置 min-width -->
+                            <div class="layui-form-item overflow" style="min-width: 100px;">
+                                <div class="layui-input-inline nowrap layui-form" lay-filter="driverBookContainer" style="max-width: 120px;">
+                                    <!-- 父容器要加最大宽度限制，可以避免提示框偏离到太右边 -->
+                                    <input type="checkbox" id="withDriverBookCheckbox" name="hasChauffeur" disabled="disabled" title="携带司机本" lay-skin="primary" lay-filter="driverBook">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">急单类型</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="singleTypeText" disabled="disabled" hc-field_type="ignoreGetter" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-row layui-col-space10">
+                        <div class="layui-col-sm8 layui-col-lg9">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">货物类型</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="goodsTypeText" disabled="disabled" hc-field_type="ignoreGetter" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-sm4 layui-col-lg3">
+                            <div class="layui-form-item overflow">
+                                <div class="layui-input-inline nowrap">
+                                    <input type="checkbox" id="requireWeighingCheckbox" name="hasRequireWeighing" disabled="disabled" title="需要过磅" lay-skin="primary">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 船务信息 -->
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">S/O No</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="bkNo" placeholder="" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">船公司</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6 padding-r-10 layui-form" lay-filter="shippingContainer">
+                                <!-- 需要一个隐藏域来保存 船公司code（主要因为 option的value被用来存放船名） -->
+                                <input type="hidden" name="shippingCompCode">
+                                <!-- 给这个select一个name是为了复制船务信息时，可以自动选定复制的值 -->
+                                <select name="shippingCompShortname" hc-field_type="ignoreGetter" class="shipping-comp-code" id="shipping" lay-search lay-filter="shipping" hc-data_url="/ucenter/code/common/shipping/search.shtml" hc-data_id_field="shippingName" hc-data_text_field="shippingCode">
+                                    <option value="" selected>请选择</option>
+                                    <option value="..." disabled>数据加载中...</option>
+                                </select>
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="shippingCompShortname" id="shippingCompShortname" placeholder="船公司简称" autocomplete="off" class="layui-input" readonly="readonly">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">船名/航次</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6 padding-r-10">
+                                <input type="text" name="shipName" placeholder="英文船名" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="shipTime" placeholder="" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">目的港</label>
+                        <div class="layui-input-block layui-form" lay-filter="portListContainer">
+                            <!-- 用于保存 purposePortShortname 目的港简称 -->
+                            <input type="hidden" name="purposePortShortname">
+                            <select name="purposePortCode" lay-search lay-filter="portList" id="portList" hc-data_url="/ucenter/code/common/port/search.shtml" hc-data_id_field="portCode" hc-data_text_field="portCcode">
+                                <option value="" selected>请选择</option>
+                                <option value="..." disabled>数据加载中...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" id="wharfLabel">提还地点</label>
+                        <div class="layui-input-block layui-form" lay-filter="wharfListContainer">
+                            <!-- 用于保存 mentionPlace 提还地点名称 -->
+                            <input type="hidden" name="mentionPlace">
+                            <select name="mentionPlaceCode" lay-search lay-filter="wharfList" id="wharfList" hc-data_url="/ucenter/code/common/wharf/search.shtml" hc-data_id_field="code" hc-data_text_field="name">
+                                <option value="" selected>请选择</option>
+                                <option value="..." disabled>数据加载中...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">截关时间</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="cutoffTime" hc-field_type="timestamp" placeholder="" autocomplete="off" class="layui-input date-time" data-time_unit="1800">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">截重时间</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="cutheavyTime" hc-field_type="timestamp" placeholder="" autocomplete="off" class="layui-input date-time" data-time_unit="1800">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">截补料时间</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="cuttingTime" hc-field_type="timestamp" placeholder="" autocomplete="off" class="layui-input date-time" data-time_unit="1800">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">截放行时间</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="releaseTime" hc-field_type="timestamp" placeholder="" autocomplete="off" class="layui-input date-time" data-time_unit="1800">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 箱型信息 -->
+            <div class="layui-row box-line-container">
+                <!-- 箱型信息id -->
+                <input type="hidden" name="id" hc-field_type="number">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">箱型</label>
+
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm5 layui-form">
+                                <!-- 箱型 -->
+                                <!-- {{# '##注释##   isShipper用来区分角色类型： true 表示货主货代   false 表示拖车行' }} -->
+                                {{#  if (d.isShipper) {  }}
+                                <select id="boxTypeList" name="arkType" lay-search lay-verify="required" lay-filter="boxType" hc-data_url="/ucenter/code/common/contatypes/searchWaybillContatypes.shtml" hc-data_id_field="isoCode" hc-data_text_field="isoCode">
+                                    <option value="" selected>请选择</option>
+                                    <option value="..." disabled>数据加载中...</option>
+                                </select>
+                                {{#  } else {  }}
+                                <input type="text" name="arkType" disabled="disabled" autocomplete="off" class="layui-input">
+                                {{#  }  }}
+                            </div>
+                            <div class="layui-col-sm3 text-right">
+                                <div class="layui-form-mid float-none">运费</div>
+                            </div>
+                            <div class="layui-col-sm4">
+                                <!-- 运费 -->
+                                <input type="text" name="freight" {{ d.isShipper ? '' : 'disabled="disabled"' }} hc-field_type="number" placeholder="保留2位小数，最大金额1,000,000" autocomplete="off" class="layui-input" hc-verify="decimals2|max" hc-verify_field="运费" hc-verify_max="1000000">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">摆柜要求</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm4 layui-col-lg4 padding-r-10 layui-form">
+                                <!-- 摆柜要求 -->
+                                <!-- {{# '##注释##   isShipper用来区分角色类型： true 表示货主货代   false 表示拖车行' }} -->
+                                {{#  if (d.isShipper) {  }}
+                                <select name="putarkPosition" hc-field_type="number" lay-filter="putRequire">
+                                    <option value="0">不限</option>
+                                    <option value="1">摆头</option>
+                                    <option value="2">置中</option>
+                                    <option value="3">摆尾</option>
+                                </select>
+                                {{#  } else {  }}
+                                <!-- 补充 摆柜要求 隐藏域 -->
+                                <input type="hidden" name="putarkPosition" hc-field_type="number">
+                                <input type="text" name="putarkPositionText" disabled="disabled" hc-field_type="ignoreGetter" autocomplete="off" class="layui-input">
+                                {{#  }  }}
+                            </div>
+                            <div class="layui-col-sm5 layui-col-lg4 text-right nowrap">
+                                <div class="layui-form-mid float-none">单柜货重(KG)</div>
+                            </div>
+                            <div class="layui-col-sm3 layui-col-lg4">
+                                <!-- 单柜货重 -->
+                                <input type="text" name="goodsWeight" {{ d.isShipper ? '' : 'disabled="disabled"' }} hc-field_type="number" placeholder="0~100000之间" autocomplete="off" class="layui-input" hc-verify="range" hc-verify_field="单柜货重" hc-verify_max="100000">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">做柜时间</label>
+                        <div class="layui-input-block">
+                            <!-- 做柜时间 -->
+                            <input type="text" id="doarkDateInput" name="doarkDate" hc-field_type="timestamp" placeholder="" autocomplete="off" class="layui-input date-time" lay-verify="required" data-time_unit="1800">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- {{# '##注释##   isShipper用来区分角色类型： true 表示货主货代   false 表示拖车行' }} -->
+            {{#  if (!d.isShipper) {  }}
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" id="stackLabel">提空/还空地点</label>
+                        <div class="layui-input-block layui-form" lay-filter="stackListContainer">
+                            <!-- 用于保存 carryEmptyAddress 提空/还空地点名称 -->
+                            <input type="hidden" name="carryEmptyAddress">
+                            <select name="carryEmptyCode" lay-search lay-filter="stackList" id="stackList" hc-data_url="/ucenter/code/common/stack/search.shtml" hc-data_id_field="code" hc-data_text_field="name">
+                                <option value="" selected>请选择</option>
+                                <option value="..." disabled>数据加载中...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">运费限价</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="freightPrice" id="freightPriceInput" hc-field_type="number" placeholder="保留2位小数" autocomplete="off" class="layui-input" hc-verify="decimals2|expenst" hc-verify_field="运费限价">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">运费涨幅</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="freightGain" id="freightGainInput" hc-field_type="number" placeholder="保留2位小数" autocomplete="off" class="layui-input" hc-verify="decimals2|expenst" hc-verify_field="运费涨幅">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{#  }  }}
+        </div>
+    </fieldset>
+
+    <!-- 装卸信息 -->
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>装卸信息</legend>
+        <div class="layui-field-box customer-address-container" id="addressContainer">
+            <div class="layui-collapse">
+                <!-- 去掉 .layui-colla-item ，防止被 默认初始化为 折叠面板 （因为这里只需要 面板样式，不需要面板功能） -->
+                <div class="customer-address-line" data-data_type="address">
+                    <!-- 装卸信息id -->
+                    <input type="hidden" name="id" hc-field_type="number">
+
+                    <h2 class="layui-colla-title">
+                        装卸地点 <span class="customer-address-counter"></span>
+                        <span class="address-icon-container">
+                            <!-- 删除按钮 -->
+                            <i class="layui-icon icon-delete">&#xe640;</i>
+                            <!-- 添加按钮 -->
+                            <i class="layui-icon icon-add">&#xe61f;</i>
+                            <!-- 复制按钮 -->
+                            <span class="icon-copy-container">
+                                <i class="layui-icon icon-copy icon-copy--bg">&#xe621;</i>
+                                <i class="layui-icon icon-copy">&#xe621;</i>
+                            </span>
+                        </span>
+                    </h2>
+                    <div class="layui-colla-content layui-show layui-fluid">
+                        <div class="layui-row">
+                            <div class="layui-col-sm4">
+                                <div class="layui-form-item layui-form-item--require">
+                                    <label class="layui-form-label">装卸地点</label>
+                                    <div class="layui-input-block layui-form" >
+                                        <!-- 用于保存 waybillAddress 装卸地点名称 -->
+                                        <input type="hidden" name="waybillAddress">
+                                        <!-- {{# '##注释##   isShipper用来区分角色类型： true 表示货主货代   false 表示拖车行' }} -->
+                                        {{#  if (d.isShipper) {  }}
+                                        <select name="customersAddressId" hc-field_type="number" lay-search lay-filter="customerAddress" id="customerAddressList" lay-verify="required" hc-data_url="/ucenter/tms/order/order/getAddressOrBroken.shtml?selectType=address&addType=">
+                                            <option value="" selected>请选择</option>
+                                        </select>
+                                        {{#  } else {  }}
+                                        <!-- 该input仅用于展示（当拖车行编辑非自己订单的运单时，不允许修改装卸地址，仅能展示） -->
+                                        <input type="text" name="waybillAddress" hc-field_type="ignoreGetter" disabled="disabled" autocomplete="off" class="layui-input shipper-address-input">
+                                        <select class="address-select" name="customersAddressId" hc-field_type="number" lay-search lay-filter="customerAddress" id="customerAddressList" lay-verify="required">
+                                            <option value="" selected>请选择</option>
+                                            <option value="..." disabled>数据加载中...</option>
+                                        </select>
+                                        {{#  }  }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm8">
+                                <div class="layui-form-item layui-form-item--require">
+                                    <label class="layui-form-label">详细地址</label>
+                                    <div class="layui-input-block address-detail-line">
+                                        <!-- 用于保存 waybillAddressAreaid 省市县id -->
+                                        <input type="hidden" name="waybillAddressAreaid" hc-field_type="number">
+                                        <!-- 用于保存 waybillAddressAreaName 省市县对应的中文 -->
+                                        <input type="hidden" name="waybillAddressAreaName">
+                                        <!-- 用于保存 waybillAddressDetail 街道后面的地址 -->
+                                        <input type="hidden" name="waybillAddressDetail">
+
+                                        <!-- 下面这个是完整地址（省市县+街道+详细地址），仅用于前端展示，不保存到后端 -->
+                                        <input type="text" name="fullAddress" readonly="readonly" placeholder="" autocomplete="off" class="layui-input address-detail-input">
+
+                                        <!-- 编辑地址按钮 -->
+                                        <i class="layui-icon icon-edit">&#xe642;</i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-row">
+                            <div class="layui-col-sm4">
+                                <div class="layui-form-item layui-form-item--require">
+                                    <label class="layui-form-label">联系人/电话</label>
+                                    <div class="layui-input-block">
+                                        <div class="layui-col-sm6 padding-r-10">
+                                            <input type="text" name="linkman" placeholder="" autocomplete="off" class="layui-input" lay-verify="required" hc-verify="userName" hc-verify_field="联系人">
+                                        </div>
+                                        <div class="layui-col-sm6">
+                                            <input type="text" name="mobile" placeholder="" autocomplete="off" class="layui-input" lay-verify="required" hc-verify="fixCellphone" hc-verify_field="电话">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm8">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">装卸备注</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="remark" placeholder="" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="layui-colla-item">
+                    <h2 class="layui-colla-title">当作panel用</h2>
+                    <div class="layui-colla-content layui-show">内容区域</div>
+                </div> -->
+            </div>
+        </div>
+    </fieldset>
+
+    <!-- 报关资料送至（报关行联系信息） -->
+    <fieldset class="layui-elem-field hide" id="brokerDataContainer">
+        <legend>报关资料送至</legend>
+        <div class="layui-field-box layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">报关行</label>
+                        <div class="layui-input-block layui-form">
+                            <input type="text" name="brokenName" disabled="disabled" hc-field_type="ignoreGetter" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm8">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">送达地址</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="brokenAddressText" disabled="disabled" hc-field_type="ignoreGetter" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">联系人</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="brokenLinkman" disabled="disabled" hc-field_type="ignoreGetter" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">手机/电话</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6 padding-r-10">
+                                <input type="text" name="brokenMobile" disabled="disabled" hc-field_type="ignoreGetter" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="brokenTel" disabled="disabled" hc-field_type="ignoreGetter" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">传真号码</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="brokenFax" disabled="disabled" hc-field_type="ignoreGetter" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <!-- 运单备注 -->
+    <div class="layui-form-item layui-form-text" id="orderRemarkContainer">
+        <label class="layui-form-label">运单备注</label>
+        <div class="layui-input-block">
+            <textarea name="remark" id="remarkTextarea" placeholder="委托注意事项" class="layui-textarea"></textarea>
+        </div>
+    </div>
+
+    <!-- 修改装卸地点面板的 内容模版 -->
+    <div id="detailLineContainerTemplate">
+        <div id="detailLineTemplate" style="display: none;">
+            <!-- 修改装卸地点面板内容 -->
+            <div class="address-edit-line layui-form" id="%lineId">
+                <!-- 装卸地点行 -->
+                <div class="compoment-district">
+                    <div class="layui-form-item">
+                        <div class="layui-input-inline">
+                            <select name="province" lay-filter="userProvince">
+                                <option value="">请选择</option>
+                            </select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <select name="city" lay-filter="userCity">
+                                <option value="">请选择</option>
+                            </select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <select name="country" lay-filter="userCounty">
+                                <option value="">请选择</option>
+                            </select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <select name="street" lay-filter="userStreet">
+                                <option value="">请选择</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="edit-addition-line">
+                    <div class="layui-input-inline district-address-detail">
+                        <!-- 与 保存街道后面地址的隐藏域 相同的name -->
+                        <input type="text" name="waybillAddressDetail" placeholder="详细地址" autocomplete="off" class="layui-input">
+                    </div>
+                    <!-- 确认取消按钮 -->
+                    <input type="button" class="layui-btn layui-btn-normal edit-line-ok" value="确定">
+                    <input type="button" class="layui-btn layui-btn-primary edit-line-cancel" value="取消">
+                </div>
+            </div>
+        </div>
+    </div>
+</script>

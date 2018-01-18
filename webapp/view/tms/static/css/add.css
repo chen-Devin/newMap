@@ -1,0 +1,94 @@
+body {
+    margin: 20px;
+}
+
+.layui-form-item--require label::before {
+    content: '*';
+    position: relative;
+    z-index: 10;
+    left: -5px;
+    font-family: 'simsun', '宋体';
+    font-size: 15px;
+    color: #f00;
+}
+
+.form-txt {
+    color: #999;
+    font-size: 13px;
+    margin-top: 10px;
+    display: block;
+}
+
+.layui-form {
+    min-width: 1106px;
+}
+
+.layui-form-item .layui-form-label {
+    width: 130px;
+}
+
+.layui-form-item .layui-input-block {
+    margin-left: 160px;
+}
+
+.layui-field-title {
+    margin-bottom: 10px
+}
+
+.button-bar {
+    text-align: center;
+    margin: 20px 0 40px;
+}
+
+.button-bar button {
+    margin-top: 10px;
+    min-width: 120px;
+}
+
+.icon-add {
+    font-size: 22px;
+    color: #1E9FFF;
+}
+
+.icon-del {
+    font-size: 24px;
+    color: #FF5722;
+}
+
+.legend-btns {
+    margin-left: 20px;
+}
+
+.legend-btns .icon-add {
+    color: #1E9FFF;
+}
+
+.btns-add {
+    text-align: center;
+    line-height: 40px;
+    height: 38px;
+    overflow: hidden;
+}
+
+.margin-right10 {
+    margin-right: 10px;
+}
+
+.margin-left10 {
+    margin-left: 10px;
+}
+
+.line-space {
+    text-align: center;
+    line-height: 38px;
+}
+
+.layui-table-page {
+    float: right;
+}
+
+.clr {
+    clear: both;
+    height: 0;
+    overflow: hidden;
+}

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script language="javascript" type="text/javascript" src="http://mapapi.careland.com.cn/api/?key=e4acef293b6d23b5f09b0e6d&v=1.2" charset="utf-8"></script>
+    <title>GPS地图 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+      span.required {color:#f00; font-family:'simsun', '宋体'; margin-right:5px; font-size:15px;}
+      .form-txt {margin:-10px 0 20px 110px; color:#999; font-size:13px;}
+      .organize {
+            padding: 10px 15px 10px 0;
+            overflow: auto;
+        }
+      .right-panel {
+          height:600px;
+          padding: 8px 15px 0;
+          border-left: #ddd 1px solid;
+          overflow: auto;
+      }
+      .right-panel .map{
+        height: 585px;
+        width: 100%;
+        background-color: rgb(238, 218, 218);
+      }
+      .left-panel{
+        height:600px;
+        padding: 20px;
+        overflow: auto;
+      }
+      #carList li{
+        height: 26px;
+        line-height: 26px;
+      }
+      #carList li.current{
+        background-color: rgb(211, 209, 208);
+      }
+      #carList li:hover{
+        background-color: rgb(236, 236, 236);
+      }
+      .mapDiv{
+        height:600px;
+        border-top: #ddd 1px solid;
+        border-bottom: #ddd 1px solid;
+      }
+    </style>
+  </head>
+  <body>
+   <!--start: 搜索-->
+   <div class="panel-handle search-bar">
+    <form class="layui-form layui-form-pane" autocomplete="off">
+        <div class="layui-row layui-col-space5">
+            <div class="layui-col-sm1" style="width:20%;">
+                <div class="layui-form-item">
+                  <label class="layui-form-label">车牌号码</label>
+                    <div class="layui-input-block">
+                      <input type="text" name="carNo"  autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm1" style="width:20%;">
+                <div class="layui-form-item">
+                  <label class="layui-form-label">S/O</label>
+                    <div class="layui-input-block">
+                      <input type="text" name="so"  autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm1" style="width:40%;">
+                <div class="layui-form-item">
+                  <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                  <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe715;</i>位置</button>
+                  <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe62c;</i>轨迹</button>
+                </div>
+            </div>
+        </div>
+    </form>
+  </div>  
+  <!--end: 搜索-->
+  <!-- start: 地图区域 -->
+    <div class="mapDiv">
+      <!--start: 列表 -->
+      <div class="layui-col-lg2 layui-col-md2 layui-col-sm3 left-panel">
+        <ul id="carList">
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+          <li>粤S45674</li>
+        </ul>
+      </div>
+      <!--end: 列表 -->
+      <!--start: 地图 -->
+      <div class="layui-col-lg10 layui-col-md10 layui-col-sm9 right-panel">
+          <div id="map" class="map">
+          </div>
+      </div>
+      <!--end: 地图 -->
+    </div>
+    <!-- end: 地图区域 -->
+    <!-- start: 列表区域 -->
+    <div>
+      <!-- 待派车区域 -->
+      <table class="layui-hide" id="tableListStay" lay-filter="tbar"></table>
+      <!-- 已派车区域 -->
+      <table class="layui-hide" id="tableListYet" lay-filter="tbar"></table>
+    </div>
+    <!-- end: 列表区域 -->
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_nav.js?v=1219"></script>
+
+  <!-- 地图 -->
+  <!-- <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.3&key=485a4e9815cb0649424f587b1a30c313"></script> -->
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'tms_tab'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    setTableListStay();
+    setTableListYet();
+
+    $('#carList li').click(function(){
+      $(this).addClass('current').siblings().removeClass("current");
+    })
+
+    // 方法级渲染待派车页面表格
+    function setTableListStay($targetName, $targetType, $billMonth, $hasUrge, $verifyStatus){
+      typeof $targetName != 'undefined' ? $targetName = $targetName : $targetName = '';
+      typeof $targetType != 'undefined' ? $targetType = $targetType : $targetType = '';
+      typeof $billMonth != 'undefined' ? $billMonth = $billMonth : $billMonth = '';
+      typeof $hasUrge != 'undefined' ? $hasUrge = $hasUrge : $hasUrge = '';
+      typeof $verifyStatus != 'undefined' ? $verifyStatus = $verifyStatus : $verifyStatus = '';
+      var $pageSize = 15;
+
+      table.render({
+        elem: '#tableListStay',
+        url: '',
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.handlePageResult.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.handlePageResult.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'', title: '业务类型', align: 'center', width:180, event: 'setSign'},
+          {field:'', title: '客户名称', align: 'center', width:150, templet:"#"},
+          {field:'', title: '做柜时间', align: 'center', width:190},
+          {field:'', title: '还柜地点', align: 'center', width:90, templet:"#"},
+          {field:'', title: '提柜地点', align: 'center', width:90},
+          {field:'', title: '装货地点', align: 'center', width:90},
+          {field:'', title: '卸货地点', align: 'center', width:90},
+          {field:'', title: 'S/O', align: 'center', width:90},
+          {field:'', title: '箱型', align: 'center', width:100},
+          {field:'', title: '摆柜位置', align: 'center', width:100},
+          {field:'', title: '运费上限', align: 'center', width:100},
+          {field:'', title: '运费涨幅', align: 'center', width:100},
+          {field:'', title: '订单号码', align: 'center', width:100},
+          {field:'', title: '作业号', align: 'center', width:90, templet:"#"},
+          {field:'', title: '急单类型', align: 'center', width:120, templet:"#"},
+          {field:'', title: '操作', align: 'center', width:120, templet:"#"}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-250',
+        even: true,
+        done: function(res, curr, count){
+        }
+      });
+    }
+     // 方法级渲染页面表格
+    function setTableListYet($targetName, $targetType, $billMonth, $hasUrge, $verifyStatus){
+      typeof $targetName != 'undefined' ? $targetName = $targetName : $targetName = '';
+      typeof $targetType != 'undefined' ? $targetType = $targetType : $targetType = '';
+      typeof $billMonth != 'undefined' ? $billMonth = $billMonth : $billMonth = '';
+      typeof $hasUrge != 'undefined' ? $hasUrge = $hasUrge : $hasUrge = '';
+      typeof $verifyStatus != 'undefined' ? $verifyStatus = $verifyStatus : $verifyStatus = '';
+      var $pageSize = 15;
+
+      table.render({
+        elem: '#tableListYet',
+        url: '',
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.handlePageResult.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.handlePageResult.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'', title: '关注类型', align: 'center', width:180, event: 'setSign'},
+          {field:'', title: '业务类型', align: 'center', width:150, templet:"#"},
+          {field:'', title: '客户名称', align: 'center', width:190},
+          {field:'', title: '做柜时间', align: 'center', width:90, templet:"#"},
+          {field:'', title: '还柜地点', align: 'center', width:90},
+          {field:'', title: '提柜地点', align: 'center', width:90},
+          {field:'', title: '装卸地点', align: 'center', width:90},
+          {field:'', title: '卸货地点', align: 'center', width:90},
+          {field:'', title: 'S/O', align: 'center', width:100},
+          {field:'', title: '箱型', align: 'center', width:100},
+          {field:'', title: '司机', align: 'center', width:100},
+          {field:'', title: '手机号码', align: 'center', width:100},
+          {field:'', title: '拖车车牌', align: 'center', width:100},
+          {field:'', title: '急单类型', align: 'center', width:120, templet:"#"}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-250',
+        even: true,
+        done: function(res, curr, count){
+        }
+      });
+    }
+  });
+  </script>
+  <script>
+      window.parent.$('.layui-tab-title').hide();
+      window.onbeforeunload = function () {
+        window.parent.$('.layui-tab-title').show();
+      };
+      var point = new Careland.Point(410942332,81392068); //创建地图中心点
+      var map = new Careland.Map("map",point,10); //创建地图对象
+      map.enableCenterIcon(); //启用地图中心点图标
+      map.enableAutoResize(); //启用自动适应容器尺寸变化
+      map.load(); //加载地图
+  </script>
+</html>

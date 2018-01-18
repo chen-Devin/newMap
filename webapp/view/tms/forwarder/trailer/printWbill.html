@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>在线运单PDF打印 - TMS</title>
+    <style>
+      body {margin:0; padding:0; background:#fff; font-size:14px; color:#000; font-family:"宋体", "simsun","Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, "Hiragino Sans GB", "Hiragino Sans GB W3", "Microsoft YaHei UI", "WenQuanYi Micro Hei", sans-serif;}
+      #main-box {margin:0 auto; width:700px; padding:0; background:#fff; overflow:hidden;}
+      h1, h2, h3, h4, h5 {text-align:center; margin:0;}
+      h1 {font-size:28px; line-height:35px; letter-spacing:2px;}
+      h2 {font-size:14px; line-height:20px; font-weight:normal; margin-top:25px;}
+      h3 {font-size:14px; line-height:20px; font-weight:normal; margin-bottom:25px;}
+      h4 {font-size:20px; line-height:20px;}
+      h4 span.t1 {letter-spacing:2px; display:block;}
+      h4 span.t2 {font-size:16px; display:block;}
+      h5 {font-size:15px; line-height:25px; font-weight:normal; text-align:right;}
+      h5 #jobNo {font-weight:bold;}
+      table {border:#000 1px solid;}
+      table td {border-bottom:#000 1px solid; border-right:#000 1px solid; padding:5px; line-height:18px;}
+      table tr:last-child td {border-bottom:0;}
+      table tr td:last-child {border-right:0;}
+      table td.tit {text-align:center;}
+      table td.bold {font-size:16px; font-weight:bold;}
+      table td.sign {height:200px; text-align:center;}
+      table td.space {padding:0;}
+      .space-line {height:15px;}
+      .iframe-box {margin:0; padding:0; position:absolute; width:100%; height:100%; z-index:999; background:#525659;}
+      .ps {margin-top:5px; font-size:12px; line-height:18px;}
+    </style>
+  </head>
+  <body>
+    <div class="iframe-box">
+      <iframe class="preview-pane" type="application/pdf" frameborder="0" scrolling="no" style="margin:0; width:100%;"></iframe>
+    </div>
+    <div id="main-box">
+      <h1 id="trailerFullName"></h1>
+      <h2>公司地址：<span id="trailerLinkAddress"></span></h2>
+      <h3>TEL：<span id="trailerTel"></span>　　FAX：<span id="trailerFax"></span></h3>
+      <h4><span class="t1">拖车作业单</span><span class="t2">DRAYAGE RECEIPT</span></h4>
+      <h5>工作号：<span id="jobNo"></span></h5>
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <colgroup>
+          <col width="15%">
+          <col width="35%">
+          <col width="15%">
+          <col width="35%">
+        </colgroup>
+        <tbody>
+          <tr>
+            <td class="tit">做柜日期</td>
+            <td class="bold" id="doArkDate"></td>
+            <td class="tit">车牌号</td>
+            <td class="bold" id="carNo"></td>
+          </tr>
+          <tr>
+            <td class="tit">工厂名称</td>
+            <td colspan="3" id="address"></td>
+          </tr>
+          <tr>
+            <td class="tit">装卸地址</td>
+            <td colspan="3" id="detailAddress"></td>
+          </tr>
+          <tr>
+            <td class="tit">联系电话</td>
+            <td id="addressMobile"></td>
+            <td class="tit">联系人</td>
+            <td id="addressLinkman"></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="space-line"></div>
+      <table width="100%" border="0" cellspacing="0" cellpadding="3">
+        <colgroup>
+          <col width="15%">
+          <col width="35%">
+          <col width="15%">
+          <col width="35%">
+        </colgroup>
+        <tbody>
+          <tr>
+            <td class="tit">订舱号</td>
+            <td id="soNumber"></td>
+            <td class="tit">柜　型</td>
+            <td id="arkType"></td>
+          </tr>
+          <tr>
+            <td class="tit">柜　号</td>
+            <td>&nbsp;</td>
+            <td class="tit">封条号</td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td class="tit">提柜堆场</td>
+            <td id="heavyAddress"></td>
+            <td class="tit">还柜堆场</td>
+            <td id="emptyAddress"></td>
+          </tr>
+          <tr>
+            <td class="tit">船公司</td>
+            <td id="shippingName"></td>
+            <td class="tit">报关方式</td>
+            <td id="brokenStyle"></td>
+          </tr>
+          <tr>
+            <td class="tit">截柜时间</td>
+            <td id="cutoffDate"></td>
+            <td class="tit">报关行</td>
+            <td id="brokenName"></td>
+          </tr>
+          <tr>
+            <td class="tit">起运地海关</td>
+            <td>&nbsp;</td>
+            <td class="tit">指运地海关</td>
+            <td>&nbsp;</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="space-line"></div>
+      <table width="100%" border="0" cellspacing="0" cellpadding="3">
+        <colgroup>
+          <col width="15%">
+          <col width="20%">
+          <col width="15%">
+          <col width="15%">
+          <col width="17%">
+          <col width="18%">
+        </colgroup>
+        <tbody>
+          <tr>
+            <td class="tit">司机姓名</td>
+            <td id="driverName"></td>
+            <td class="tit">海关编号</td>
+            <td>&nbsp;</td>
+            <td class="tit">拖头重量</td>
+            <td id="carPrep"></td>
+          </tr>
+          <tr>
+            <td class="tit">司机手机</td>
+            <td id="driverMobile"></td>
+            <td class="tit">IC卡号</td>
+            <td>&nbsp;</td>
+            <td class="tit">拖架型号/重量</td>
+            <td id="carFramePrep"></td>
+          </tr>
+          <tr>
+            <td colspan="3" rowspan="3" valign="top" style="border-bottom:0;" id="remark"></td>
+            <td colspan="3" class="tit"><b>以下信息由收/交方填写</b></td>
+          </tr>
+          <tr>
+            <td colspan="3" class="space">
+              <table width="100%" border="0" cellspacing="0" cellpadding="3" style="border:0;">
+                <colgroup>
+                  <col width="25%">
+                  <col width="25%">
+                  <col width="25%">
+                  <col width="25%">
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <td class="tit">到厂时间</td>
+                    <td>&nbsp;</td>
+                    <td>离厂时间</td>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td class="tit">货物重量</td>
+                    <td colspan="3">&nbsp;</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="3" class="sign" valign="top">工厂签字或盖章，谢谢！</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="ps">
+        <b>托运须知:</b><br>
+        一、托运货物如因所报名称、件数、重量不符、致被当地政府扣留或处罚时，均由托运方负责，同时本公司车辆如因上述原因被阻，<br>　　暂不能营业，托运人应按实际时间赔偿本公司损失；<br>
+        二、托运方应依照约定时间地点装卸货物，本公司车辆到达后两小时内装卸完毕，如若超时，托运人应按时间计算附加费；<br>
+        三、托运方需提供出口报关文件，进口报关合同，协议与正本，发票，于装车前送交承运方；<br>
+        四、货物装卸及启运期间，一切交通意外致路面不能行驶或车辆损坏而令货物不能如期赴运上船，及一切风、水、火险、盗窃及其他<br>　　意外均由托运人自理。
+      </div>
+    </div>
+    <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+    <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+    <script charset="utf-8" src="/view/frame/static/js/comm.js?v=1.0"></script>
+    <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+    <script charset="utf-8" src="/view/frame/jspdf/libs/html2canvas/dist/html2canvas.js"></script>
+    <script charset="utf-8" src="/view/frame/jspdf/dist/jspdf.debug.js"></script>
+    <!--[if IE]>
+    <script type="text/javascript">
+      layui.use('layer', function(){
+        parent.layer.alert('该浏览器不支持打印，请使用火狐或谷歌等其它浏览器！', {
+          yes: function(){
+            parent.layer.closeAll();
+          }
+        });
+      });
+    </script>
+    <![endif]-->
+
+    <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+    <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+    <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+    <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+    <script>
+      var $id = $.trim(getUrlParam('id'));
+      if($id == null || $id == ''){
+        layui.use('layer', function(){
+          parent.layer.alert('非法参数！', {
+            yes: function(){
+              parent.layer.closeAll();
+            }
+          });
+        });
+      }
+
+      //获取运单数据
+      $.get('/ucenter/tms/waybill/waybill/printWaybill.shtml', {id: $id}, function(d){
+        var $code = d.code,
+            $msg = d.msg,
+            $objects = d.objects;
+            
+        if($code === 'SUCCESS'){
+          $('#trailerFullName').text($objects.trailerFullName != null ? $objects.trailerFullName : '');
+          $('#trailerLinkAddress').text($objects.trailerLinkAddress != null ? $objects.trailerLinkAddress.split(',').join('') : '');
+          $('#trailerTel').text($objects.trailerTel != null ? $objects.trailerTel : '');
+          $('#trailerFax').text($objects.trailerFax != null ? $objects.trailerFax : '');
+          $('#jobNo').text($objects.jobNo != null ? $objects.jobNo : '');
+          $('#doArkDate').text($objects.doArkDate != null ? new Date($objects.doArkDate).format('yyyy-MM-dd hh:mm') : '');
+          $('#carNo').text($objects.carNo != null ? $objects.carNo : '');
+          $('#address').text($objects.address != null ? $objects.address.split(';').join('，') : '');
+          $('#detailAddress').html($objects.detailAddress != null ? $objects.detailAddress.split(';').join('<br>').split(',').join('') : '');
+          $('#addressMobile').text($objects.addressMobile != null ? $objects.addressMobile : '');
+          $('#addressLinkman').text($objects.addressLinkman != null ? $objects.addressLinkman : '');
+          $('#soNumber').text($objects.soNumber != null ? $objects.soNumber : '');
+          $('#arkType').text($objects.arkType != null ? $objects.arkType : '');
+          $('#heavyAddress').text($objects.heavyAddress != null ? $objects.heavyAddress : '');
+          $('#emptyAddress').text($objects.emptyAddress != null ? $objects.emptyAddress : '');
+          $('#shippingName').text($objects.shippingName != null ? $objects.shippingName : '');
+          $('#brokenStyle').text($objects.brokenStyle != null ? setBrokenStyle($objects.brokenStyle) : '');
+          $('#cutoffDate').text($objects.cutoffDate != null ? new Date($objects.cutoffDate).format('yyyy-MM-dd hh:mm') : '');
+          $('#brokenName').text($objects.brokenName != null ? $objects.brokenName.split(',').join('，') : '');
+          $('#driverName').text($objects.driverName != null ? $objects.driverName : '');
+          $('#driverMobile').text($objects.driverMobile != null ? $objects.driverMobile : '');
+          $('#carPrep').text($objects.carPrep != null ? $objects.carPrep : '');
+          $('#carFramePrep').text($objects.carFramePrep != null ? $objects.carFramePrep : '');
+          var $remark = '', $wRemark = '', $aRemark = '';
+          $wRemark = $objects.waybillRemark != null ? '<b>运单备注：</b>' + $objects.waybillRemark + '<br><br>' : '';
+          $aRemark = $objects.addressRemark != null ? '<b>装卸备注：</b>' + $objects.addressRemark : '';
+          $remark = $wRemark + $aRemark;
+          $('#remark').html($remark);
+        }
+        setPrint($('#main-box'));
+      }, 'JSON')
+
+      $(function(){
+        winSize();
+  
+        $(window).on('resize', function () {
+          winSize();
+        });
+      });
+  
+      function winSize(){
+        var $wh = $(window).height() - 4;
+        $('.preview-pane').height($wh);
+      }
+  
+      //打印
+      function setPrint(elem){
+        html2canvas(elem, {
+          allowTaint: true,
+          taintTest: false,
+          background: "#ffffff",
+          onrendered: function(canvas){
+            var docWidth = 595.58 - 80;
+            var imgData = canvas.toDataURL('image/png');
+            elem.hide();
+            var doc = new jsPDF('', 'pt', 'a4');
+            doc.addImage(imgData, 'PNG', 40, 30, docWidth, docWidth/canvas.width * canvas.height);
+            $('.preview-pane').attr('src', doc.output('bloburl'));
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

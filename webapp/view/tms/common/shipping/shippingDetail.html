@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>船公司联系方式 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <body>
+    <h3 style="margin-top:10px;">船公司代码：<span id="code"></span></h3>
+    <h3 style="margin-top:5px;">船公司名称：<span id="name"></span></h3>
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="table_list"></table>
+    <!--end:表格列表-->
+
+    <div style="text-align:center;"><button class="layui-btn btn-close">关闭</button></div>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/tms_common/utils.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  $(function(){
+    var param = getUrlParam("id");
+
+    layui.use(['layer', 'table'], function(){
+      var $layer = layui.layer,
+          $table = layui.table,
+          $ = layui.jquery;
+
+      var options = {
+        "tableOptions": {
+          cols: [[
+            {field:'name', title: '码头', width:80, sort: true},
+            {field:'code', title: '码头代码', width:120},
+            {field:'shippingCode', title: '码头船公司代码', width:150},
+            {field:'phone', title: '联系电话', width:200},
+            {field:'managePhone', title: '箱管电话', width:200},
+            {field:'ticketPhone', title: '打单电话', width:200},
+            {field:'ticketPrice', title: '打单费', width:120}
+          ]],
+          response: {
+              dataName: 'objects.wharfs'
+          },
+          page: false,
+          height: 'full-122', 
+          url: '/ucenter/code/common/shipping/' + param + '.shtml',
+          done: function(res, curr, count){
+            $("#code").html(res.objects.shippingCode);
+            $("#name").html(res.objects.shippingFullname);
+          }
+        }   
+      }
+
+      tmsCommonTable.init(options, $table);
+
+      $(".btn-close").click(function(){
+        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+        parent.layer.close(index); //再执行关闭
+      });
+    });
+  });
+  </script>
+</html>

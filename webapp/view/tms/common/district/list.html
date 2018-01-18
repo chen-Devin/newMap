@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>行政区划代码 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+
+    <style>
+      #juryDistrict #street {display:none !important;}
+    </style>
+  </head>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+      <form class="layui-form layui-form-pane" action="">
+        <div class="layui-inline" id="juryDistrict">
+          <div class="layui-input-inline">
+          <select name="juryProvince" lay-filter="juryProvince">
+          <option value="">请选择</option>
+          </select>
+          </div>
+          <div class="layui-input-inline">
+          <select name="juryCity" lay-filter="juryCity">
+          <option value="">请选择</option>
+          </select>
+          </div>
+          <div class="layui-input-inline">
+          <select name="juryCounty" lay-filter="juryCounty">
+          <option value="">请选择</option>
+          </select>
+          </div>
+          <div class="layui-input-inline" id="street">
+          <select name="juryStreet" lay-filter="juryStreet">
+          <option value="">请选择</option>
+          </select>
+          </div>
+          <div class="layui-input-inline">
+          <button class="layui-btn layui-btn-danger" type="button" lay-submit="" lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+          <button class="layui-btn layui-btn-primary search-reset" type="reset" style="margin:0;">取消</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="table_list"></table>
+    <!--end:表格列表-->
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/tms_common/utils.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table'], function(){
+    var $form = layui.form,
+        $layer = layui.layer,
+        $table = layui.table,
+        $ = layui.jquery;
+
+    $('#juryDistrict').district($form);
+
+    var getParameter = function (fn) {
+      $form.on('select', function(data){
+        var provinceVal = $('#juryDistrict').find('select').eq(0).val();
+        var cityVal = $('#juryDistrict').find('select').eq(1).val();
+        var countyVal = $('#juryDistrict').find('select').eq(2).val();
+
+        var parentId = data.value;
+        if(provinceVal != ""){
+          if(cityVal == ""){
+            parentId = provinceVal;
+          }else{
+            if(countyVal == ""){
+              parentId = cityVal;
+            }
+          }
+        }
+
+        //港澳专门作判断
+        if(provinceVal != "810000" && String(cityVal).substring(0,2) == "81"){
+          parentId = data.value;
+        }
+        if(provinceVal != "820000" && String(cityVal).substring(0,2) == "82"){
+          parentId = data.value;
+        }
+
+        fn({"parentId": parentId});
+        
+        $(".search-reset").click(function(ev) {
+          $("#juryDistrict .layui-input-inline").eq(1).hide();
+          $("#juryDistrict .layui-input-inline").eq(2).hide();
+          fn({"parentId": ""});
+        });
+        
+      });
+    }
+    var options = {
+      "seachOptions":{
+        "rely": $form,
+        "getParameter": getParameter
+      },
+
+      "tableOptions": {
+        cols: [[
+          {field:'id', title: '序号', width:110, sort: true},
+          {field:'province', title: '省', width:150},
+          {field:'city', title: '市', width:150},
+          {field:'county', title: '县(区)', width:250},
+          {field:'street', title: '乡/镇/街道', width:300}
+          // ,{field:'id', title: '乡镇(街道)代码', width:300}
+        ]],
+        url: '/common/district/full.shtml',
+        where: {"parentId" : null}
+      }   
+    }
+
+    tmsCommonTable.init(options, $table);
+  });
+  </script>
+</html>

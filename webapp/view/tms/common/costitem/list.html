@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>费用定义 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+</head>
+
+<body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane">
+            <div class="layui-inline">
+                <label class="layui-form-label">系统代码</label>
+                <div class="layui-input-inline">
+                    <select name="sysNo">
+              <option value="TMS" selected="selected">TMS</option>
+            </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">业务类型</label>
+                <div class="layui-input-inline">
+                    <select name="business">
+                      <option value="集港" selected="selected">集港</option>
+                      <option value="城配">城配</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">费用类型</label>
+                <div class="layui-input-inline">
+                    <select name="costType">
+			                <option value="" selected="selected">请选择</option>
+                      <option value="1">集港 - 应收</option>
+                      <option value="2">集港 - 应付</option>
+                      <option value="3">集港 - 车辆成本</option>
+                      <option value="4">集港 - 公司成本</option>
+                      <option value="11">城配 - 应收</option>
+                      <option value="12">城配 - 应付</option>
+                      <option value="13">城配 - 车辆成本</option>
+                      <option value="14">城配 - 公司成本</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <div class="layui-input-inline">
+                    <select name="exact">
+                      <option value="0" selected="selected">模糊查询</option>
+                      <option value="1">精确查询</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <div class="layui-input-inline">
+                    <input type="text" name="name" lay-verify="title" placeholder="费用名称" autocomplete="off" placeholder="" class="layui-input">
+                </div>
+            </div>
+            <button type="button" class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+        </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="table_list"></table>
+    <!--end:表格列表-->
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<script charset="utf-8" src="/view/frame/static/js/tms_common/utils.js?v=1.0"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'table'], function() {
+        var $form = layui.form,
+            $layer = layui.layer,
+            $table = layui.table,
+            $ = layui.jquery;
+
+        var options = {
+            "seachOptions": {
+                "rely": $form,
+                "condition": ["sysNo", "business", "costType", "exact", "name"],
+                "getParameter": ""
+            },
+
+            "tableOptions": {
+                cols: [
+                    [{
+                        field: 'businessType',
+                        title: '业务类型',
+                        width: 100,
+                        sort: true
+                    }, {
+                        field: 'jobCode',
+                        title: '作业类型',
+                        width: 120,
+                        templet: "#jobCodeTpl"
+                    }, {
+                        field: 'costType',
+                        title: '费用类型',
+                        width: 120,
+                        templet: "#costTypeTpl"
+                    }, {
+                        field: 'costName',
+                        title: '费用名称',
+                        width: 120
+                    }, {
+                        field: 'costNo',
+                        title: '费用编码',
+                        width: 120
+                    }, {
+                        field: 'finance',
+                        title: '财务科目',
+                        width: 120
+                    }, {
+                        field: 'algorithm',
+                        title: '计算方法',
+                        width: 120
+                    }, {
+                        field: 'prior',
+                        title: '常用项',
+                        width: 120,
+                        templet: "#priorTpl"
+                    }, {
+                        field: 'sort',
+                        title: '界面显示顺序',
+                        width: 120
+                    }, {
+                        field: 'status',
+                        title: '状态',
+                        width: 120,
+                        templet: "#statusTpl"
+                    }]
+                ],
+                url: '/ucenter/code/common/costItem/page.shtml',
+                where: {
+                    "exact": false
+                }
+            }
+        }
+
+        tmsCommonTable.init(options, $table);
+    });
+</script>
+<script type="text/html" id="jobCodeTpl">
+    {{# if(d.costType == 0){ }} 运输 {{# }else if(d.costType == 1){ }} 关务 {{# }else if(d.costType == 2){ }} 运输，关务 {{# }else if(d.costType == 3){ }} 船务 {{# }else if(d.costType == 4){ }} 运输，代送资料 {{# } }}
+</script>
+<script type="text/html" id="costTypeTpl">
+    {{# if(d.costType == 1){ }} 应收 {{# }else if(d.costType == 2){ }} 应付 {{# }else if(d.costType == 3){ }} 车辆成本 {{# }else if(d.costType == 4){ }} 公司成本 {{# } }}
+</script>
+<script type="text/html" id="priorTpl">
+    {{# if(d.prior == 1){ }} 是 {{# }else if(d.prior == 0){ }} 否 {{# } }}
+</script>
+<script type="text/html" id="statusTpl">
+    {{# if(d.status == '1'){ }} 启用 {{# } else { }} 停用 {{# } }}
+</script>
+
+</html>

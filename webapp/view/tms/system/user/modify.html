@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>修改密码 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+      span.required {color:#f00; font-family:'simsun', '宋体'; margin-right:5px; font-size:15px;}
+      .form-txt {margin:-10px 0 20px 110px; color:#999; font-size:13px;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" method="post" autocomplete="off">
+      <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>原密码</label>
+        <div class="layui-input-inline">
+          <input type="password" name="oldPassword" lay-verify="required" placeholder="请输入原密码" class="layui-input" maxlength="20">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>新密码</label>
+        <div class="layui-input-inline">
+          <input type="password" name="password1" lay-verify="password1" placeholder="大小写字母和数字，6~20位" class="layui-input" maxlength="20">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>确认密码</label>
+        <div class="layui-input-inline">
+          <input type="password" name="password2" lay-verify="password2" placeholder="大小写字母和数字，6~20位" class="layui-input" maxlength="20">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label"></label>
+        <div class="layui-input-inline">
+          <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit">保存</button>
+          <button class="layui-btn layui-btn-primary" type="reset">重置</button>
+        </div>
+      </div>
+    </form>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        $ = layui.jquery;
+
+    //自定义验证规则
+    var $myReg = [/(^\s*)|(\s*$)/g, /^(?![^a-zA-Z]+$)(?!\D+$)/];  //空格，大小写英文和数字
+    var $errMsg = ['密码为6~20位', '密码由大小写字母和数字两种以上组合', '两次密码输入不一致'];
+    form.verify({
+      oldPassword: function(v){
+        if(v.length == 0){
+          return '请输入原密码';
+        }else if(v.length < 6 || v.length > 20){
+          return $errMsg[0];
+        }else if(!$myReg[0].test(v) || !$myReg[1].test(v)){
+          return $errMsg[1];
+        }
+      },
+      password1: function(v){
+        if(v.length == 0){
+          return '请输入新密码';
+        }else if(v.length < 6 || v.length > 20){
+          return $errMsg[0];
+        }else if(!$myReg[0].test(v) || !$myReg[1].test(v)){
+          return $errMsg[1];
+        }
+      },
+      password2: function(v){
+        if(v.length == 0){
+          return '请输入确认密码';
+        }else if(v.length < 6 || v.length > 20){
+          return $errMsg[0];
+        }else if(!$myReg[0].test(v) || !$myReg[1].test(v)){
+          return $errMsg[1];
+        }else if($('input[name="password1"]').val() != v){
+          return $errMsg[2];
+        }
+      }
+    });
+    
+    //监听提交
+    form.on('submit(submit)', function(data){
+      //数据源
+      var $saveData = {
+        pwd: $.trim(data.field.oldPassword),
+        newPwd: $.trim(data.field.password1)
+      };
+
+      //调用接口
+      $.ajax({
+        type: 'PUT', 
+        url: '/login/updatePwd.shtml', 
+        dataType: "json",      
+        contentType: "application/json",               
+        data: JSON.stringify($saveData), 
+        success:function(d){
+          var $code = d.code,
+              $msg = d.msg,
+              $objects = d.objects;
+              
+          if($code === 'SUCCESS'){
+            parent.layer.alert('修改密码成功，请退出重新登录！', {
+              yes: function(){
+                logout();
+              }
+            });
+          }else if($code === 'ERROR_PASSWORD'){
+            parent.layer.msg('原密码错误！');
+          }else{
+            parent.layer.msg('修改密码失败！');
+          }
+        }
+      });
+      return false;
+    });
+  });
+  </script>
+</html>

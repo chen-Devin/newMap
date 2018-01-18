@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>司机管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+</head>
+
+<body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane" action="">
+            <button class="layui-btn layui-btn-danger" onclick="window.location.href='list.html'">全部</button>
+            <div class="layui-input-inline">
+                <input type="text" name="username" lay-verify="required" placeholder="角色名称" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">所属系统</label>
+                <div class="layui-input-inline">
+                    <select name="system">
+            <option value="0" selected="selected">全部</option>
+            <option value="1">TMS运输管理系统</option>
+            <option value="2">报关管理系统</option>
+            </select>
+                </div>
+            </div>
+            <button class="layui-btn layui-btn-danger" lay-submit="" lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+            <button class="layui-btn layui-btn-primary" type="reset" style="margin:0;">重置</button>
+        </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+        <div class="layui-btn-group fl">
+            <button class="layui-btn layui-btn-normal" data-type="addData">新增</button>
+            <button class="layui-btn layui-btn-normal" data-type="editData">编辑</button>
+            <button class="layui-btn layui-btn-normal" data-type="delData">删除</button>
+            <button class="layui-btn layui-btn-normal" id="menu">设置菜单权限</button>
+            <button class="layui-btn layui-btn-normal" id="money">设置费用权限</button>
+            <button class="layui-btn layui-btn-normal" id="role">角色成员</button>
+        </div>
+        <div class="layui-btn-group fr">
+            <button class="layui-btn"><i class="layui-icon">&#xe614;</i>定义表头</button>
+            <button class="layui-btn"><i class="layui-icon">&#xe62d;</i>导出</button>
+        </div>
+        <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="table_list"></table>
+    <!--end:表格列表-->
+
+    <!--start:快捷搜索-->
+    <div class="short-search-bar">
+        <dl>
+            <dt>数据总数<span class="layui-badge layui-bg-cyan">125</span></dt>
+            <dd><a href="">聘用<span class="layui-badge">50</span></a></dd>
+            <dd><a href="">挂靠<span class="layui-badge">43</span></a></dd>
+            <dd><a href="">外协<span class="layui-badge">18</span></a></dd>
+        </dl>
+    </div>
+    <!--end:快捷搜索-->
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'table', 'tms_tab', 'laypage'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            tmsTab = layui.tms_tab,
+            laypage = layui.laypage,
+            $ = layui.jquery;
+
+        //监听提交
+        form.on('submit(search)', function(data) {
+            layer.alert(JSON.stringify(data.field), {
+                title: '最终的提交信息'
+            })
+            return false;
+        });
+
+        //读取数据
+        $parameter = 'name=';
+        $.ajax({
+            url: '/ucenter/centre/permi/role/page.shtml',
+            data: $parameter,
+            type: "GET",
+            dataType: 'json',
+            beforeSend: function() {},
+            success: function(d) {
+                var $code = d.code;
+                $msg = d.msg;
+                $objects = d.objects;
+
+                console.log(d);
+
+                if ($code === 'SUCCESS') {
+                    getData($objects);
+                } else if ($code === 'ERROR_USER_LOGOFF') {
+                    loginFailure();
+                } else {
+                    parent.layer.alert('数据异常');
+                    return;
+                }
+            }
+        });
+
+        //方法级渲染
+        function getData(rows) {
+            table.render({
+                elem: '#table_list',
+                data: rows.list,
+                response: {
+                    countName: 'total' //数据总数的字段名称，默认：count
+                },
+                request: {
+                    pageName: 'pageNum', //页码的参数名称，默认：page
+                    limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                },
+                cols: [
+                    [{
+                        checkbox: true,
+                        fixed: true
+                    }, {
+                        field: 'id',
+                        title: '序号',
+                        width: 80,
+                        sort: true
+                    }, {
+                        field: 'name',
+                        title: '角色名称',
+                        width: 100
+                    }, {
+                        field: 'platformName',
+                        title: '所属系统',
+                        width: 150,
+                        sort: true
+                    }, {
+                        field: 'remarks',
+                        title: '描述',
+                        width: 250
+                    }, {
+                        field: 'roleUsers',
+                        title: '角色成员',
+                        width: 300
+                    }]
+                ],
+                id: 'testReload',
+                page: true,
+                limits: [30, 50, 100],
+                limit: rows.pageSize,
+                height: 'full-130',
+                even: true, //开启隔行背景
+                //size: 'sm' //小尺寸的表格
+            });
+
+            //分页渲染
+            // laypage.render({
+            //   elem: 'layui-table-page1',
+            //   count: rows.total,
+            //   theme: '#1E9FFF',
+            //   layout: ['prev', 'page', 'next', 'skip'],
+            //   limit: 1
+            // });
+        }
+
+        var active = {
+            //新增
+            addData: function() {
+                tmsTab.add($(this), '新增司机', 'edit.html?type=add');
+            },
+            //修改
+            editData: function() { //获取选中数据
+                var checkStatus = table.checkStatus('testReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('修改只能选择一条数据！');
+                } else {
+                    tmsTab.add($(this), '修改角色（' + data[0].name + '）', 'edit.html?type=edit&id=' + data[0].id);
+                }
+            }
+        };
+
+        $('.btns-bar .layui-btn').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>
+
+</html>

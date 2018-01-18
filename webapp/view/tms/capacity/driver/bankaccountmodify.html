@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>新增银行账号</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+    <style>
+      body {margin:20px;}
+      span.required {color:#f00; font-family:'simsun', '宋体'; margin-right:5px; font-size:15px;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" method="post" autocomplete="off">
+      <div class="layui-row">
+        <div class="layui-col-md2">
+          <label class="layui-form-label" style="float:right;"><span class="required">*</span>渠道：</label>
+        </div>
+        <div class="layui-col-md5">
+          <input type="radio" name="way" value="银行" title="银行" lay-filter="way" checked>
+          <input type="radio" name="way" value="支付宝" title="支付宝" lay-filter="way">
+          <input type="radio" name="way" value="微信" title="微信" lay-filter="way">
+        </div>
+      </div>
+      <br/>
+      <div class="layui-row row-bank">
+        <div class="layui-col-md2">
+          <label class="layui-form-label" style="float:right;"><span class="required">*</span>开户银行：</label>
+        </div>
+        <div class="layui-col-md3">
+          <select name="bank" lay-verify="required">
+            <option value=""></option>
+          </select>
+        </div>
+        <div class="layui-col-md2">
+          <label class="layui-form-label" style="float:right; width:90px;"><span class="required">*</span>分行/支行：</label>
+        </div>
+        <div class="layui-col-md3">
+          <input type="text" name="branch" id="branch" placeholder="请输入分行或支行名称" maxlength="200" class="layui-input" lay-verify="required" hc-verify="bankName" hc-verify_field="分行或支行名称">
+        </div>
+      </div>
+      <br/>
+      <div class="layui-row">
+        <div class="layui-col-md2">
+          <label class="layui-form-label" style="float:right;"><span class="required">*</span>账户名称：</label>
+        </div>
+        <div class="layui-col-md3">
+          <input type="text" name="name" id="name" placeholder="请输入收款人名称/姓名" class="layui-input" lay-verify="required" maxlength="255" hc-verify="companyRegex|companySize" hc-verify_field="收款人名称/姓名">
+        </div>
+        <div class="layui-col-md2">
+          <label class="layui-form-label" style="float:right; width:90px;"><span class="required">*</span>账号：</label>
+        </div>
+        <div class="layui-col-md3">
+          <input type="text" name="account" id="account" placeholder="请输入账号" maxlength="50" class="layui-input" lay-verify="required">
+        </div>
+      </div>
+      <br/>
+      <div class="layui-row">
+        <div class="layui-col-md2">
+          <label class="layui-form-label" style="float:right;">备注：</label>
+        </div>
+        <div class="layui-col-md8">
+          <textarea name="remarks" id="remarks" placeholder="0~1000字符之间" maxlength="1000" class="layui-textarea" hc-verify="remarkSize"></textarea>
+        </div>
+      </div>
+      <br/>
+      <br/>
+      <div class="layui-row">
+        <div class="layui-col-md5">
+          <label class="layui-form-label" style="float:right;"></label>
+        </div>
+        <div class="layui-col-md2">
+          <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="submit">保存</button>
+          <button class="layui-btn layui-btn-primary btn-close" type="button">取消</button>
+        </div>
+      </div>
+    </form>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  <!-- 工具库依赖 -->
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+  <script>
+  $(function(){
+    layui.use(['form', 'layer'], function(){
+      var form = layui.form,
+      layer = layui.layer,
+      $ = layui.jquery;
+
+
+      //加载开户银行下拉框数据
+      $.get('/ucenter/general/finance/settlementChannel/search.shtml', function(d){
+        var $code = d.code,
+            $msg = d.msg,
+            $objects = d.objects;
+
+        if($code != 'SUCCESS') return false;
+        
+        if($objects.length > 0){
+          for(var $i = 0; $i < $objects.length; $i++){
+            $("select[name='bank']").append('<option value="'+ $objects[$i].bankName +'">'+ $objects[$i].bankName +'</option>');
+          }
+          form.render('select');
+          $("select[name='bank']").val(bank);
+          form.render();
+        }
+      }, 'json');
+
+      form.on('radio(way)', function(data){
+        if (data.value == "支付宝" || data.value == "微信") {
+          $(".row-bank").hide();
+          $("select[name='bank']").attr("lay-verify","");
+          $("input[name='branch']").attr("lay-verify","");
+        }else {
+          $(".row-bank").show();
+          $("select[name='bank']").attr("lay-verify","required");
+          $("input[name='branch']").attr("lay-verify","branch");
+        };
+      });
+
+      var type = $.trim(getUrlParam("do"));
+      var  bank = $.trim(decodeURI(getUrlParam("bank")));
+      //编辑
+      if (type == "edit") {
+        var way = $.trim(decodeURI(getUrlParam("way"))),
+            bank = $.trim(decodeURI(getUrlParam("bank"))),
+            branch = decodeURI(getUrlParam("branch")),
+            name = decodeURI(getUrlParam("name")),
+            account = decodeURI(getUrlParam("account")),
+            remarks = decodeURI(getUrlParam("remarks"));
+
+        if(way == "银行"){
+          $("span:contains('银行')").click();
+        }else if(way == "支付宝"){
+          $("span:contains('支付宝')").click();
+        }else{
+          $("span:contains('微信')").click();
+        }
+        $("select[name='bank']").val(bank);
+        $("input[name='branch']").val(branch);
+        $("input[name='name']").val(name);
+        $("input[name='account']").val(account);
+        $("textarea[name='remarks']").val(remarks);
+        form.render();
+      };
+
+      //监听提交
+      form.on('submit(submit)', function(data){
+        if (!bizUtil.validator.verifyContainer($('form'))) {
+            return false;
+        }
+        
+        //数据源
+        var $saveData = {
+          way: $.trim(data.field.way),
+          bank: $.trim(data.field.way) == "银行" ? $.trim(data.field.bank) : "",
+          branch: $.trim(data.field.way) == "银行" ? $.trim(data.field.branch) : "",
+          name: $.trim(data.field.name),
+          account: $.trim(data.field.account),
+          remarks: $.trim(data.field.remarks)
+        }
+
+        if (type != "edit") {
+          var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+
+          if($(window.parent['f' + $layId].document).find('.layui-table-body table.layui-table').length>0){
+            var str = '<tr>' +
+                        '<td data-field="id"><div class="layui-table-cell laytable-cell-1-id">' + '' + '</div></td>' +
+                        '<td data-field="channelType"><div class="layui-table-cell laytable-cell-1-channelType">' + $saveData.way + '</div></td>' +
+                        '<td data-field="bankName"><div class="layui-table-cell laytable-cell-1-bankName">' + $saveData.bank + '</div></td>' +
+                        '<td data-field="bankSubBranch"><div class="layui-table-cell laytable-cell-1-bankSubBranch">' + $saveData.branch + '</div></td>' +
+                        '<td data-field="accountName"><div class="layui-table-cell laytable-cell-1-accountName">' + $saveData.name + '</div></td>' +
+                        '<td data-field="accountNo"><div class="layui-table-cell laytable-cell-1-accountNo">' + $saveData.account + '</div></td>' +
+                        '<td data-field="remarks"><div class="layui-table-cell laytable-cell-1-remarks">' + $saveData.remarks + '</div></td>' +
+                        '<td data-field="7"><div class="layui-table-cell laytable-cell-1-7"><a class="layui-btn layui-btn-mini btn-edit">编辑</a><a class="layui-btn layui-btn-danger layui-btn-mini btn-delete">删除</a></div></td>' +
+                      '</tr>';
+            $(window.parent['f' + $layId].document).find('.layui-table-body table.layui-table tbody').append(str);
+          }else{
+            $(window.parent['f' + $layId].document).find('.layui-table-body .layui-none').remove();
+            
+            var str = '<table cellspacing="0" cellpadding="0" border="0" class="layui-table" lay-even="">' +
+                        '<tbody>' +
+                          '<tr>' +
+                            '<td data-field="id"><div class="layui-table-cell laytable-cell-1-id">' + '' + '</div></td>' +
+                            '<td data-field="channelType"><div class="layui-table-cell laytable-cell-1-channelType">' + $saveData.way + '</div></td>' +
+                            '<td data-field="bankName"><div class="layui-table-cell laytable-cell-1-bankName">' + $saveData.bank + '</div></td>' +
+                            '<td data-field="bankSubBranch"><div class="layui-table-cell laytable-cell-1-bankSubBranch">' + $saveData.branch + '</div></td>' +
+                            '<td data-field="accountName"><div class="layui-table-cell laytable-cell-1-accountName">' + $saveData.name + '</div></td>' +
+                            '<td data-field="accountNo"><div class="layui-table-cell laytable-cell-1-accountNo">' + $saveData.account + '</div></td>' +
+                            '<td data-field="remarks"><div class="layui-table-cell laytable-cell-1-remarks">' + $saveData.remarks + '</div></td>' +
+                            '<td data-field="7"><div class="layui-table-cell laytable-cell-1-7"><a class="layui-btn layui-btn-mini btn-edit">编辑</a><a class="layui-btn layui-btn-danger layui-btn-mini btn-delete">删除</a></div></td>' +
+                          '</tr>' +
+                        '</tbody>' +
+                      '</table>';
+            $(window.parent['f' + $layId].document).find('.layui-table-body').append(str);
+          }
+        }else{
+          var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+          var tdArr = $(window.parent['f' + $layId].document).find('.layui-table-body table.layui-table tr[status="edit"] td');
+          $(tdArr[0]).find("div").html();
+          $(tdArr[1]).find("div").html($saveData.way);
+          $(tdArr[2]).find("div").html($saveData.bank);
+          $(tdArr[3]).find("div").html($saveData.branch);
+          $(tdArr[4]).find("div").html($saveData.name);
+          $(tdArr[5]).find("div").html($saveData.account);
+          $(tdArr[6]).find("div").html($saveData.remarks);
+
+          $(window.parent['f' + $layId].document).find('.layui-table-body table.layui-table tr[status="edit"]').attr("status","");
+        }
+        parent.layer.closeAll();
+        return false;
+      });
+
+      $(".btn-close").click(function(){
+        var $layId = $(parent.document).find('.layui-this').attr('lay-id');
+        $(window.parent['f' + $layId].document).find('.layui-table-body table.layui-table tr[status="edit"]').attr("status","");
+        var index = parent.layer.getFrameIndex(window.name);
+        parent.layer.close(index);
+      });
+    });
+  });
+  </script>
+</html>

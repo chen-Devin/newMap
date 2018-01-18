@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>会计科目 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+    <style>
+        .organize {
+            padding: 10px 15px 10px 0;
+            overflow: auto;
+        }
+        
+        #menus cite p {
+            margin: 0;
+            padding: 0;
+            display: inline;
+        }
+        
+        #menus cite p.current {
+            color: #f60 !important;
+        }
+        
+        #menus cite p.cancel {
+            color: #999;
+        }
+        
+        #menus cite p.cancel span.status {
+            color: #999;
+        }
+        
+        .left-panel {
+            padding: 0;
+        }
+        
+        .right-panel {
+            padding: 8px 15px 0;
+            border-left: #ddd 1px solid;
+            overflow: auto;
+        }
+        /* #menus cite.cur {
+            color: #f60;
+        }
+        
+        #menus cite.cancle {
+            color: #999;
+        } */
+    </style>
+</head>
+
+<body style="margin:0 0 0 15px;">
+    <div class="layui-row">
+        <div class="layui-col-lg3 layui-col-md3 layui-col-sm4 left-panel">
+            <!--start: 按钮组-->
+            <div class="panel-handle btns-bar" style="border-bottom:#ddd 1px solid; padding-bottom:10px;">
+                <div class="layui-btn-group fl">
+                    <button class="layui-btn layui-btn-normal layui-btn-small" data-type="addCompany">新增</button>
+                    <button class="layui-btn layui-btn-normal layui-btn-small" data-type="statusCancel">停用</button>
+                    <button class="layui-btn layui-btn-normal layui-btn-small" data-type="statusStart">启用</button>
+                </div>
+                <div class="clr"></div>
+            </div>
+            <!--end: 按钮组-->
+
+            <div class="organize">
+                <ul id="menus"></ul>
+            </div>
+        </div>
+        <div class="layui-col-lg9 layui-col-md9 layui-col-sm8 right-panel">
+            <div id="rightMainer"></div>
+        </div>
+    </div>
+</body>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script charset="utf-8" src="./list.js?v=1219"></script>
+
+</html>

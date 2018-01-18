@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>编辑客户 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+      span.required {color:#f00; font-family:'simsun', '宋体'; margin-right:5px; font-size:15px;}
+      .form-txt {color:#999; font-size:12px; margin-top:10px; display:block;}
+      .layui-form-label {width:200px;}
+      .layui-input-inline {width:300px;}
+      .layui-form-item {margin-bottom: 0;}
+      .hide-box {display:none;}
+      .hide-btn {text-align:right; margin-bottom:-20px;}
+      .hide-btn a {font-size:12px; color:#1E9FFF;}
+      .hide-btn a i {margin-left:5px; font-size:12px;}   
+      .layui-btn.layui-btn-radius {line-height:20px;height: 20px;padding: 0 30px;margin-top: 10px; }   
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off" style="width:900px">
+      <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+        <legend>添加</legend>
+      </fieldset>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>渠道：</label>
+        <div class="layui-input-block">
+          <input type="radio" name="channelType" lay-filter="channelType" value="0" title="银行" checked>
+          <input type="radio" name="channelType" lay-filter="channelType" value="1" title="支付宝" >
+          <input type="radio" name="channelType" lay-filter="channelType" value="2" title="微信" >
+        </div>          
+      </div>
+      <div class="layui-form-item row-bank">
+        <div class="layui-inline">
+          <label class="layui-form-label"><span class="required">*</span>开户银行：</label>
+          <div class="layui-input-block">
+            <select name="bankName" id="bankName" lay-verify="bankName" lay-search lay-filter="bankName" lay-search hc-data_url="/ucenter/general/finance/settlementChannel/search.shtml" hc-data_id_field="bankName" hc-data_text_field="bankName">
+                <option value="" selected>请选择</option>
+                <option value="" disabled>数据加载中...</option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label"><span class="required">*</span>分行/支行：</label>
+          <div class="layui-input-inline">
+            <input type="text" name="bankSubBranch" value="街道口分行" lay-verify="bankSubBranch" class="layui-input" maxlength="51">
+          </div>
+        </div>
+      </div>
+    
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label"><span class="required">*</span>账户名称：</label>
+          <div class="layui-input-inline">
+            <input type="text" name="accountName" value="yu2490100" lay-verify="accountName" class="layui-input" maxlength="51">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label"><span class="required">*</span>账号：</label>
+          <div class="layui-input-inline">
+            <input type="text" name="accountNo" value="420135124502" lay-verify="accountNo" class="layui-input" maxlength="51">
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">备注：</label>
+          <div class="layui-input-inline">
+              <textarea name="remarks" lay-verify="accountNo" id="account" placeholder="" maxlength="1000" class="layui-textarea"></textarea>
+          </div>
+        </div>
+      </div>
+      <div  id = "inputEdit" class="layui-form-item" style="margin:0 0 0 250px"> 
+        <input type="checkbox" name="conAdd" lay-verify="conAdd" value="1" title="保存后继续新增" lay-skin="primary">
+        <button class="layui-btn layui-btn-radius layui-btn-normal hold" id="vsubmit" lay-submit lay-filter="submit" style="margin-left: 30px;margin-right: 30px;">保存</button>
+        <!-- <button class="layui-btn layui-btn-radius layui-btn-normal" style="margin-left: 30px;margin-right: 30px">保存</button> -->
+        <button class="layui-btn layui-btn-radius layui-btn-normal">取消</button> 
+      </div>
+    
+    </form>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  <!-- <script charset="utf-8" src="/view/tms/static/js/tms_company.js?v=1.0"></script> -->
+  <!-- 工具库依赖 -->
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  <script>
+    // console.log(window.parent['f' + $layId]);
+  </script>
+  <script>
+  layui.use(['form', 'layer', 'layedit', 'laydate'], function(){
+    // console.log(parent);
+    var form = layui.form,
+        layer = layui.layer,
+        layedit = layui.layedit,
+        laydate = layui.laydate,
+        $ = layui.jquery;
+
+    bizUtil.init.initSelectData();
+    
+    laydate.render({
+      elem: '#birthday'
+    });
+    laydate.render({
+      elem: '#positionDate'
+    });
+    form.on('radio(channelType)', function(data){
+      console.log(data);
+      if (data.value == "1" || data.value == "2") {
+        $(".row-bank").hide();
+        $("select[name='bankName']").attr("lay-verify","");
+        $("input[name='bankSubBranch']").attr("lay-verify","");
+      }else {
+        $(".row-bank").show();
+        $("select[name='bankName']").attr("lay-verify","bankName");
+        $("input[name='bankSubBranch']").attr("lay-verify","bankSubBranch");
+      };
+    });
+    // $('#userDistrict').district(form);
+    // $('#juryDistrict').district(form);
+    //自定义验证规则
+    form.verify({
+      loginAccid: function(v){
+        if(v.length > 0 && !$jsReg.userName.test(v)){
+          return '登录账号格式不正确';
+        }else if(v.length > 50){
+          return '登录账号长度最多50位';
+        }
+      },
+      loginPwd: function(v){
+        if(v.length > 50){
+          return '登录密码长度最多50位';
+        }
+      },
+      payAccid: function(v){
+        if(v.length > 0 && !$jsReg.userName.test(v)){
+          return '登录账号格式不正确';
+        }else if(v.length > 50){
+          return '登录账号长度最多50位';
+        }
+      },
+      payPwd: function(v){
+        if(v.length > 50){
+          return '登录密码长度最多50位';
+        }
+      }
+    });
+
+    
+    //监听提交
+    var datas,
+        $type = $.trim(getUrlParam('do')),
+        $id = $.trim(getUrlParam('id')),
+        // $channelType = $.trim(getUrlParam('channelType')),
+        // $types = $.trim(getUrlParam('ppp')),
+        // $bankName2 =unescape(getUrlParam("bankName")),
+        
+        $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+        console.log(parent['f' + $layId]);
+        // console.log($types);
+        // console.log($(window.parent['f' + $layId].document).find('input[name=dataSSC]').attr('data-func'));
+        // console.log($bankName);
+    //监听提交
+    function callB(obj){
+        console.log(obj);
+        return obj
+    }
+
+    console.log($id);
+    if($type == 'edit' || $type == 'add'){
+    //   form.on('submit(submit)', function(data){
+      form.on('submit(submit)', function(data){
+        // layer.msg(JSON.stringify(data.field));
+        // return false;
+        console.log('nnn');
+        // console.log("000");
+        var conAdd = $.trim(data.field.conAdd);
+        var $saveDataHD = {
+            channelType:parseInt($.trim(data.field.channelType)),
+            bankName:$.trim(data.field.bankName),
+            bankSubBranch:$.trim(data.field.bankSubBranch),
+            accountName:$.trim(data.field.accountName),
+            accountNo:$.trim(data.field.accountNo),
+            remarks:$.trim(data.field.remarks),
+            id:$id,
+            status:3
+        };
+        // if($type == 'edit'){
+        //   $saveDataHD.$id=parseInt($id);
+        // }
+        // data.field
+        // console.log($saveDataHD);
+        var datas = JSON.stringify($saveDataHD);
+        
+            $.ajax({
+                    type:'POST', 
+                    url:'/ucenter/crm/supplier/supplierSettlementChannel/add.shtml', 
+                    dataType:"json",      
+                    contentType:"application/json",               
+                    data:datas, 
+                    success:function(d){
+                        console.log(d);
+                        var $code = d.code,
+                            $msg = d.msg,
+                            $objects = d.objects;
+                            
+                        if($code === 'SUCCESS'){
+                            // obj.update(objs);
+                            // parent.layer.closeAll();
+                            // parent.layer.alert('保存成功！', {
+                            //   yes: function(){
+                            //     //关闭窗口
+                            //     parent.layer.closeAll();
+                            //   }
+                            // });
+                            $(':input','#myform').not(':button, :submit, :reset, :hidden').val('').removeAttr('checked').removeAttr('selected'); 
+
+                        }
+                    }        
+                });
+        if(conAdd != 1){
+            parent.layer.closeAll();
+        }
+        // console.log(datas);
+        // $(window.parent['f' + $layId].document).find('.tableSSC').attr('data-func','callbackSSC('+datas+')');
+        
+      });
+
+    }
+  });
+  </script>
+</html>

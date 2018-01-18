@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>员工管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+    <style>
+        .layui-table {
+            margin: 3px 0 15px;
+        }
+        
+        .layui-table td {
+            padding: 0;
+        }
+        
+        .layui-table th span {
+            float: right;
+        }
+        
+        .layui-table th span input[type=checkbox] {
+            vertical-align: -2px;
+        }
+        
+        #menuPermi,
+        #btnsPermi {
+            padding: 12px 15px;
+            height: 300px;
+            overflow: auto;
+            background: #fff;
+        }
+        
+        #btnsPermi dl {
+            margin: 0;
+        }
+        
+        #btnsPermi dl dt {
+            border-bottom: #ddd 1px dotted;
+            padding-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        #btnsPermi dl dd {
+            margin: 5px 0;
+            padding: 5px;
+            border: #ddd 1px solid;
+        }
+        
+        #btnsPermi dl dd h4 {
+            padding: 0 3px;
+            font-size: 12px;
+            color: #055bae;
+        }
+        
+        #btnsPermi .layui-form-checkbox {
+            margin: 5px 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <blockquote class="layui-elem-quote layui-quote-nm">
+        <b>注：</b><br> 1、如果需要给员工赋予角色之外的权限，可以在本页面设置，一般情况，请尽量通过角色去赋予员工角色；<br> 2、给员工赋予角色后，然后在本页面再单独设置权限，该员工将拥有角色和自己单独设置的权限之和；<br>3、菜单权限：复选框勾选，勾选的一级菜单，单击菜单名称可查看功能权限，双击菜单名称展开。
+    </blockquote>
+    <table class="layui-table" id="menuBox">
+        <colgroup>
+            <col width="50%">
+            <col width="50%">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>菜单权限</th>
+                <th>功能权限</th>
+                <!-- <th>功能权限<span><input type="checkbox" name="checkAll"> 全选</span></th> -->
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div id="menuPermi">
+                        <ul id="menus"></ul>
+                    </div>
+                </td>
+                <td>
+                    <div id="btnsPermi">
+                        <form class="layui-form" autocomplete="off" style="min-width:auto;">
+                            <div id="subBtns"></div>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="button-bar" style="margin:0 0 25px;">
+        <input type="hidden" name="rolePermis">
+        <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit">保存</button>
+        <button class="layui-btn layui-btn-primary" id="vclose">关闭</button>
+    </div>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/menuPermi.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use('form', function() {
+        var $id = getUrlId($.trim(getUrlParam('id')));
+        var form = layui.form;
+        var $url = '/ucenter/centre/permi/employee/' + $id + '/authorization.shtml';
+
+        //获取员工角色和权限
+        $.get($url, function(d) {
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+
+            if ($code != 'SUCCESS') return false;
+
+            if ($objects != null) {
+                var $roleIds = $objects.roleIds;
+                $('input[name="rolePermis"]').val($roleIds.join(','));
+                $('#menuBox').treeMenu($url);
+            }
+        }, 'json');
+
+        form.on('submit(submit)', function(data) {
+            var $selRoleVal = $.trim($('input[name="rolePermis"]').val()),
+                $selMenuObjs = $('#subBtns input[name="btnId"]:checked'),
+                $notSelMenuObjs = $('#subBtns input[name="btnId"]').not(':checked'),
+                $addRoleIds = [],
+                $removeRoleIds = [],
+                $addFunctionIds = [],
+                $removeFunctionIds = [];
+
+            if ($selRoleVal.length > 0) {
+                $selRoleVal = $selRoleVal.split(',');
+                $.each($selRoleVal, function(k, v) {
+                    $addRoleIds.push(parseInt(v));
+                });
+            }
+
+            $selMenuObjs.each(function() {
+                $addFunctionIds.push(parseInt($(this).val()));
+            });
+
+            $notSelMenuObjs.each(function() {
+                $removeFunctionIds.push(parseInt($(this).val()));
+            });
+
+            $rmvMenuIds = deWeightArr($rmvIds);
+            $removeFunctionIds = deWeightArr($removeFunctionIds.concat($rmvMenuIds));
+
+            // console.log($addRoleIds);
+            // console.log($removeRoleIds);
+            // console.log($addFunctionIds);
+            // console.log($removeFunctionIds);
+
+            //数据源
+            var $saveData = {
+                addRoleIds: $addRoleIds,
+                removeRoleIds: $removeRoleIds,
+                addFunctionIds: $addFunctionIds,
+                removeFunctionIds: $removeFunctionIds
+            }
+
+            // console.log($saveData);
+            // return false;
+
+            //保存数据，调用接口
+            $.ajax({
+                type: 'PUT',
+                url: '/ucenter/centre/permi/employee/' + $id + '/authorization.shtml',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify($saveData),
+                success: function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code === 'SUCCESS') {
+                        setLayerAlert(parent.layer, '保存成功', {
+                            yes: function() {
+                                parent.layer.closeAll();
+
+                                //获取当前框架ID
+                                var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+                                parent['f' + $layId].location.reload();
+                            }
+                        });
+                    } else {
+                        setLayerAlert(parent.layer, '保存失败');
+                    }
+                }
+            });
+
+            return false;
+        });
+    });
+</script>
+
+</html>

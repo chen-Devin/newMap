@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>付款记录 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <style>
+      .layui-form-item{
+          margin:0;
+      }
+  </style>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane" autocomplete="off">
+            <div class="layui-row layui-col-space5">
+                <div class="layui-col-sm1" style="width:25%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">收款日期</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <input type="text" name="startTime" id="beginDate" placeholder="开始时间" class="layui-input">
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="endTime" id="endDate" placeholder="到期时间" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">单位简称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="targetName" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">付款单号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="expenditureNo" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">付款账号</label>
+                        <div class="layui-input-block">
+                            <select name="accountNo">
+                                <option value="" selected="selected">请选择</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">账期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="billMonth" class="layui-input" id="billMonth"  placeholder="全部">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--end: 搜索-->
+    
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+      <div class="fl">
+        <button class="layui-btn layui-btn-normal" data-type="deriveBrief">导出</button>
+      </div>
+      <!-- <div class="layui-btn-group fr">
+        <button class="layui-btn"><i class="layui-icon">&#xe614;</i>定义表头</button>
+        <button class="layui-btn"><i class="layui-icon">&#xe62d;</i>导出EXCEL</button>
+      </div> -->
+      <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+  </body>
+    <script type="text/html" id="statusTpl">
+    {{#  if(d.status == 1){ }}
+      <p>已到账</p>
+    {{#  }else{ }}
+      <p>撤销</p>
+    {{#  } }}
+  </script>
+  <script type="text/html" id="billMonthTpl">
+      {{new Date(d.billMonth).format("yyyy-MM")}}
+  </script>
+  <script type="text/html" id="expenditureDateTpl">
+      {{new Date(d.expenditureDate).format("yyyy-MM-dd")}}
+  </script>
+  <script type="text/html" id="createDateTpl">
+      {{new Date(d.createDate).format("yyyy-MM-dd hh:mm:ss")}}
+  </script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'laydate', 'table', 'tms_tab'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+        laydate.render({
+          elem: '#beginDate'
+        });
+        laydate.render({
+          elem: '#endDate'
+        });
+        laydate.render({
+          elem: '#billMonth'
+          ,type: 'month'
+        });
+    
+    var $targetName,
+      $expenditureNo,
+      $settlementChannelId,
+      $billMonth,
+      $startTime,
+      $endTime;
+
+    setTableData();
+
+    //加载收支账户下拉框数据
+    $.get('/ucenter/general/finance/settlementChannel/searchBankNameAccountNo.shtml', function(d) {
+        var $code = d.code,
+            $msg = d.msg,
+            $objects = d.objects;
+        if ($code != 'SUCCESS') return false;
+        if ($objects.length > 0) {
+            for (var $i = 0; $i < $objects.length; $i++) {
+                if ($objects[$i].accountName != null && $objects[$i].accountNo != null && $objects[$i].status == 1) {
+                    $('select[name="accountNo"]').append('<option value="' + $objects[$i].id + '">' + $objects[$i].accountNo + '(' + $objects[$i].accountName + ')</option>');
+                }
+            }
+            form.render('select');
+        }
+    }, 'json');
+    
+    //监听提交
+    form.on('submit(search)', function(data){
+      $targetName = $.trim(data.field.targetName),
+      $expenditureNo = $.trim(data.field.expenditureNo),
+      $settlementChannelId  = $.trim(data.field.accountNo ),
+      $billMonth = $.trim(data.field.billMonth),
+      $startTime = $.trim(data.field.startTime),
+      $endTime = $.trim(data.field.endTime);
+      setTableData($targetName, $expenditureNo, $settlementChannelId, $billMonth, $startTime, $endTime);
+      console.log($targetName, $expenditureNo, $settlementChannelId, $billMonth, $startTime, $endTime);
+      return false;
+    });
+    
+    //方法级渲染
+    function setTableData($targetName, $expenditureNo, $settlementChannelId, $billMonth, $startTime, $endTime){
+      typeof $targetName != 'undefined' ? $targetName = $targetName : $targetName = '';
+      typeof $expenditureNo != 'undefined' ? expenditureNo = expenditureNo : expenditureNo = '';
+      typeof $settlementChannelId != 'undefined' ? $settlementChannelId = $settlementChannelId : $settlementChannelId = '';
+      typeof $billMonth != 'undefined' ? $billMonth = $billMonth : $billMonth = '';
+      typeof $startTime != 'undefined' ? $startTime = $startTime : $startTime = '';
+      typeof $endTime != 'undefined' ? $endTime = $endTime : $endTime = '';
+      var $pageSize = 15;
+
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/expenditureRecord/paymentHistory.shtml',
+        where:{"targetName":$targetName,"expenditureNo":$expenditureNo,"settlementChannelId":$settlementChannelId,"billMonth":$billMonth,"startTime":$startTime,"endTime":$endTime
+        },
+        method:"post",
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          // {checkbox: true, fixed: true},
+          {field:'expenditureNo', title: '付款单号', align: 'center', width:170},
+          {field:'targetName', title: '结算单位', align: 'center', width:150},
+          {field:'askPriceNo', title: '请款号', align: 'center', width:200},
+          {field:'billMonth', title: '账期', align: 'center', width:90, templet:"#billMonthTpl"},
+          {field:'paymentAccountNumber', title: '付款账号', align: 'center', width:250},
+          {field:'price', title: '付款金额', align: 'center', width:110},
+          {field:'expenditureDate', title: '付款日期', align: 'center', width:110, templet:"#expenditureDateTpl"},
+          {field:'described', title: '摘要', align: 'center', width:150},
+          {field:'status', title: '状态', align: 'center', width:90, templet:"#statusTpl"},
+          {field:'creator', title: '创建人', align: 'center', width:110},
+          {align:'createDate', title: '创建时间', align: 'center', width:200, templet:"#createDateTpl"}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){}
+      });
+    }
+
+    //监听工具条
+    table.on('tool(tbar)', function(obj){
+      
+    });
+
+    var active = {
+      //导出
+      deriveBrief: function(){
+        typeof $targetName != 'undefined' ? $targetName = $targetName : $targetName = '';
+        typeof $settlementChannelId != 'undefined' ? $settlementChannelId = $settlementChannelId : $settlementChannelId = '';
+        typeof $expenditureNo != 'undefined' ? $expenditureNo = $expenditureNo : $expenditureNo = '';
+        typeof $billMonth != 'undefined' ? $billMonth = $billMonth : $billMonth = '';
+        typeof $startTime != 'undefined' ? $startTime = $startTime : $startTime = '';
+        typeof $endTime != 'undefined' ? $endTime = $endTime : $endTime = '';
+        $.ajax({
+          type:'GET', 
+          url:'/ucenter/general/finance/expenditureRecord/paymentHistoryExport.shtml?targetName=' + $targetName + '&expenditureNo=' + $expenditureNo + '&settlementChannelId=' + $settlementChannelId + '&billMonth=' + $billMonth + '&startTime=' + $startTime + '&endTime=' + $endTime , 
+          success:function(d){
+            if(d.code == 'ERROR_FINANACE_EXPORT_EXCEL'){
+              parent.layer.alert('没有查询到相关数据！');
+            }else{
+                document.location.href = '/ucenter/general/finance/expenditureRecord/paymentHistoryExport.shtml?targetName=' + $targetName + '&expenditureNo=' + $expenditureNo + '&settlementChannelId=' + $settlementChannelId + '&billMonth=' + $billMonth + '&startTime=' + $startTime + '&endTime=' + $endTime
+            }
+          },
+          error:function(){
+             parent.layer.alert('操作失败！');
+          }
+        });
+      }
+    };
+  
+    $('.btns-bar .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+  });
+  </script>
+</html>

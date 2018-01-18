@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>银行账号管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+    <style>
+        .layui-form-item {
+            margin: 0;
+        }
+        
+        .layui-layer-tips .layui-layer-content {
+            padding: 0;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane">
+            <!-- <button class="layui-btn layui-btn-danger" onclick="window.location.href='list.html'">全部</button> -->
+            <div class="layui-row layui-col-space5">
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">账户名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="accountName" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">账户</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="accountNo" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                            <label class="layui-form-label">渠道</label>
+                        <div class="layui-input-block">
+                            <select name="channelType">
+                                <option value="" selected="selected">全部</option>
+                                <option value="0">银行</option>
+                                <option value="1">支付宝</option>
+                                <option value="2">微信</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                            <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            <select name="status">
+                                <option value="" selected="selected">全部</option>
+                                <!-- <option value="0">未激活</option> -->
+                                <option value="1">激活</option>
+                                <option value="3">冻结</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <button class="layui-btn layui-btn-danger btn-search" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                    </div>
+                </div>
+               
+            </div>
+        </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+        <div class="layui-btn-group fl">
+            <button class="layui-btn layui-btn-normal" data-type="addData">新增</button>
+            <button class="layui-btn layui-btn-normal" data-type="detailData">查看</button>
+            <button class="layui-btn layui-btn-normal" data-type="actData">激活</button>
+            <button class="layui-btn layui-btn-normal" data-type="frozenData">冻结</button>
+        </div>
+        <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList"></table>
+    <!--end:表格列表-->
+</body>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script charset="utf-8" src="./list.js"></script>
+<script type="text/html" id="channelTypeTpl">
+    {{# if(d.channelType == '0'){ }}
+        银行 
+    {{# } else if(d.channelType == '1'){ }}
+        支付宝 
+    {{# } else if(d.channelType == '2'){ }}
+        微信 
+    {{# } }}
+</script>
+<script type="text/html" id="statusTpl">
+    {{# if(d.status == '0'){ }} 未激活 {{# } else if(d.status == '1'){ }} 激活 {{# } else if(d.status == '3'){ }} 冻结 {{# } }}
+</script>
+<script type="text/html" id="balanceTpl">
+    <p class="layui-table-link" data-id="{{d.id}}" style="cursor:pointer;">{{ d.balance != null ? d.balance : "0" }}</p>
+</script>
+<script type="text/html" id="createDateTpl">
+    {{d.createDate != null ? new Date(d.createDate).format("yyyy-MM-dd hh:mm:ss") : ""}}
+</script>
+
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>新增银行账号</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+    <style>
+        .not{cursor:not-allowed;}
+    </style>
+</head>
+
+<body>
+    <form class="layui-form" autocomplete="off" style="min-width:800px;">
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-md7">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">渠道</label>
+                        <div class="layui-input-block">
+                            <input type="radio" name="way" value="0" title="银行" lay-filter="way" checked>
+                            <input type="radio" name="way" value="1" title="支付宝" lay-filter="way">
+                            <input type="radio" name="way" value="2" title="微信" lay-filter="way">
+                        </div>
+                    </div>
+                </div>
+            </div>
+           <div class="layui-row row-bank">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">开户银行</label>
+                        <div class="layui-input-block">
+                            <select name="bank" lay-verify="required">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                        <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">分行/支行</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="branch" id="branch" placeholder="请输入分行或支行名称" class="layui-input" lay-verify="required" maxlength="200" hc-verify="bankName">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">账户名称</label>
+                        <div class="layui-input-block">
+                                <input type="text" name="name" id="name" placeholder="请输入收款人名称" class="layui-input" lay-verify="required" maxlength="255" hc-verify="companyRegex|companySize" hc-verify_field="收款人名称/姓名">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                        <div class="layui-form-item layui-form-item--require">
+                                <label class="layui-form-label">账号</label>
+                        <div class="layui-input-block">
+                                <input type="text" name="account" id="account" placeholder="请输入账号" class="layui-input" maxlength="50" lay-verify="required">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">初始余额</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="balance" id="balance" placeholder="请输入初始余额" class="layui-input" maxlength="12" lay-verify="required" hc-verify="expenst" hc-verify_field="初始余额">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                        <div class="layui-form-item layui-form-item--require">
+                                <label class="layui-form-label">账号状态</label>
+                        <div class="layui-input-block">
+                                <select name="status" lay-verify="required">
+                                <option value="1">激活</option>
+                                <option value="3">冻结</option>
+                                </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item">
+                            <label class="layui-form-label">创建人</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="creator" id="creator" class="layui-input not" placeholder="当前账户，不可修改" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                        <div class="layui-form-item">
+                                <label class="layui-form-label">创建时间</label>
+                        <div class="layui-input-block">
+                                <input type="text" name="createDate" id="createDate" class="layui-input not"  placeholder="创建时,默认为系统当前时间,不可修改" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item">
+                            <label class="layui-form-label">更新者</label>
+                        <div class="layui-input-block">
+                                <input type="text" name="modifier" id="modifier" class="layui-input not" placeholder="当前账户，不可修改" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                        <div class="layui-form-item">
+                                <label class="layui-form-label">更新时间</label>
+                        <div class="layui-input-block">
+                                <input type="text" name="modifyDate" id="modifyDate" class="layui-input not" placeholder="创建时,默认为系统当前时间,不可修改" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm12">
+                    <div class="layui-form-item">
+                            <label class="layui-form-label">备注</label>
+                        <div class="layui-input-block">
+                                <textarea name="remarks" id="remarks" placeholder="0~1000字符之间" class="layui-textarea" style="min-height:50px;" maxlength="1000" hc-verify="remarkSize"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item btn-group"  style="text-align:center;margin-left:-80px">
+                <div class="layui-input-block" id="inputEdit" >
+                        <button class="layui-btn  layui-btn-normal btn-save" style="width:120px;" lay-submit="" lay-filter="submit">保存</button>
+                        <button type="reset" style="width:120px;" class="layui-btn btn-close btn-return layui-btn-primary">取消</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- <form class="layui-form" method="post" autocomplete="off">
+     
+    </form> -->
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script charset="utf-8" src="./addBank.js?v=1219"></script>
+</html>

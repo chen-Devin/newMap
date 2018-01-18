@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>车辆保险 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+</head>
+
+<body>
+    <form class="layui-form" autocomplete="off">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top:20px;">
+            <legend>保险管理</legend>
+        </fieldset>
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">车牌号码</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm4">
+                                <div class="margin-right10">
+                                    <select name="carShort">
+                                <option value="粤">粤</option>
+                                <option value="京">京</option>
+                                <option value="津">津</option>
+                                <option value="沪">沪</option>
+                                <option value="渝">渝</option>
+                                <option value="冀">冀</option>
+                                <option value="豫">豫</option>
+                                <option value="云">云</option>
+                                <option value="辽">辽</option>
+                                <option value="黑">黑</option>
+                                <option value="湘">湘</option>
+                                <option value="皖">皖</option>
+                                <option value="鲁">鲁</option>
+                                <option value="新">新</option>
+                                <option value="苏">苏</option>
+                                <option value="浙">浙</option>
+                                <option value="赣">赣</option>
+                                <option value="鄂">鄂</option>
+                                <option value="桂">桂</option>
+                                <option value="甘">甘</option>
+                                <option value="晋">晋</option>
+                                <option value="蒙">蒙</option>
+                                <option value="陕">陕</option>
+                                <option value="吉">吉</option>
+                                <option value="闽">闽</option>
+                                <option value="贵">贵</option>
+                                <option value="青">青</option>
+                                <option value="藏">藏</option>
+                                <option value="川">川</option>
+                                <option value="宁">宁</option>
+                                <option value="琼">琼</option>
+                              </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm4">
+                                <div>
+                                    <input type="text" name="carNo" id="carNo" placeholder="" maxlength="10" class="layui-input layui-col-sm6" lay-verify="required">
+                                    <input type="hidden" name="carId">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm1 line-space">/</div>
+                            <div class="layui-col-sm3">
+                                <div>
+                                    <select name="carColor" lay-verify="required">
+                                <option value="黄">黄</option>
+                                <option value="黑">黑</option>
+                                <option value="白">白</option>
+                                <option value="蓝">蓝</option>
+                                <option value="绿">绿</option>
+                              </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">保险种类</label>
+                        <div class="layui-input-block">
+                            <select name="insuranceType" lay-verify="required" lay-filter="insuranceType">
+                                  <option value=""></option>
+                                  <option value="0">交强险</option>
+                                  <option value="1">商业险</option>
+                                  <option value="2">车船税</option>
+                                </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label warrantyNoTitle">保单号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="warrantyNo" id="warrantyNo" placeholder="" maxlength="30" class="layui-input" lay-verify="required">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">起始有效期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="indateB" id="indateB" placeholder="" class="layui-input" lay-verify="required" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">截止有效期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="indateE" id="indateE" placeholder="" class="layui-input" lay-verify="required" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label ">保费</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="premium" id="premium"  maxlength="12" class="layui-input" placeholder="0~999999999.99" lay-verify="required" hc-verify="expenst" hc-verify_field="保费">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require amountClaimsMaxDiv">
+                        <label class="layui-form-label">最高理赔金额</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="amountClaimsMax" id="amountClaimsMax" maxlength="12" class="layui-input" placeholder="0~999999999.99" lay-verify="required" hc-verify="expenst" hc-verify_field="最高理赔金额">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">保费承担</label>
+                        <div class="layui-input-block">
+                            <select name="premiumAssume" lay-verify="required">
+                          <option value="0">公司</option>
+                          <option value="1">车主</option>
+                        </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">购买日期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="dateBuy" id="dateBuy" placeholder="" class="layui-input" lay-verify="required">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">办理人员</label>
+                        <div class="layui-input-block">
+                            <select name="acceptingUname" lay-verify="required">
+                          <option value=""></option>
+                        </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">返司机折扣(%)</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="discountRateDriver" id="discountRateDriver" lay-verify="discountRateDriver" maxlength="5" placeholder="0~100" class="layui-input" hc-verify="range|decimals2" hc-verify_min="0" hc-verify_max="100" hc-verify_field="返司机折扣">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require insuranceCoNameDiv">
+                        <label class="layui-form-label">承保公司</label>
+                        <div class="layui-input-block">
+                            <select name="insuranceCoName" id="insuranceCoName" lay-verify="required">
+                                <option value=""></option>
+                              </select>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require insuranceCoTelDiv">
+                        <label class="layui-form-label">保险公司电话</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="insuranceCoTel" id="insuranceCoTel" maxlength="20" placeholder="" class="layui-input" lay-verify="required" hc-verify="tele">
+                    </div>
+                </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">业务员ID/姓名</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <div class="margin-right10">
+                                    <input type="text" name="salesmanJobNo" id="salesmanJobNo" lay-verify="salesmanJobNo" maxlength="20" placeholder="" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="salesman" id="salesman" maxlength="20" placeholder="" class="layui-input" hc-verify="userName|nameSize" hc-verify_field="业务员姓名">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">业务员手机</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="salesmanMobile" id="salesmanMobile" maxlength="20" placeholder="" class="layui-input" hc-verify="mobile">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br><br>
+        <div class="layui-form-item div-add  button-bar" style="text-align:center;">
+            <div class="layui-inline continue"><input type="checkbox" lay-skin="primary" id="continue" title="保存并继续新增" checked></div>
+            <button class="layui-btn layui-btn-normal submit" lay-submit="" lay-filter="submit">保存</button>
+            <button class="layui-btn layui-btn-primary btn-cancel">取消</button>
+        </div>
+        <div class="layui-form-item div-info" style="text-align:center; display:none;">
+            <button class="layui-btn layui-btn-normal btn-copy" style="width:100px;">复制</button>
+            <button class="layui-btn layui-btn-normal btn-delete" type="button" style="width:100px;">删除</button>
+            <button class="layui-btn layui-btn-normal btn-contract" type="button" style="width:100px;">续保</button>
+            <button class="layui-btn layui-btn-normal btn-cancellation" type="button" style="width:100px;">作废</button>
+            <button class="layui-btn layui-btn-normal btn-modify" type="button" style="width:100px;">编辑</button>
+            <button class="layui-btn layui-btn-normal btn-back" type="button" style="width:100px;">返回</button>
+        </div>
+        <input type="hidden" name="id">
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<script charset="utf-8" src="/view/frame/static/js/layui.district_1.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    $(function() {
+        layui.use(['form', 'layer', 'table', 'laydate'], function() {
+            var form = layui.form,
+                layer = layui.layer,
+                table = layui.table,
+                laydate = layui.laydate,
+                tmsTab = layui.tms_tab,
+                $ = layui.jquery;
+            var statusType,layIdID;
+            var $type = $.trim(getUrlParam('type')),
+                $carNo;
+            if($type == "add"){
+                acceptingUnameFun();
+                insuranceCoNameFun ();
+            }
+           
+
+            function acceptingUnameFun(acceptingUname){
+            //所有人
+            $("select[name='acceptingUname']").empty();
+            $("select[name='acceptingUname']").append("<option value=''></option>");
+            $.get('/ucenter/centre/permi/employee/employee.shtml', function(d) {
+                var $code = d.code,
+                    $msg = d.msg,
+                    $objects = d.objects;
+                if ($code == 'SUCCESS') {
+                    for (var i = 0; i < $objects.length; i++) {
+                        $("select[name='acceptingUname']").append("<option value='" + $objects[i].id + "'>" + $objects[i].name + "</option>");
+                    }
+                } else {
+                    $('select[name="acceptingUname"]').append('<option></option>');
+                }
+                    if(acceptingUname){
+                        $('select[name="acceptingUname"]').val(acceptingUname);
+                    }
+                form.render('select');
+            }, 'json');
+            }
+
+        function insuranceCoNameFun(insuranceCoId){
+            //承保公司
+            $("select[name='insuranceCoName']").empty();
+            $("select[name='insuranceCoName']").append("<option value=''></option>");
+            $.get('/ucenter/crm/supplier/supplier/showInsure.shtml?type=557', function(d) {
+                var $code = d.code,
+                    $msg = d.msg,
+                    $objects = d.objects;
+                if ($code == 'SUCCESS') {
+                    for (var i = 0; i < $objects.length; i++) {
+                        $("select[name='insuranceCoName']").append("<option value='" + $objects[i].id + "'>" + $objects[i].nameShort + "</option>");
+                    }
+                } else {
+                    $('select[name="insuranceCoName"]').append('<option></option>');
+                }
+                if(insuranceCoId){
+                    $('select[name="insuranceCoName"]').val(insuranceCoId);
+                }
+                form.render('select');
+            }, 'json');
+        }
+
+          
+            //日期
+            laydate.render({
+                elem: '#indateB' //起始有效期
+                    ,
+                done: function(value, date, endDate) {
+                    var d = new Date(value);
+                    d.setFullYear(d.getFullYear() + 1);
+                    d.setDate(d.getDate() - 1);
+                    $("#indateE").val(d.format('yyyy-MM-dd'));
+                }
+            });
+            laydate.render({
+                elem: '#indateE' //截止有效期
+            });
+            laydate.render({
+                elem: '#dateBuy' //购买日期
+                    ,
+                value: new Date()
+            });
+
+            form.on('select(insuranceType)', function(data) {
+                if(data.value == 2){
+                    $('.warrantyNoTitle').html("税费发票号");
+                    $('.amountClaimsMaxDiv').removeClass("layui-form-item--require");
+                    $('#amountClaimsMax').attr('lay-verify','');
+                    $('.insuranceCoNameDiv').removeClass("layui-form-item--require");
+                    $('#insuranceCoName').attr('lay-verify','');
+                    $('.insuranceCoTelDiv').removeClass("layui-form-item--require");
+                    $('#insuranceCoTel').attr('lay-verify','');
+
+                    $('#premium').parent().siblings('label').text('税费');
+                    $('select[name="premiumAssume"]').parent().siblings('label').text('费用承担');
+                    form.render();
+                }else{
+                    $('.warrantyNoTitle').html("保单号");
+                    $('.amountClaimsMaxDiv').addClass("layui-form-item--require");
+                    $('#amountClaimsMax').attr('lay-verify','required');
+                    $('.insuranceCoNameDiv').addClass("layui-form-item--require");
+                    $('#insuranceCoName').attr('lay-verify','required');
+                    $('.insuranceCoTelDiv').addClass("layui-form-item--require");
+                    $('#insuranceCoTel').attr('lay-verify','required');
+
+                    $('#premium').parent().siblings('label').text('保费');
+                    $('select[name="premiumAssume"]').parent().siblings('label').text('保费承担');
+                    form.render();
+                }
+            })
+
+            //编辑和续保
+            
+            if ($type == 'edit' || $type == 'info' || $type == 'contract') {
+                $(".continue").hide();
+                var $id = $.trim(getUrlParam('id'));
+                if ($id != null) {
+                    $('input[name="id"]').val($id);
+
+                    //获取数据
+                    $.get('/ucenter/tms/capacity/carInsurance/' + $id + '.shtml', function(d) {
+                        var $code = d.code,
+                            $msg = d.msg,
+                            $objects = d.objects;
+
+                        if ($code === 'SUCCESS') {
+                            statusType = $objects.status;
+                            console.log(statusType);
+                            var $acceptingUid = $objects.acceptingUid;
+                            var $insuranceCoId = $objects.insuranceCoId;
+                            if($objects.insuranceType == 2){
+                                $('.warrantyNoTitle').html("税费发票号");
+                                $('.amountClaimsMaxDiv').removeClass("layui-form-item--require");
+                                $('#amountClaimsMax').attr('lay-verify','');
+                                $('.insuranceCoNameDiv').removeClass("layui-form-item--require");
+                                $('#insuranceCoName').attr('lay-verify','');
+                                $('.insuranceCoTelDiv').removeClass("layui-form-item--require");
+                                $('#insuranceCoTel').attr('lay-verify','');
+
+                                $('#premium').parent().siblings('label').text('税费');
+                                $('select[name="premiumAssume"]').parent().siblings('label').text('费用承担');
+                            }
+                            if (statusType == 0) { //未生效
+                                $(".btn-contract").hide(); //续保
+                                $(".btn-cancellation").hide(); //作废
+                            }
+                            if (statusType == 1) { //生效
+                                $(".btn-delete").hide(); //删除
+                                $(".btn-modify").hide(); //编辑
+                            }
+                            // if(statusType == 2){//删除
+                            //     // $(".btn-copy").hide();      //复制
+                            //     $(".btn-delete").hide();        //删除
+                            //     $(".btn-contract").hide();       //续保
+                            //     $(".btn-cancellation").hide();        //作废
+                            //     $(".btn-modify").hide();          //编辑
+                            //     $(".btn-back").hide();        //返回
+                            // }
+                            if (statusType == 3) { //作废
+                                $(".btn-delete").hide(); //删除
+                                $(".btn-contract").hide(); //续保
+                                $(".btn-cancellation").hide(); //作废
+                                $(".btn-modify").hide(); //编辑
+                                // $(".btn-back").hide(); //返回
+                            }
+                            if (statusType == 4) { //失效
+                                $(".btn-delete").hide(); //删除
+                                $(".btn-cancellation").hide(); //作废
+                                $(".btn-modify").hide(); //编辑
+                            }
+                            if ($objects.carNo != "") {
+                                $('select[name="carShort"]').val($objects.carNo.substring(0, 1));
+                                $('input[name="carNo"]').val($objects.carNo.substring(1));
+                                $('input[name="carId"]').val($objects.carId);
+                            }
+                            $('select[name="carColor"]').val($objects.carColor);
+
+                            $('select[name="insuranceType"]').val($objects.insuranceType);
+                            // $('input[name="insuranceType"]').each(function(){
+                            //   if($objects.insuranceType == parseInt($(this).val())){
+                            //     $(this).prop('checked', true);
+                            //   }else{
+                            //     $(this).prop('checked', false);
+                            //   }
+                            // });
+                            if ($type == 'edit' || $type == 'info') {
+                                $('input[name="warrantyNo"]').val($objects.warrantyNo);
+                                $('input[name="indateE"]').val($objects.indateE != null ? new Date($objects.indateE).format('yyyy-MM-dd') : '');
+                            }
+                            $('input[name="indateB"]').val($objects.indateB != null ? new Date($objects.indateB).format('yyyy-MM-dd') : '');
+                            if ($type == 'contract') {
+                                $('input[name="indateB"]').val($objects.indateE != null ? new Date($objects.indateE + 86400000).format('yyyy-MM-dd') : '');
+                            }
+                            $('input[name="premium"]').val($objects.premium);
+                            $('input[name="amountClaimsMax"]').val($objects.amountClaimsMax);
+                            $('select[name="premiumAssume"]').val($objects.premiumAssume);
+                            $('input[name="discountRateCo"]').val($objects.discountRateCo);
+                            $('input[name="discountRateDriver"]').val($objects.discountRateDriver);
+
+                            $('input[name="salesman"]').val($objects.salesman);
+                            $('input[name="salesmanMobile"]').val($objects.salesmanMobile);
+                            $('input[name="salesmanJobNo"]').val($objects.salesmanJobNo);
+                            $('input[name="dateBuy"]').val($objects.dateBuy != null ? new Date($objects.dateBuy).format('yyyy-MM-dd') : '');
+                            $('input[name="insuranceCoTel"]').val($objects.insuranceCoTel);
+                            acceptingUnameFun($acceptingUid);
+                            insuranceCoNameFun($insuranceCoId);
+                            form.render();
+                        } else {
+                            parent.layer.alert('数据异常');
+                            return false;
+                        }
+                    }, 'json');
+                }
+            } else {
+                $carNo = decodeURI(getUrlParam('carNo'));
+                $carId = $.trim(getUrlParam('carId'));
+                if ($carNo && $carId) {
+                    $('select[name="carShort"]').val($carNo.substring(0, 1));
+                    $('input[name="carNo"]').val($carNo.substring(1));
+                    $('input[name="carId"]').val($carId);
+                    form.render();
+                }
+            }
+            if ($type == 'info') {
+                layIdID = $('.layui-this', window.parent.document).attr('lay-id');
+                $("input,textarea,select").prop("disabled", true);
+                $(".div-add").hide();
+                $(".div-info").show();
+                $("a").css("display", "none");
+                form.render();
+            }
+            var carNoObj = {
+                target: $('#carNo'),
+                notice: 1,
+                callBack: function() {
+                    return {
+                        'firstWord': $('select[name="carShort"]').val(),
+                        'signVal': $('#carNo').val()
+                    }
+                }
+            }
+            verifyCarNuber(carNoObj);
+
+            //监听提交
+            form.on('submit(submit)', function(data) {
+                $('.submit').blur();
+                carNoObj.notice = 2;
+                if (!verifyCarNuber(carNoObj)) {
+                    return false;
+                }
+                if (!bizUtil.validator.verifyContainer($('form'))) {
+                    return false;
+                }
+
+                //返公司折扣为空值为0
+                var $discountRateCo = $.trim(data.field.discountRateCo).length == 0 ? 0 : $.trim(data.field.discountRateCo);
+                //数据源
+                var $saveData = {
+                    carNo: $.trim(data.field.carNo) != "" ? data.field.carShort + $.trim(data.field.carNo) : "",
+                    carId: $.trim(data.field.carId) != "" ? parseInt($.trim(data.field.carId)) : "0",
+                    carColor: $.trim(data.field.carColor),
+                    insuranceType: $.trim(data.field.insuranceType),
+                    warrantyNo: $.trim(data.field.warrantyNo),
+                    indateB: $.trim(data.field.indateB),
+                    indateE: $.trim(data.field.indateE),
+                    premium: $.trim(data.field.premium),
+                    amountClaimsMax: $.trim(data.field.amountClaimsMax),
+                    premiumAssume: $.trim(data.field.premiumAssume),
+                    discountRateCo: $discountRateCo,
+                    discountRateDriver: $.trim(data.field.discountRateDriver),
+                    insuranceCoId: $.trim(data.field.insuranceCoName),
+                    insuranceCoName: $.trim($("select[name='insuranceCoName']").find("option:selected").text()),
+                    insuranceCoTel: $.trim(data.field.insuranceCoTel),
+                    salesman: $.trim(data.field.salesman),
+                    salesmanMobile: $.trim(data.field.salesmanMobile),
+                    salesmanJobNo: $.trim(data.field.salesmanJobNo),
+                    acceptingUid: $.trim(data.field.acceptingUname),
+                    acceptingUname: $.trim($("select[name='acceptingUname']").find("option:selected").text()),
+                    dateBuy: $.trim(data.field.dateBuy)
+                }
+
+                var $url, $method;
+                if ($type == 'edit') {
+                    $url = '/ucenter/tms/capacity/carInsurance/' + $.trim(data.field.id) + '.shtml';
+                    $method = 'PUT';
+                    $saveData.id = $('input[name="id"]').val();
+                } else {
+                    $url = '/ucenter/tms/capacity/carInsurance/add.shtml';
+                    $method = 'POST';
+                }
+
+                //调用接口
+                HC.ajax[$method.toLowerCase()]({
+                    type: $method,
+                    url: $url,
+                    data: JSON.stringify($saveData),
+                    success: function(d) {
+                        parent.layer.alert("保存成功", {
+                            closeBtn: 0,
+                            yes: function(index) {
+                                parent.layer.close(index);
+                                if ($("#continue").is(":checked")) { //保存后继续新增
+                                    if ($type == 'edit') {
+                                        $(window.parent['f1'].document).find('.btn-search').click();
+                                        bizUtil.frame.closeCurrentIframeTab(window.parent);
+                                    } else if ($type == 'contract') {
+                                        $(window.parent['f1'].document).find('.btn-search').click();
+                                        bizUtil.frame.closeCurrentIframeTab(window.parent);
+                                    } else {
+                                        $(window.parent['f1'].document).find('.btn-search').click();
+                                        $("input[name='carNo']").val("");
+                                        $("input[name='carId']").val("");
+                                        $("input[name='warrantyNo']").val("");
+                                        $("input[name='indateB']").val("");
+                                        $("input[name='indateE']").val("");
+                                        $("input[name='premium']").val("");
+                                        $("input[name='amountClaimsMax']").val("");
+                                        $("input[name='discountRateCo']").val("");
+                                        $("input[name='discountRateDriver']").val("");
+                                    }
+                                } else {
+                                    $(window.parent['f1'].document).find('.btn-search').click();
+                                    bizUtil.frame.closeCurrentIframeTab(window.parent);
+                                }
+                            }
+                        });
+                    }
+                });
+                return false;
+            });
+
+            //删除操作
+            $(".btn-delete").click(function() {
+                parent.layer.confirm('确定删除该记录？', function(index) {
+                    var idArr = [];
+                    idArr.push($("input[name='id']").val());
+
+                    if (idArr.length > 0) {
+                        var $saveData = {
+                            ids: idArr,
+                            status: 2
+                        }
+
+                        $.ajax({
+                            url: '/ucenter/tms/capacity/carInsurance/status.shtml',
+                            data: JSON.stringify($saveData),
+                            type: 'PUT',
+                            dataType: 'json',
+                            contentType: 'application/json',
+                            beforeSend: function() {},
+                            success: function(d) {
+                                var $code = d.code;
+                                $msg = d.msg;
+                                $objects = d.objects;
+
+                                if ($code === 'SUCCESS') {
+                                    parent.layer.alert('删除成功', {
+                                        closeBtn: 0,
+                                        yes: function(index) {
+                                            parent.layer.close(index);
+                                            $(window.parent['f1'].document).find('.btn-search').click();
+                                            tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+                                        }
+                                    });
+                                } else if ($code === 'ERROR_USER_LOGOFF') {
+                                    loginFailure();
+                                } else {
+                                    parent.layer.alert('数据异常');
+                                }
+                            }
+                        });
+                        return false;
+                    }
+                });
+            });
+
+            //续保操作
+            $(".btn-contract").click(function() {
+                parent.layer.confirm('确定续保该记录？', function(index) {
+                    var idArr = [];
+                    idArr.push($("input[name='id']").val());
+
+                    if (idArr.length > 0) {
+                        var $saveData = {
+                            ids: idArr,
+                            status: 4
+                        }
+
+                        $.ajax({
+                            url: '/ucenter/tms/capacity/carInsurance/status.shtml',
+                            data: JSON.stringify($saveData),
+                            type: 'PUT',
+                            dataType: 'json',
+                            contentType: 'application/json',
+                            beforeSend: function() {},
+                            success: function(d) {
+                                var $code = d.code;
+                                $msg = d.msg;
+                                $objects = d.objects;
+
+                                if ($code === 'SUCCESS') {
+                                    parent.layer.alert('续保成功', {
+                                        closeBtn: 0,
+                                        yes: function(index) {
+                                            parent.layer.close(index);
+                                            tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+                                            // bizUtil.frame.refreshCurrentFrame();
+                                        }
+                                    });
+                                } else if ($code === 'ERROR_USER_LOGOFF') {
+                                    loginFailure();
+                                } else {
+                                    parent.layer.alert('数据异常');
+                                }
+                            }
+                        });
+                        return false;
+                    }
+                });
+            });
+
+            //作废操作
+            $(".btn-cancellation").click(function() {
+                parent.layer.confirm('确定作废该记录？', function(index) {
+                    var idArr = [];
+                    idArr.push($("input[name='id']").val());
+
+                    if (idArr.length > 0) {
+                        var $saveData = {
+                            ids: idArr,
+                            status: 3
+                        }
+
+                        $.ajax({
+                            url: '/ucenter/tms/capacity/carInsurance/status.shtml',
+                            data: JSON.stringify($saveData),
+                            type: 'PUT',
+                            dataType: 'json',
+                            contentType: 'application/json',
+                            beforeSend: function() {},
+                            success: function(d) {
+                                var $code = d.code;
+                                $msg = d.msg;
+                                $objects = d.objects;
+
+                                if ($code === 'SUCCESS') {
+                                    parent.layer.alert('作废成功', {
+                                        closeBtn: 0,
+                                        yes: function(index) {
+                                            parent.layer.close(index);
+                                            window.parent.location.reload();
+                                            tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+                                        }
+                                    });
+                                } else if ($code === 'ERROR_USER_LOGOFF') {
+                                    loginFailure();
+                                } else {
+                                    parent.layer.alert('数据异常');
+                                }
+                            }
+                        });
+                        return false;
+                    }
+                });
+            });
+
+            //修改车辆保险
+            $(".btn-modify").click(function() {
+                tmsTab.add($(this), "编辑车辆保险", "modify.html?type=edit&id=" + $('input[name="id"]').val());
+                layui.tms_tab.del(layIdID);
+            });
+
+            //返回
+            $(".btn-back").click(function() {
+                bizUtil.frame.closeCurrentIframeTab(window.parent);
+            });
+
+            //取消
+            $(".btn-cancel").click(function() {
+                bizUtil.frame.closeCurrentIframeTab(window.parent);
+            });
+        });
+    });
+</script>
+
+</html>

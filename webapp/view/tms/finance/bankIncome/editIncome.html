@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>收支登记</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <!-- <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0"> -->
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+    <style>
+        body {
+            margin: 20px;
+        }
+        span.required {
+            color: #f00;
+            font-family: 'simsun', '宋体';
+            margin-right: 5px;
+            font-size: 15px;
+        }
+        .layui-form-label {
+            width: 120px;
+        } 
+        .layui-form-item .layui-input-inline {
+            width: 250px;
+        }
+        .layui-unselect dl {
+            max-height: 200px;
+        }
+    </style>
+</head>
+
+<body>
+        <form class="layui-form" autocomplete="off" style="min-width:800px;">
+            <div class="layui-fluid">
+                <div class="layui-row">
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">收支类型</label>
+                            <div class="layui-input-block">
+                                <input type="radio" name="inOrOut" value="收入" class="inorOut" title="收入" checked>
+                                <input type="radio" name="inOrOut" value="支出" title="支出">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm6">
+                            <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">收支账户</label>
+                            <div class="layui-input-block">
+                                <select name="accountNo" lay-verify="required">
+                                    <option value=""></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">收支日期</label>
+                            <div class="layui-input-block">
+                                    <input type="text" name="tradeDate" id="tradeDate" placeholder="请选择日期" lay-verify="required" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm6">
+                            <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">收支金额(元)</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="money" id="money" lay-verify="money" class="layui-input" maxlength="12" hc-verify="range|decimals2" hc-verify_field="收支金额(元)" hc-verify_min="0" hc-verify_max="999999999.99" >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">往来单位类型</label>
+                            <div class="layui-input-block">
+                                    <select name="tradeTargetType" lay-filter="tradeTargetType">
+                                        <option value=""></option>
+                                        <option value="1" >客户</option>    
+                                        <option value="2">供应商</option>
+                                        <option value="3" >分公司/部门</option>
+                                        <option value="4" >司机</option>
+                                    </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm6">
+                            <div class="layui-form-item">
+                            <label class="layui-form-label">往来单位</label>
+                            <div class="layui-input-block">
+                                    <select name="tradeTarget">
+                                        <option value=""></option>
+                                    </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">会计科目</label>
+                            <div class="layui-input-block">
+                                <div class="layui-col-md3" >
+                                    <div style="margin-right:10px">
+                                        <select name="accountantOne" lay-filter="accountantOne">
+                                                <option value=""></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-col-md3" >
+                                    <div style="margin-right:10px">
+                                        <select name="accountantTwo"  lay-filter="accountantTwo"  disabled="true">
+                                                <option value=""></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-col-md3" >
+                                    <div style="margin-right:10px">
+                                        <select name="accountantThree"  lay-filter="accountantThree"  disabled="true">
+                                                <option value=""></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-col-md3" >
+                                    <select name="accountantFour"  lay-filter="accountantFour"  disabled="true">
+                                            <option value=""></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">摘要</label>
+                            <div class="layui-input-block">
+                                <textarea name="described" style="min-height:50px;" class="layui-textarea"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm6">
+                            <div class="layui-form-item">
+                            <label class="layui-form-label">备注</label>
+                            <div class="layui-input-block">
+                                <textarea name="remark" style="min-height:50px;" class="layui-textarea"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div  style="text-align:center">注：新增收支记录后，收支记录的收支类型、账户、金额不能再变更，其他信息，在审核前，都可以变。</div>
+                <div class="layui-row">
+                    <div class="layui-col-md12">
+                        <div class="layui-form-item"   style="text-align:center;margin-left:-80px">
+                            <div class="layui-input-block button-bar">
+                                <button class="layui-btn layui-btn-normal btn-save" lay-submit="" lay-filter="submit" style="width:120px">保存</button>
+                                <button class="layui-btn layui-btn-normal btn-audit" lay-submit="" lay-filter="audit" style="width:120px">审核通过</button>
+                                <button class="layui-btn layui-btn-primary btn-back" style="width:120px">取消</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script charset="utf-8" src="./editIncome.js?v=1219"></script>
+</html>

@@ -1,0 +1,268 @@
+@charset "utf-8";
+
+/* 引入表单组件（如上传组件等）样式 */
+@import url(/view/tms/static/css/formComponent.css);
+
+/* CSS Document */
+
+
+/* html {overflow-y:hidden;} */
+
+body {
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, "Hiragino Sans GB", "Hiragino Sans GB W3", "Microsoft YaHei UI", "WenQuanYi Micro Hei", sans-serif
+}
+
+h1,
+.h1,
+h2,
+.h2,
+h3,
+.h3,
+h4,
+.h4,
+.lead {
+    margin: 0;
+    padding: 0;
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, "Hiragino Sans GB", "Hiragino Sans GB W3", "Microsoft YaHei UI", "WenQuanYi Micro Hei", sans-serif
+}
+
+dl,
+dt,
+dd,
+ul,
+li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+p,
+form {
+    margin: 0;
+    padding: 0;
+}
+
+input,
+select,
+textarea {
+    color: #333;
+}
+
+button {
+    outline: none;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    font-size: 13px;
+    color: #333;
+}
+
+a,
+a:visited {
+    color: #333;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a:hover {
+    color: #428bca;
+    text-decoration: none;
+}
+
+.layui-upload-box {
+    width: 200px;
+    min-height: 80px;
+    line-height: 80px;
+    margin: 15px auto 0;
+    border: #ddd 1px solid;
+    text-align: center;
+    color: #999;
+    background: #efefef;
+}
+
+.layui-upload-img {
+    width: 100%;
+}
+
+.layui-upload-main {
+    width: 99.8%;
+    padding: 15px 0;
+    border: #ddd 1px dotted;
+    text-align: center;
+    border-radius: 2px;
+}
+
+.layui-tree li {
+    margin: 0;
+    padding: 0;
+}
+
+.layui-tree li ul {
+    margin: 0;
+    padding-left: 21px;
+    background: url('/view/frame/layui/images/l5.gif') repeat-y;
+}
+
+.layui-tree li i {
+    padding: 0;
+}
+
+.layui-tree li input[type=checkbox] {
+    vertical-align: -2px;
+    margin: 0;
+}
+
+.layui-tree li a cite {
+    padding: 0 3px;
+}
+
+.layui-layer-msg.layer-anim-06 {
+    -webkit-animation-name: layui-scale;
+    animation-name: layui-scale;
+    min-width: 100px;
+    background-color: #000;
+    filter: alpha(opacity=60);
+    background-color: rgba(0, 0, 0, .6);
+    color: #fff;
+    border: none;
+}
+
+.layui-layer-msg.layer-anim-06 .layui-layer-content {
+    padding: 12px 25px;
+    text-align: center;
+}
+
+.layui-layer-msg.layer-anim-06 .layui-layer-content i {
+    display: none;
+}
+
+
+/*选中表格行背景颜色*/
+
+.layui-table-click {
+    background-color: #edf4fd !important;
+}
+
+
+/* .tmp-box-radius {-moz-border-radius:5px; -webkit-border-radius:5px; border-radius:5px;}
+.btn {border-radius:2px;}
+.btn-primary {background:#055bae; border:#055bae 1px solid;}
+.btn-primary:hover {background:#097ff1; border:#097ff1 1px solid;}
+.btn-default {background:#fff; border:#ddd 1px solid;}
+.btn-default:hover {background:#eee; border:#ddd 1px solid;}
+.btn-success {background:#4cae4c; border:#4cae4c 1px solid;}
+.btn-success:hover {background:#64c764; border:#64c764 1px solid;}
+.btn-info {background:#46b8da; border:#46b8da 1px solid;}
+.btn-info:hover {background:#4dcaef; border:#4dcaef 1px solid;}
+.btn-warning {background:#eea236; border:#eea236 1px solid;}
+.btn-warning:hover {background:#febe64; border:#febe64 1px solid;}
+.btn-danger {background:#d43f3a; border:#d43f3a 1px solid;}
+.btn-danger:hover {background:#f2514c; border:#f2514c 1px solid;}
+
+.form-control {border-radius:2px;} */
+
+
+/*控制台面板*/
+
+
+/*统计*/
+
+
+/* .panel-stat {width:20%; float:left;}
+.panel-stat-box {padding:20px; margin-right:15px; -moz-border-radius:3px; -webkit-border-radius:3px; border-radius:3px; color:#fff;}
+.panel-stat-box.r {margin-right:0;}
+.panel-stat-box .img {height:56px;}
+.panel-stat-box .num {margin-top:-4px; padding:0; height:56px; line-height:16px;}
+.panel-stat-box .num small {font-family:Century Gothic, Verdana, Geneva, sans-serif; font-size:12px;}
+.panel-stat-box .num h1 {margin:0; padding:0; font-size:40px; font-family:Century Gothic, Verdana, Geneva, sans-serif;}
+.panel-stat-box .num h1>span {font-size:14px; font-family:"Microsoft YaHei";}
+.panel-stat-box .txt {padding-top:10px; font-size:14px; height:30px; overflow:hidden;}
+.panel-1 {background:#1caf9a;}
+.panel-2 {background:#d9534f;}
+.panel-3 {background:#428bca;}
+.panel-4 {background:#df9627;}
+.panel-5 {background:#1d2939;} */
+
+
+/*排行榜*/
+
+
+/* .panel-rank {border-top:#ddd 1px dotted; border-bottom:#ddd 1px solid;}
+.panel-rank .row {padding:0 7px 0 8px;}
+.panel-rank .panel {margin:0;}
+.panel-rank .col-xs-4 {padding:0 8px 0 7px;}
+
+.submit-btns .btn {margin:0 8px;}
+.other-btns label {font-weight:normal;}
+.other-btns label input {vertical-align:-1px;}
+.other-btns .btn {margin-left:10px;}
+
+table label {font-weight:normal;}
+table label input {vertical-align:-1px;}
+
+.table-box .btn-default,
+.table-box .btn-default:hover {border-radius:0; border:#ccc 1px solid; border-left:0; border-right:0; background:#fff;} */
+
+
+/*
+@media (min-width: 768px) {}
+@media (min-width: 992px) {}
+@media (min-width: 1200px) {}
+*/
+
+
+/* 表单输入框 占位符 颜色 */
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+    color: #d2d2d2;
+}
+
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+    color: #d2d2d2;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+    color: #d2d2d2;
+}
+
+
+/* 禁用状态 的表单域颜色 */
+
+input:disabled,
+textarea:disabled {
+    background: #eee;
+    color: #333;
+    cursor: not-allowed;
+}
+
+
+/* 美化后的select组件的颜色 */
+
+input:disabled.layui-disabled,
+input:disabled.layui-disabled:hover {
+    color: #333 !important;
+}
+
+
+/* 禁用时，placeholder的字体颜色改为与背景色一致 */
+
+input:disabled::-moz-placeholder,
+textarea:disabled::-moz-placeholder {
+    color: #eee;
+}
+
+input:disabled:-ms-input-placeholder,
+textarea:disabled:-ms-input-placeholder {
+    color: #eee;
+}
+
+input:disabled::-webkit-input-placeholder,
+textarea:disabled::-webkit-input-placeholder {
+    color: #eee;
+}

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>包含费用</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+    <style>
+        body {
+            margin: 10px 20px 0;
+        }
+        
+        .item-list {
+            margin: 0;
+        }
+        
+        .item-list li {
+            float: left;
+            width: 20%;
+            line-height: 26px;
+        }
+        
+        .main-contain {
+            margin: 0;
+        }
+        
+        .main-contain h4 {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .main-contain h4 span {
+            float: right;
+        }
+        
+        .main-contain .item-box {
+            padding: 5px 10px 10px;
+            border: #ddd 1px solid;
+            border-radius: 2px;
+            min-height: 140px;
+        }
+    </style>
+</head>
+
+<body>
+    <form class="layui-form" autocomplete="off" style="min-width:auto;">
+        <div class="main-contain">
+            <h4>费用类型<span><input type="checkbox" name="checkAll" lay-filter="checkAll" title="全选" lay-skin="primary"></span></h4>
+            <div class="item-box">
+                <ul class="item-list">
+                    <li><input type="checkbox" name="costItem1" lay-filter="costItem" title="运费" value="1" lay-skin="primary"></li>
+                    <li><input type="checkbox" name="costItem2" lay-filter="costItem" title="打单费" value="2" lay-skin="primary"></li>
+                    <li><input type="checkbox" name="costItem3" lay-filter="costItem" title="报关费" value="3" lay-skin="primary"></li>
+                </ul>
+                <div class="clr"></div>
+            </div>
+        </div>
+
+        <div id="inputEdit" class="layui-form-item button-bar" style="display:none;">
+            <button class="layui-btn" id="vsubmit" lay-submit lay-filter="submit" style="display:none;">保存</button>
+            <button class="layui-btn" style="display:none;">取消</button>
+        </div>
+
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery;
+
+        var datas,
+            $type = $.trim(getUrlParam('do')),
+            $id = $.trim(getUrlParam('id')),
+            $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+
+
+
+        //获取费用类型
+        var setCostItemHtml = (function() {
+            var costItemHtml = $(window.parent['f' + $layId].document).find('.costItemObj').html(); 
+            var costItemObj = {};
+            var itemArr = [];
+            if(costItemHtml !== ''){
+                costItemObj = JSON.parse(costItemHtml);
+            }
+            var i = 0;
+            for(var key in costItemObj){
+                itemArr.push('<li><input type="checkbox" name="costItem'+(i+1)+'" lay-filter="costItem" title="'+costItemObj[key]+'" value="'+key+'" lay-skin="primary"></li>'); 
+                i++;
+            }
+            $('.item-list').html(itemArr.join(''));    
+            form.render();
+        })();
+
+        //监听提交
+        function callB(obj) {
+            return obj;
+        }
+
+        if ($type == 'edit') {
+            var typeArr = $id.split(',');
+            $('input[name^="costItem"]').each(function() {
+                for (var key in typeArr) {
+                    if (typeArr[key] == parseInt($(this).val())) {
+                        $(this).prop('checked', true);
+                        return;
+                    }
+                }
+            });
+            form.render();
+        };
+
+        if ($type == 'edit' || $type == 'add') {
+            form.on('submit(submit)', function(data) {
+                var bankNameArr = [];
+                var $saveDataHD = data.field;
+                delete $saveDataHD.checkAll;
+                
+                for (var key in $saveDataHD) {
+                    if ($saveDataHD[key] != undefined && $saveDataHD[key] != "") {
+                        bankNameArr.push($saveDataHD[key])
+                    }
+                }
+                var bankNameObj = bankNameArr.join(",");
+                $(window.parent['f' + $layId].document).find('#costItemBtn').attr('data-func', bankNameObj);
+                return false;
+            });
+        }
+
+        //全选
+        var checkboxItem = $('.item-list input[lay-filter="costItem"]');
+        form.on('checkbox(checkAll)', function(data) {
+            if (data.elem.checked) {
+                checkboxItem.prop('checked', true);
+            } else {
+                checkboxItem.prop('checked', false);
+            }
+            form.render('checkbox');
+        });
+
+        //是否全选默认
+        var checkboxLen = checkboxItem.length,
+            isCheckboxLen = $('.item-list input[lay-filter="costItem"]:checked').length;
+        if (checkboxLen == isCheckboxLen) {
+            $('input[name="checkAll"]').prop('checked', true);
+            form.render('checkbox');
+        }
+    });
+</script>
+
+</html>

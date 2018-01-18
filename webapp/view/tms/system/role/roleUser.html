@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>角色管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+        body {
+            margin: 20px;
+        }
+        
+        .layui-table td {
+            padding: 0;
+        }
+        
+        #orgPermi {
+            padding: 0;
+            background: #fff;
+        }
+        
+        #orgs {
+            padding: 12px 15px;
+            height: 200px;
+            border-bottom: #ddd 1px solid;
+            overflow: auto;
+        }
+        
+        #orgs cite p {
+            margin: 0;
+            padding: 0;
+            display: inline;
+        }
+        
+        #orgs cite p.current {
+            color: #f60 !important;
+        }
+        
+        #orgs cite p span.manager,
+        #orgs cite p.current span.manager {
+            color: #777;
+        }
+        
+        #orgs cite p.cancel {
+            color: #999;
+        }
+        
+        #orgs cite p.cancel span.manager {
+            color: #999;
+        }
+        
+        #orgs cite p.cancel span.status {
+            color: #999;
+        }
+        
+        #users {
+            padding: 10px 15px;
+            height: 80px;
+            overflow: auto;
+        }
+        
+        #users h4 {
+            font-size: 13px;
+            color: #055bae;
+            display: none;
+        }
+        
+        #users ul li {
+            float: left;
+            width: 33%;
+            line-height: 26px;
+        }
+        
+        #users ul li input[type=checkbox] {
+            vertical-align: -1px;
+        }
+        
+        #roleUser {
+            padding: 0;
+            height: 324px;
+            overflow: auto;
+            background: #fff;
+        }
+        
+        #roleUser dl {
+            margin: 0;
+        }
+        
+        #roleUser dl dd {
+            padding: 0 15px;
+            line-height: 40px;
+            height: 40px;
+            border-bottom: #ddd 1px dotted;
+        }
+    </style>
+</head>
+
+<body>
+    <table class="layui-table">
+        <colgroup>
+            <col width="50%">
+            <col width="50%">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>组织架构：点击选择员工</th>
+                <th>已选成员：双击移除</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div id="orgPermi">
+                        <ul id="orgs"></ul>
+                        <div id="users">
+                            <h4></h4>
+                            <ul></ul>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div id="roleUser">
+                        <dl></dl>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <form class="layui-form" method="post" autocomplete="off">
+        <input type="hidden" name="addUserIds"><input type="hidden" name="removeUserIds">
+        <div class="layui-form-item" style="text-align:center;">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit">保存</button>
+            <button class="layui-btn layui-btn-primary" id="vcancel">关闭</button>
+        </div>
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_company.js?v=1.0"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    var $id = $.trim(getUrlParam('id'));
+    if ($id == null || $id == '') {
+        layui.use('layer', function() {
+            parent.layer.alert('非法参数！', {
+                yes: function() {
+                    parent.layer.closeAll();
+                }
+            });
+        });
+    }
+
+    layui.use(['form', 'layer', 'tree'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery;
+
+        var $addUserIds = [],
+            $removeUserIds = [];
+
+        //获取组织架构
+        var setMenus = function() {
+            $.get('/ucenter/centre/core/organization/all.shtml', function(d) {
+                var $code = d.code,
+                    $msg = d.msg,
+                    $objects = d.objects;
+
+                if ($code != 'SUCCESS') return false;
+
+                //重新编绎json
+                var $allArr = setTreeData(0, $objects);
+
+                //参数设置
+                var $options = {
+                        elem: '#orgs',
+                        drag: true,
+                        click: function(item) {
+                            $('#orgs cite').removeClass('cur');
+                            $('#cc' + item.rid).addClass('cur');
+                            //$('#users h4').text(item.name);
+                            getEmployees(item.rid);
+                        },
+                        nodes: $allArr
+                    }
+                    //树形菜单
+                layui.tree($options);
+            }, 'json');
+        }
+
+        //获取已选角色成员的信息
+        var setEmployees = function($id) {
+            $.get('/ucenter/centre/permi/role/' + $id + '/member.shtml', function(d) {
+                var $code = d.code,
+                    $msg = d.msg,
+                    $objects = d.objects;
+
+                if ($code != 'SUCCESS') return false;
+
+                if ($objects.length > 0) {
+                    for (var $j = 0; $j < $objects.length; $j++) {
+                        $('#roleUser dl').append('<dd><a id="u' + $objects[$j].userId + '">' + $objects[$j].deptName + ' - ' + $objects[$j].userName + '</a></dd>');
+                        userDbl($('#u' + $objects[$j].userId).parent());
+                    }
+                }
+            }, 'json');
+        }
+
+        setMenus();
+        setEmployees($id);
+
+        //通过公司部门获取员工
+        function getEmployees($pid) {
+            $.get('/ucenter/centre/permi/employee/page.shtml', {
+                organizeId: $pid,
+                pageSize: -1
+            }, function(d) {
+                var $code = d.code,
+                    $msg = d.msg,
+                    $objects = d.objects.list;
+
+                if ($code === 'SUCCESS') {
+                    $('#users ul').html('');
+                    if ($objects.length > 0) {
+                        for (var $m = 0; $m < $objects.length; $m++) {
+                            $('#users ul').append('<li><label><input type="checkbox" name="employeeId" id="e' + $objects[$m].id + '" value="' + $objects[$m].id + '/' + $objects[$m].name + '/' + $objects[$m].departmentName + '"> ' + $objects[$m].name + '</label></li>');
+                        }
+
+                        $('#users ul li input[name="employeeId"]').on('click', function() {
+                            var $eobj = $(this),
+                                $evalArr = $eobj.val().split('/'),
+                                $eid = $evalArr[0],
+                                $ename = $evalArr[1],
+                                $edepartName = $evalArr[2],
+                                $isCheck = $eobj.prop('checked');
+
+                            if ($isCheck) {
+                                if ($('#u' + $eid).length == 0) {
+                                    $('#roleUser dl').append('<dd><a id="u' + $eid + '">' + $edepartName + ' - ' + $ename + '</a></dd>');
+                                    $addUserIds.push($eid);
+                                    $removeUserIds.splice($.inArray($eid, $removeUserIds), 1);
+                                }
+                            } else {
+                                if ($('#u' + $eid).length > 0) {
+                                    $('#roleUser #u' + $eid).parent().remove();
+                                    $removeUserIds.push($eid);
+                                    $addUserIds.splice($.inArray($eid, $addUserIds), 1);
+                                }
+                            }
+                            //右边角色成员双击
+                            userDbl($('#u' + $eid).parent());
+                            // $('#u' + $eid).parent().on('dblclick', function(){
+                            //   $(this).remove();
+                            //   $('#users ul input[id="e' + $eid + '"]').prop('checked', false);
+                            //   $removeUserIds.push($eid);
+                            //   $addUserIds.splice($.inArray($eid, $addUserIds), 1);
+                            // });
+                        });
+                    }
+                }
+
+            }, 'json');
+        }
+
+        function userDbl($obj) {
+            $obj.on('dblclick', function() {
+                var $oid = $obj.find('a').attr('id')
+                var $eid = $oid.substr(1, $oid.length);
+                $(this).remove();
+                $('#users ul input[id="e' + $eid + '"]').prop('checked', false);
+                $removeUserIds.push($eid);
+                $addUserIds.splice($.inArray($eid, $addUserIds), 1);
+            });
+        }
+
+        //保存数据
+        form.on('submit(submit)', function(data) {
+            $addUserIds = deWeightArr($addUserIds);
+            $removeUserIds = deWeightArr($removeUserIds);
+
+            //数据源
+            var $saveData = {
+                addUserIds: $addUserIds,
+                removeUserIds: $removeUserIds
+            }
+
+            //保存数据，调用接口
+            $.ajax({
+                type: 'PUT',
+                url: '/ucenter/centre/permi/role/' + $id + '/member.shtml',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify($saveData),
+                success: function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code === 'SUCCESS') {
+                        parent.layer.alert('保存成功！', {
+                            yes: function() {
+                                parent.layer.closeAll();
+
+                                //获取当前框架ID
+                                var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+                                parent['f' + $layId].location.reload();
+                            }
+                        });
+                    } else {
+                        parent.layer.alert('保存信息失败，请重新填写！');
+                    }
+                }
+            });
+
+            return false;
+        });
+
+        $('#vcancel').on('click', function() {
+            parent.layer.closeAll();
+        })
+    });
+</script>
+
+</html>

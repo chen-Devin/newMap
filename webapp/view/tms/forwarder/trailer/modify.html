@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>订单管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="../order/orderComponent.css">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css">
+    <link rel="stylesheet" href="../order/orderForm.css">
+</head>
+
+<body>
+    <!-- 如果船务信息需要添加序号，则在 form中加上 .shipping-counter-container 类 -->
+    <form class="layui-form trailer-form" method="post" autocomplete="off" id="myForm">
+        <!-- 内容由js动态填充 -->
+
+        <!-- 操作按钮区 -->
+        <div class="layui-form-item hide" id="buttonContainer">
+            <div class="button-bar">
+                <span id="continueAddContainer" style="display: none;">
+                    <input type="checkbox" title="继续新增" lay-skin="primary" id="continueAddCheckbox">
+                </span>
+
+                <input type="button" class="layui-btn layui-btn-normal" lay-submit lay-filter="save" value="保存">
+                <input type="button" class="layui-btn layui-btn-primary" id="cancelButton" value="取消">
+                <input type="reset" class="layui-btn layui-btn-primary" id="resetButton" value="重置" style="display: none;">
+                <input type="button" class="layui-btn layui-btn-primary" id="testFormData" value="打印测试表单数据">
+            </div>
+        </div>
+    </form>
+
+    <div id="formTemplates">
+        <!-- 动态加载的表单元素模版 -->
+    </div>
+
+    <!-- 进度条元素，用于 初始化加载数据的遮罩层 -->
+    <div id="progressContent" style="display: none; padding: 20px; background: #8ACBFF;">
+        <span class="loading-content-text">加载中...</span>
+        <div class="layui-progress layui-progress-big" lay-filter="loadDataProgress" lay-showPercent="true" id="loadDataProgress" style="background: white;">
+            <div class="layui-progress-bar layui-bg-blue" lay-percent="15%"></div>
+        </div>
+    </div>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1.0"></script>
+<!-- 为了使用 layui.tms_tab 模块，需要引入 tms_tab.js -->
+<script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+<!-- 新版省市县组件插件 -->
+<script charset="utf-8" src="/view/frame/static/js/layui.district_1.js?v=1.0"></script>
+
+<!-- 工具库 -->
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+<!-- 订单相关的公共代码 -->
+<script charset="utf-8" src="../js/orderCommon.js"></script>
+<script src="../order/order.js"></script>
+
+<!-- 本页面的js -->
+<script charset="utf-8" src="./js/modify.js"></script>
+
+</html>

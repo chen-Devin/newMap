@@ -1,0 +1,190 @@
+.hide {
+    display: none;
+}
+
+/* 强制不换行 */
+.nowrap {
+    white-space: nowrap;
+}
+/* 提示：一些带 .nowrap 的元素可能会破坏布局，因此需要给父容器加 .overflow 来限制 */
+.overflow {
+    overflow: hidden;
+}
+
+.pull-right {
+    float: right;
+}
+.float-none {
+    float: none;
+}
+.text-center {
+    text-align: center;
+}
+.text-right {
+    text-align: right;
+}
+.padding-r-10 {
+    padding-right: 10px;
+}
+
+
+/* 红色星号的“必填”标识，基本跟原来的 span.required 一样 */
+.layui-form-item--require label::before {
+    content: '*';
+    position: relative;
+    z-index: 10;
+    left: -5px;
+    font-family: 'simsun', '宋体';
+    font-size: 15px;
+    color: #f00;
+}
+
+
+/* 重置 add.css 中的样式，避免破坏布局 */
+.layui-form {
+    min-width: auto;
+}
+/* 表单支持 1040px 最小宽度（屏幕为1280px，右侧界面为 1080px 宽度） */
+form.layui-form {
+    min-width: 1040px;
+}
+
+/* 查看时，隐藏操作按钮 */
+.form--detail .icon-add,
+.form--detail .icon-delete,
+.form--detail .icon-copy-container,
+.form--detail .button-bar,
+.form--detail .address-icon-container,
+/* 隐藏附件的添加、删除按钮 */
+.form--detail .so-attachment-container .icon-link,
+.form--detail .so-attachment-container .icon-link-delete,
+.form--detail .file-item .icon-delete,
+.form--detail .file-control-group .file-control-upload {
+    display: none;
+}
+/* 查看时，重置一些禁用元素的样式（layui.css可能被改过） */
+.form--detail .layui-form-checkbox[lay-skin=primary] span,
+/* 非查看时，禁用状态也要重置样式 */
+.layui-checkbox-disbaled[lay-skin=primary] span {
+    color: #c2c2c2;
+}
+.form--detail input:disabled,
+.form--detail textarea:disabled {
+    background: #f7f7f7;
+}
+.form--detail input:disabled::-moz-placeholder,
+.form--detail textarea:disabled::-moz-placeholder {
+    color: #f7f7f7;
+}
+.form--detail input:disabled:-ms-input-placeholder,
+.form--detail textarea:disabled:-ms-input-placeholder {
+    color: #f7f7f7;
+}
+.form--detail input:disabled::-webkit-input-placeholder,
+.form--detail textarea:disabled::-webkit-input-placeholder {
+    color: #f7f7f7;
+}
+
+
+/* 样式控制 layui 的带搜索下拉框组件 禁用时仍可输入内容的bug */
+.layui-select-disabled,
+.layui-select-disabled .layui-edge {
+    cursor: not-allowed;
+}
+.layui-select-disabled input {
+    position: relative;
+    /* 利用 负index 将 input 藏到父元素“背面” */
+    z-index: -1;
+}
+.compoment-district .layui-select-disabled input {
+    /* 恢复显示 省市县组件禁用状态的元素 */
+    z-index: auto;
+}
+
+
+/* 船务信息、箱型信息、装卸地点 图标位置布局 */
+.shipping-icon-container {
+    margin-left: 20px;
+}
+.box-line-container .layui-icon {
+    margin-left: 10px;
+    line-height: 38px;
+}
+.address-icon-container {
+    position: absolute;
+    right: 15px;
+    z-index: 10;
+}
+
+
+/* 箱型信息（拖车行订单 箱型信息有多行）需要额外样式 */
+.trailer-form .box-line-container + .box-line-container {
+    padding-top: 15px;
+    border-top: 1px dashed #e2e2e2;
+}
+
+
+/* 因为去掉了 .layui-colla-item 类，所以补充 .customer-address-line 的样式（与 .layui-colla-item 一致） */
+.customer-address-line:first-child {
+    border-top: none;
+}
+.customer-address-line {
+    border-top: 1px solid #e2e2e2;
+}
+/* 组件样式重置 */
+.customer-address-container .layui-colla-title {
+    cursor: default;
+}
+
+
+.layui-form-item .layui-input-inline--small {
+    width: 100px;
+}
+/* “危品申报” 的 label 需要大一点 */
+.layui-form-label.layui-form-label-lg {
+    width: 180px;
+}
+.layui-form-label.layui-form-label-lg+.layui-input-block {
+    margin-left: 220px;
+}
+/* 订单界面的附件行，右padding不需要给上传按钮预留太多空间 */
+.file-line-container--nobutton .file-line,
+.file-line--nobutton {
+    padding-right: 10px;
+}
+
+
+/* 底部按钮区 */
+.button-bar input {
+    margin-top: 10px;
+    min-width: 120px;
+}
+
+/* 隐藏底部按钮区的测试按钮 */
+.button-bar input#testFormData,
+.button-bar input#logFormData {
+    display: none;
+}
+
+
+/* 支持1500px分辨率下的显示 */
+@media screen and (max-width: 1500px) {
+    /* 优化录入界面的显示（减去左侧菜单后，右侧界面只有1300px） */
+
+    /* 恢复 layui 表单元素的默认设置（这里设置得更紧凑些，label间距缩小5px） */
+    .layui-form-item .layui-form-label {
+        width: 85px;
+        padding-right: 10px;
+    }
+    .layui-form-item .layui-input-block {
+        margin-left: 110px;
+    }
+
+    /* 重置大label */
+    .layui-form-label.layui-form-label-lg {
+        width: 180px;
+    }
+    .layui-form-label.layui-form-label-lg+.layui-input-block {
+        margin-left: 220px;
+    }
+}

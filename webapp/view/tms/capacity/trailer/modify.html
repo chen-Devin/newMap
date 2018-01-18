@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>拖车管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+</head>
+
+<body>
+    <form class="layui-form" autocomplete="off">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>基本信息</legend>
+        </fieldset>
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">拖车车牌</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm4">
+                                <div class="margin-right10">
+                                    <select name="carShort">
+                                <option value="粤">粤</option>
+                                <option value="京">京</option>
+                                <option value="津">津</option>
+                                <option value="沪">沪</option>
+                                <option value="渝">渝</option>
+                                <option value="冀">冀</option>
+                                <option value="豫">豫</option>
+                                <option value="云">云</option>
+                                <option value="辽">辽</option>
+                                <option value="黑">黑</option>
+                                <option value="湘">湘</option>
+                                <option value="皖">皖</option>
+                                <option value="鲁">鲁</option>
+                                <option value="新">新</option>
+                                <option value="苏">苏</option>
+                                <option value="浙">浙</option>
+                                <option value="赣">赣</option>
+                                <option value="鄂">鄂</option>
+                                <option value="桂">桂</option>
+                                <option value="甘">甘</option>
+                                <option value="晋">晋</option>
+                                <option value="蒙">蒙</option>
+                                <option value="陕">陕</option>
+                                <option value="吉">吉</option>
+                                <option value="闽">闽</option>
+                                <option value="贵">贵</option>
+                                <option value="青">青</option>
+                                <option value="藏">藏</option>
+                                <option value="川">川</option>
+                                <option value="宁">宁</option>
+                                <option value="琼">琼</option>
+                              </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm4">
+                                <div>
+                                    <input type="text" name="carNo" id="carNo" placeholder="" maxlength="10" class="layui-input layui-col-sm6" lay-verify="required">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm1 line-space">/</div>
+                            <div class="layui-col-sm3">
+                                <div>
+                                    <select name="carColor" lay-verify="required">
+                                <option value="黄">黄</option>
+                                <option value="黑">黑</option>
+                                <option value="白">白</option>
+                                <option value="蓝">蓝</option>
+                                <option value="绿">绿</option>
+                              </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">车架车牌</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm4">
+                                <div class="margin-right10">
+                                    <select name="frameShort">
+                                <option value="粤">粤</option>
+                                <option value="京">京</option>
+                                <option value="津">津</option>
+                                <option value="沪">沪</option>
+                                <option value="渝">渝</option>
+                                <option value="冀">冀</option>
+                                <option value="豫">豫</option>
+                                <option value="云">云</option>
+                                <option value="辽">辽</option>
+                                <option value="黑">黑</option>
+                                <option value="湘">湘</option>
+                                <option value="皖">皖</option>
+                                <option value="鲁">鲁</option>
+                                <option value="新">新</option>
+                                <option value="苏">苏</option>
+                                <option value="浙">浙</option>
+                                <option value="赣">赣</option>
+                                <option value="鄂">鄂</option>
+                                <option value="桂">桂</option>
+                                <option value="甘">甘</option>
+                                <option value="晋">晋</option>
+                                <option value="蒙">蒙</option>
+                                <option value="陕">陕</option>
+                                <option value="吉">吉</option>
+                                <option value="闽">闽</option>
+                                <option value="贵">贵</option>
+                                <option value="青">青</option>
+                                <option value="藏">藏</option>
+                                <option value="川">川</option>
+                                <option value="宁">宁</option>
+                                <option value="琼">琼</option>
+                              </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm4">
+                                <div>
+                                    <input type="text" name="frameNo" id="frameNo" placeholder="" maxlength="10" class="layui-input layui-col-sm6">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm1 line-space">/</div>
+                            <div class="layui-col-sm3">
+                                <div>
+                                    <select name="frameColor">
+                                <option value="黄">黄</option>
+                                <option value="黑">黑</option>
+                                <option value="白">白</option>
+                                <option value="蓝">蓝</option>
+                                <option value="绿">绿</option>
+                              </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">车辆归属/所有人</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <div class="margin-right10">
+                                    <select name="carBelong" lay-verify="required" lay-filter="carBelong">
+                                  <option></option>
+                                  <option value="0">自营</option>
+                                  <option value="1">合营</option>
+                                  <option value="2">合作</option>
+                                  <option value="3">挂靠</option>
+                                  <option value="4">外协</option>
+                                </select>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-sm6">
+                                <div>
+                                    <select name="ownerSupplierId" lay-verify="required" lay-filter="ownerSupplierId">
+                                        <option></option>
+                                    </select>
+                                </div>
+                                <input type="text" name="ownerCompanyName" id="ownerCompanyName" maxlength="255" placeholder="请输入" class="layui-input layui-hide" hc-verify="companyRegex|companySize">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">道路运输营运证号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="operateRoadNo" id="operateRoadNo" maxlength="20" placeholder="" class="layui-input" lay-verify="required">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">危品运输营运证号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="operateDangerousNo" id="operateDangerousNo" maxlength="20" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <!-- <div class="layui-col-sm6"> -->
+                        <label class="layui-form-label">驾驶司机</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm5">
+                                <div class="margin-right10">
+                                    <select name="driverId" lay-search="">
+                                <option value="" selected>请选择</option>
+                                <option></option>
+                              </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <span style="height:38px;line-height:38px;float:right;margin-right:10px">燃油种类</span>
+                            </div>
+                            <div class="layui-col-sm4">
+                                <select name="fuelTypesDcode">
+                                <option value=""></option>
+                                <option value="0" selected>0#柴油</option>
+                                <option value="1">92#汽油</option>
+                                <option value="2">95#汽油</option>
+                                <option value="3">97#汽油</option>
+                                <option value="4">LNG</option>
+                              </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">车架号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="frameDcode" id="frameDcode" maxlength="18" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">发动机号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="engineNo" id="engineNo" maxlength="18" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">档案编号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="fileNo" id="fileNo" lay-verify="fileNo" maxlength="20" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">车辆类型</label>
+                        <div class="layui-input-block">
+                            <select name="frameType">
+                            <option value="重型半挂车牵引车">重型半挂车牵引车</option>
+                          </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">品牌型号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="brandNo" id="brandNo" maxlength="50" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <!-- <div class="layui-col-sm6"> -->
+                        <label class="layui-form-label">核载人数</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm5">
+                                <div class="margin-right10">
+                                    <input type="text" name="loadPeopleNumber" id="loadPeopleNumber" placeholder="" maxlength="1" class="layui-input" hc-verify="positiveIntegers" hc-verify="max" hc-verify_field="核载人数" hc-verify_max="10">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <span style="height:38px;line-height:38px;float:right;margin-right:10px">总质量(KG)</span>
+                            </div>
+                            <div class="layui-col-sm4">
+                                <input type="text" name="qualityTotal" id="qualityTotal" maxlength="6" placeholder="" class="layui-input" hc-verify="positiveIntegers|max" hc-verify_field="总质量" hc-verify_max="100000">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">整备质量/核定载质量(KG)</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <div class="margin-right10">
+                                    <input type="text" name="qualityFullPrep" id="qualityFullPrep" maxlength="6" placeholder="" class="layui-input" hc-verify="positiveIntegers|max" hc-verify_field="整备质量" hc-verify_max="100000">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="qualityLoad" id="qualityLoad" maxlength="6" placeholder="" class="layui-input" hc-verify="positiveIntegers|max" hc-verify_field="核定载质量" hc-verify_max="100000">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">准牵引总质量(KG)</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="towWeight" id="towWeight" maxlength="6" placeholder="" class="layui-input" hc-verify="positiveIntegers|max" hc-verify_field="准牵引总质量" hc-verify_max="100000">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">外廓尺寸(长*宽*高)</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm3">
+                                <!-- <div class="margin-right10"> -->
+                                <input type="text" name="gabariteLength" id="gabariteLength" placeholder="长" maxlength="6" class="layui-input" hc-verify="positiveIntegers|max" hc-verify_field="长" hc-verify_max="100000">
+                                <!-- </div> -->
+                            </div>
+                            <div class="layui-col-sm1">
+                                <div style="margin-left:7px">
+                                    <span style="height:38px;line-height:38px">*</span>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <!-- <div class="margin-right10"> -->
+                                <input type="text" name="gabariteWidth" id="gabariteWidth" placeholder="宽" maxlength="6" class="layui-input" hc-verify="positiveIntegers|max" hc-verify_field="宽" hc-verify_max="100000">
+                                <!-- </div> -->
+                            </div>
+                            <div class="layui-col-sm1">
+                                <div style="margin-left:7px">
+                                    <span style="height:38px;line-height:38px">*</span>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <input type="text" name="gabariteHeight" id="gabariteHeight" placeholder="高" maxlength="6" class="layui-input" hc-verify="positiveIntegers|max" hc-verify_field="高" hc-verify_max="100000">
+                            </div>
+                            <div class="layui-col-sm1">
+                                <span style="height:38px;line-height:38px">MM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">注册日期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="dateReg" id="dateReg" placeholder="" class="layui-input" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">发证日期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="dateCertificate" id="dateCertificate" placeholder="" class="layui-input" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">强制报废期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="dateRetirement" id="dateRetirement" placeholder="" class="layui-input" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm8">
+                    <div class="layui-form-item " id="userDistrict">
+                        <label class="layui-form-label">所有人地址</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="userProvince" id="userProvince" lay-filter="userProvince">
+                                    <option value="">请选择</option>
+                                  </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="userCity" id="userCity" lay-filter="userCity">
+                                    <option value="">请选择</option>
+                                  </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="userCounty" id="userCounty" lay-filter="userCounty">
+                                    <option value="">请选择</option>
+                                  </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div>
+                                    <select name="userStreet" id="userStreet" lay-filter="userStreet">
+                                    <option value="">请选择</option>
+                                  </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="margin-left10">
+                        <input type="text" name="ownerAddress" placeholder="请输入详细地址" class="layui-input" maxlength="255">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>其他信息</legend>
+        </fieldset>
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <div class="layui-col-sm6">
+                            <label class="layui-form-label">高速收费标准</label>
+                            <div class="layui-input-block">
+                                <select name="expresswayPriceNormal">
+                              <option value=""></option>
+                              <option value="0">一类</option>
+                              <option value="1">二类</option>
+                              <option value="2">三类</option>
+                              <option value="3">四类</option>
+                              <option value="4">五类</option>
+                            </select>
+                            </div>
+                        </div>
+                        <div class="layui-col-sm6">
+                            <label class="layui-form-label">马力</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="power" id="power" placeholder="" class="layui-input" maxlength="5" hc-verify="positiveIntegers|max" hc-verify_field="马力" hc-verify_max="10000">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <div class="layui-col-sm6">
+                            <label class="layui-form-label">国产/进口</label>
+                            <div class="layui-input-block">
+                                <select name="hasImport">
+                              <option value=""></option>
+                              <option value="0">进口</option>
+                              <option value="1">国产</option>
+                          </select>
+                            </div>
+                        </div>
+                        <div class="layui-col-sm6">
+                            <label class="layui-form-label">车身颜色</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="carBodyColor" id="carBodyColor" maxlength="10" placeholder="" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">GPS信息</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <div class="margin-right10">
+                                    <select name="gpsCompany" lay-verify="gpsCompany" lay-filter="gpsCompany">
+                                  <option value="" >请选择</option>
+                                </select>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-sm6">
+                                <input type="text" name="gpsDeviceNo" id="gpsDeviceNo" lay-verify="gpsDeviceNo" maxlength="20" placeholder="GPS设备号" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">车辆海关编号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="customsVehicleNo" id="customsVehicleNo" maxlength="10" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">港澳车牌号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="hkCarNo" id="hkCarNo" maxlength="10" placeholder="" class="layui-input" hc-verify="carNo">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">港运通号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="hkExpressNo" id="hkExpressNo" placeholder="" class="layui-input" maxlength="20">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm12">
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">备注</label>
+                        <div class="layui-input-block">
+                            <textarea id="remarks" name="remarks" placeholder="0~1000字符之间" class="layui-textarea" style="min-height:50px;" maxlength="1000" hc-verify="remarkSize"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm12 layui-col-lg6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">行驶证附件</label>
+                        <div class="layui-input-block">
+                            <div class="file-line"></div>
+                            <div class="file-upload-button">
+                                <i class="layui-icon icon-folder">&#xe7a0;</i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm12 layui-col-lg6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">营运证附件</label>
+                        <div class="layui-input-block">
+                            <div class="file-line"></div>
+                            <div class="file-upload-button">
+                                <i class="layui-icon icon-folder">&#xe7a0;</i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm12 layui-col-lg6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">车辆登记证附件</label>
+                        <div class="layui-input-block">
+                            <div class="file-line"></div>
+                            <div class="file-upload-button">
+                                <i class="layui-icon icon-folder">&#xe7a0;</i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm12 layui-col-lg6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">协议附件</label>
+                        <div class="layui-input-block">
+                            <div class="file-line"></div>
+                            <div class="file-upload-button">
+                                <i class="layui-icon icon-folder">&#xe7a0;</i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm12 layui-col-lg6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">其他附件</label>
+                        <div class="layui-input-block">
+                            <div class="file-line"></div>
+                            <div class="file-upload-button">
+                                <i class="layui-icon icon-folder">&#xe7a0;</i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <fieldset class="layui-elem-field layui-field-title">
+            <legend>结算对象
+                <span class="legend-btns">
+                    <a class="layui-icon icon-add calculationObj" id="btn-add">&#xe61f;</a>
+                </span>
+                <div class="layui-hide ckObj"></div>
+
+                <div class="layui-hide existedCkdObj"></div>
+
+            </legend>
+            <table class="layui-table" id="table_list" lay-filter="table_list">
+            </table>
+        </fieldset>
+
+        <div id="insuranceInfo" style="display:none;">
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                <legend>保险信息</legend>
+            </fieldset>
+            <div class="layui-fluid">
+                <div class="layui-row">
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">商业险保单</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="bizWarrantyNo" id="bizWarrantyNo" lay-verify="bizWarrantyNo" placeholder="" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">交强险保单</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="forceWarrantyNo" id="forceWarrantyNo" lay-verify="forceWarrantyNo" placeholder="" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">商业险有效期</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="bizInsuranceE" id="bizInsuranceE" placeholder="" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">交强险有效期</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="forceInsuranceE" id="forceInsuranceE" placeholder="" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">商业险保费</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="bizPremium" id="bizPremium" lay-verify="bizPremium" placeholder="" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">交强险保费</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="forcePremium" id="forcePremium" lay-verify="forcePremium" placeholder="" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item div-add  button-bar" style="text-align:center;">
+            <div class="layui-inline continue"><input type="checkbox" lay-skin="primary" id="continue" title="保存并继续新增" checked></div>
+            <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="submit">保存</button>
+            <button class="layui-btn layui-btn-primary btn-cancel">取消</button>
+        </div>
+        <div class="layui-form-item div-info  button-bar" style="text-align:center; display:none;">
+            <button class="layui-btn layui-btn-normal btn-modify" type="button">编辑</button>
+            <button class="layui-btn layui-btn-primary btn-back" type="button">返回</button>
+        </div>
+        <input type="hidden" name="id">
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<script charset="utf-8" src="/view/frame/static/js/layui.district_1.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<!-- 工具库依赖 -->
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    $(function() {
+        layui.use(['form', 'layer', 'table', 'laydate'], function() {
+            var form = layui.form,
+                layer = layui.layer,
+                table = layui.table,
+                laydate = layui.laydate;
+            tmsTab = layui.tms_tab,
+                $ = layui.jquery;
+            var $type = $.trim(getUrlParam('type'));
+
+            var calculationObj = {};
+            var layIdID;
+
+            //日期
+            laydate.render({
+                elem: '#dateRetirement', //强制报废期
+                min: 0
+            });
+            laydate.render({
+                elem: '#dateReg' //注册日期
+                    ,
+                max: 0
+            });
+            laydate.render({
+                elem: '#dateCertificate' //发证日期
+                    ,
+                max: 0
+            });
+
+            /****上传附件*****/
+            // 初始化（绑定事件）
+            $('.icon-folder').each(function() {
+                HC.upload({
+                    // 触发上传的元素
+                    elem: $(this),
+                    // 多文件上传
+                    multiple: true,
+                    // 允许上传的文件类型 images（默认）、file、video、audio
+                    accept: 'file',
+                    // 最大文件大小限制（单位kb，默认不限制）
+                    size: 1024,
+                }, {
+                    layuiUpload: layui.upload,
+                    // 指定 存放文件项的容器
+                    fileItemContainer: $(this).parent().prev()
+                });
+            });
+
+            var $driverId = $.trim(getUrlParam('driverId'));
+            $('#userDistrict').district(form);
+
+            if ($type == 'add') {
+                //加载驾驶司机下拉框数据
+                $.get('/ucenter/tms/capacity/driver/getNull.shtml', function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code != 'SUCCESS') return false;
+
+                    if ($objects.length > 0) {
+                        for (var $i = 0; $i < $objects.length; $i++) {
+                            $('select[name="driverId"]').append('<option value="' + $objects[$i].id + '">' + $objects[$i].name + '</option>');
+                        }
+                        form.render('select');
+                    }
+                }, 'json');
+
+                //GPS
+                $("select[name='gpsCompany']").empty();
+                $("select[name='gpsCompany']").append("<option value=''></option>");
+                $.get('/ucenter/crm/supplier/supplier/showInsure.shtml?type=556', function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+                    if ($code == 'SUCCESS') {
+
+                        for (var i = 0; i < $objects.length; i++) {
+                            $("select[name='gpsCompany']").append("<option value='" + $objects[i].id + "'>" + $objects[i].nameShort + "</option>");
+                        }
+                    } else {
+                        $('select[name="gpsCompany"]').append('<option></option>');
+                    }
+                    form.render('select');
+                    // $('select[name="gpsCompany"]').val($objects.gpsCompany);
+                    // form.render();
+                }, 'json');
+            }
+
+
+
+            //所有人
+            function ownPossessor() {
+                $("select[name='ownerSupplierId']").empty();
+                $.get('/ucenter/userinfo.shtml', function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+                    if ($code == 'SUCCESS') {
+                        $("select[name='ownerSupplierId']").append("<option value='" + $objects.regBodyId + "'>" + $objects.regBodyName + "</option>");
+                    } else {
+                        $('select[name="ownerSupplierId"]').append('<option></option>');
+                    }
+                    form.render('select');
+                }, 'json');
+            }
+
+            //车辆归属为外协时的所有人
+            function outsourcePossessor() {
+                $("select[name='ownerSupplierId']").empty();
+                $('select[name="ownerSupplierId"]').append('<option value= ></option>');
+                $.get('/ucenter/crm/supplier/supplier/showCarOwnAndTowing.shtml', function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+                    if ($code == 'SUCCESS') {
+                        if ($objects.length > 0) {
+                            for (var $i = 0; $i < $objects.length; $i++) {
+                                $('select[name="ownerSupplierId"]').append('<option value="' + $objects[$i].id + '">' + $objects[$i].nameShort + '</option>');
+                            }
+                        } else {
+                            $('select[name="ownerSupplierId"]').append('<option></option>');
+                        }
+                    } else {
+                        $('select[name="ownerSupplierId"]').append('<option></option>');
+                    }
+                    form.render('select');
+                }, 'json');
+            }
+            //驾驶司机
+            function drive(type, supplierId) {
+                if (supplierId == undefined || supplierId == null) {
+                    supplierId = '';
+                }
+                $('select[name="driverId"]').empty();
+                $('select[name="driverId"]').append('<option value=""></option>')
+                $.get('/ucenter/tms/capacity/driver/getNull.shtml?contractType=' + type + '&supplierId=' + supplierId, function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+                    if ($code != 'SUCCESS') return false;
+                    if ($objects.length > 0) {
+                        for (var $i = 0; $i < $objects.length; $i++) {
+                            $('select[name="driverId"]').append('<option value="' + $objects[$i].id + '">' + $objects[$i].name + '</option>');
+                        }
+                        form.render('select');
+                    }
+                    form.render();
+                }, 'json');
+            };
+
+            //车辆归属为外协车架时 营运证号为非必填和所有人的下拉框变成输入框
+            var requireJudge = (function() {
+                var operateRoadNoInput = $('input[name="operateRoadNo"]');
+                var operateRoadNoParent = $('input[name="operateRoadNo"]').parent().parent();
+                return {
+                    notReq: function() {
+                        operateRoadNoInput.removeAttr('lay-verify');
+                        operateRoadNoParent.removeClass('layui-form-item--require');
+
+                        $('#ownerCompanyName').removeClass('layui-hide').attr('lay-verify', 'required');
+                        $('select[name="ownerSupplierId"]').parent().addClass('layui-hide');
+                        $('select[name="ownerSupplierId"]').removeAttr('lay-verify');
+                    },
+                    yesReq: function() {
+                        operateRoadNoInput.attr('lay-verify', 'required');
+                        operateRoadNoParent.addClass('layui-form-item--require');
+
+                        $('#ownerCompanyName').addClass('layui-hide').removeAttr('lay-verify');
+                        $('select[name="ownerSupplierId"]').parent().removeClass('layui-hide');
+                        $('select[name="ownerSupplierId"]').attr('lay-verify');
+                    },
+                    getOwnerCompanyName: function() {
+                        if ($('#ownerCompanyName').hasClass('layui-hide')) {
+                            return $('select[name="ownerSupplierId"]').find('option:selected').text();
+                        }
+                        return $('#ownerCompanyName').val();
+                    },
+                    getOwnerCompanyId: function() {
+                        if ($('#ownerCompanyName').hasClass('layui-hide')) {
+                            return $('select[name="ownerSupplierId"]').val();
+                        }
+
+                        var osId = '';
+                        $('select[name="ownerSupplierId"] option').each(function(i, d) {
+                            if ($('#ownerCompanyName').val() == $(this).text()) {
+                                osId = $(this).val();
+                            }
+                        });
+
+                        return osId;
+                    }
+                }
+            })();
+
+            form.on('select(carBelong)', function(data) {
+                if (data.value == "0" || data.value == "1" || data.value == "2") {
+                    requireJudge.yesReq();
+                    ownPossessor();
+                    drive(1);
+                } else if (data.value == "3") {
+                    requireJudge.yesReq();
+                    ownPossessor();
+                    drive(2);
+                } else {
+                    requireJudge.notReq();
+                    outsourcePossessor();
+                    drive(3);
+                }
+            });
+            form.on('select(ownerSupplierId)', function(data) {
+                if ($('select[name="carBelong"]').val() == '4') {
+                    drive(3, data.value);
+                }
+            });
+
+            //编辑
+            var $carColor, $carNo;
+            var $id = $.trim(getUrlParam('id'));
+            var $type = $.trim(getUrlParam('type'));
+            if ($type == 'edit' || $type == 'info') {
+                $(".continue").hide();
+                if ($id != null) {
+                    $('input[name="id"]').val($id);
+
+                    //获取数据
+                    $.get('/ucenter/tms/capacity/trailer/' + $id + '.shtml', function(d) {
+                        var $code = d.code,
+                            $msg = d.msg,
+                            $objects = d.objects;
+                        $carColor = $objects.carColor;
+                        $carNo = $objects.carNo;
+                        $gpssupplieId = $objects.gpsSupplieId;
+
+                        if ($code === 'SUCCESS') {
+                            if ($objects.carNo != "") {
+                                $('select[name="carShort"]').val($objects.carNo.substring(0, 1));
+                                $('input[name="carNo"]').val($objects.carNo.substring(1));
+                            }
+                            $('select[name="carColor"]').val($objects.carColor);
+                            if ($objects.frameNo != "" && $objects.frameNo != null) {
+                                $('select[name="frameShort"]').val($objects.frameNo.substring(0, 1));
+                                $('input[name="frameNo"]').val($objects.frameNo.substring(1));
+                            }
+                            $('select[name="frameColor"]').val($objects.frameColor);
+                            $('select[name="carBelong"]').val($objects.carBelong);
+                            if ($objects.carBelong == "0" || $objects.carBelong == "1" || $objects.carBelong == "2") {
+                                var $ownerSupplierId;
+                                if ($objects.ownerSupplierId == null) {
+                                    $ownerSupplierId = '';
+                                } else {
+                                    $ownerSupplierId = $objects.ownerSupplierId;
+                                };
+                                var $driverId;
+                                if ($objects.driverId == null) {
+                                    $driverId = '';
+                                } else {
+                                    $driverId = $objects.driverId;
+                                };
+                                $('select[name="ownerSupplierId"]').empty();
+                                $.get('/ucenter/userinfo.shtml', function(d) {
+                                    var $code = d.code,
+                                        $msg = d.msg,
+                                        $objects = d.objects;
+
+                                    if ($code == 'SUCCESS') {
+                                        $("select[name='ownerSupplierId']").append("<option value='" + $objects.regBodyId + "'>" + $objects.regBodyName + "</option>");
+                                    } else {
+                                        $('select[name="ownerSupplierId"]').append('<option></option>');
+                                    }
+                                    form.render('select');
+                                    $('select[name="ownerSupplierId"]').val($ownerSupplierId);
+                                    form.render();
+                                }, 'json');
+                                $('select[name="driverId"]').empty();
+                                $('select[name="driverId"]').append('<option value=""></option>')
+                                $.get('/ucenter/tms/capacity/driver/getNull.shtml?contractType=1&supplierId=' + $ownerSupplierId + '&driverId=' + $driverId, function(d) {
+                                    var $code = d.code,
+                                        $msg = d.msg,
+                                        $objects = d.objects;
+                                    if ($code != 'SUCCESS') return false;
+                                    if ($objects.length > 0) {
+                                        for (var $i = 0; $i < $objects.length; $i++) {
+                                            $('select[name="driverId"]').append('<option value="' + $objects[$i].id + '">' + $objects[$i].name + '</option>');
+                                        }
+                                        form.render('select');
+                                        $('select[name="driverId"]').val($driverId);
+                                        form.render();
+                                    }
+                                    // $('select[name="driverId"]').val($driverId);
+                                    form.render();
+                                }, 'json');
+                            } else if ($objects.carBelong == "3") {
+                                var $ownerSupplierId;
+                                if ($objects.ownerSupplierId == null) {
+                                    $ownerSupplierId = '';
+                                } else {
+                                    $ownerSupplierId = $objects.ownerSupplierId;
+                                };
+                                var $driverId;
+                                if ($objects.driverId == null) {
+                                    $driverId = '';
+                                } else {
+                                    $driverId = $objects.driverId;
+                                };
+                                $('select[name="ownerSupplierId"]').empty();
+                                $.get('/ucenter/userinfo.shtml', function(d) {
+                                    var $code = d.code,
+                                        $msg = d.msg,
+                                        $objects = d.objects;
+
+                                    if ($code == 'SUCCESS') {
+                                        $("select[name='ownerSupplierId']").append("<option value='" + $objects.regBodyId + "'>" + $objects.regBodyName + "</option>");
+                                    } else {
+                                        $('select[name="ownerSupplierId"]').append('<option></option>');
+                                    }
+                                    form.render('select');
+                                    $('select[name="ownerSupplierId"]').val($ownerSupplierId);
+                                    form.render();
+                                }, 'json');
+                                $('select[name="driverId"]').empty();
+                                $('select[name="driverId"]').append('<option value=""></option>')
+                                $.get('/ucenter/tms/capacity/driver/getNull.shtml?contractType=2&supplierId=' + $ownerSupplierId + '&driverId=' + $driverId, function(d) {
+                                    var $code = d.code,
+                                        $msg = d.msg,
+                                        $objects = d.objects;
+                                    if ($code != 'SUCCESS') return false;
+                                    if ($objects.length > 0) {
+                                        for (var $i = 0; $i < $objects.length; $i++) {
+                                            $('select[name="driverId"]').append('<option value="' + $objects[$i].id + '">' + $objects[$i].name + '</option>');
+                                        }
+                                        form.render('select');
+                                        $('select[name="driverId"]').val($driverId);
+                                        form.render();
+                                    }
+                                    form.render();
+                                }, 'json');
+                            } else {
+                                requireJudge.notReq();
+
+                                var $ownerSupplierId;
+                                if ($objects.ownerSupplierId == null) {
+                                    $ownerSupplierId = '';
+                                } else {
+                                    $ownerSupplierId = $objects.ownerSupplierId;
+                                };
+                                var $driverId;
+                                if ($objects.driverId == null) {
+                                    $driverId = '';
+                                } else {
+                                    $driverId = $objects.driverId;
+                                };
+                                $("select[name='ownerSupplierId']").empty();
+                                $.get('/ucenter/crm/supplier/supplier/showCarOwnAndTowing.shtml', function(d) {
+                                    var $code = d.code,
+                                        $msg = d.msg,
+                                        $objects = d.objects;
+                                    if ($code == 'SUCCESS') {
+                                        if ($objects.length > 0) {
+                                            for (var $i = 0; $i < $objects.length; $i++) {
+                                                $('select[name="ownerSupplierId"]').append('<option value="' + $objects[$i].id + '">' + $objects[$i].nameShort + '</option>');
+                                            }
+                                        } else {
+                                            $('select[name="ownerSupplierId"]').append('<option></option>');
+                                        }
+                                    } else {
+                                        $('select[name="ownerSupplierId"]').append('<option></option>');
+                                    }
+                                    form.render('select');
+                                    $('select[name="ownerSupplierId"]').val($ownerSupplierId);
+                                    form.render();
+                                }, 'json');
+                                $('select[name="driverId"]').empty();
+                                $('select[name="driverId"]').append('<option value=""></option>')
+                                $.get('/ucenter/tms/capacity/driver/getNull.shtml?contractType=3&supplierId=' + $ownerSupplierId + '&driverId=' + $driverId, function(d) {
+                                    var $code = d.code,
+                                        $msg = d.msg,
+                                        $objects = d.objects;
+                                    if ($code != 'SUCCESS') return false;
+                                    if ($objects.length > 0) {
+                                        for (var $i = 0; $i < $objects.length; $i++) {
+                                            $('select[name="driverId"]').append('<option value="' + $objects[$i].id + '">' + $objects[$i].name + '</option>');
+                                        }
+                                        form.render('select');
+                                        $('select[name="driverId"]').val($driverId);
+                                        form.render();
+                                    }
+                                    form.render();
+                                }, 'json');
+                            }
+                            $('select[name="driverId"]').val($objects.driverId);
+                            $('select[name="fuelTypesDcode"]').val($objects.fuelTypesDcode);
+                            $('input[name="operateRoadNo"]').val($objects.operateRoadNo);
+                            $('input[name="operateDangerousNo"]').val($objects.operateDangerousNo);
+                            $('input[name="frameDcode"]').val($objects.frameDcode);
+                            $('input[name="engineNo"]').val($objects.engineNo);
+                            $('input[name="loadPeopleNumber"]').val($objects.loadPeopleNumber);
+                            $('input[name="qualityTotal"]').val($objects.qualityTotal);
+                            $('input[name="qualityFullPrep"]').val($objects.qualityFullPrep);
+                            $('input[name="qualityLoad"]').val($objects.qualityLoad);
+                            $('input[name="gabariteLength"]').val($objects.gabariteLength);
+                            $('input[name="gabariteWidth"]').val($objects.gabariteWidth);
+                            $('input[name="gabariteHeight"]').val($objects.gabariteHeight);
+                            $('input[name="towWeight"]').val($objects.towWeight);
+                            $('#userDistrict').district(form, $objects.ownerAreaId);
+                            $('input[name="ownerAddress"]').val($objects.ownerAddress);
+                            $('input[name="brandNo"]').val($objects.brandNo);
+                            $('input[name="dateRetirement"]').val($objects.dateRetirement != null ? new Date($objects.dateRetirement).format('yyyy-MM-dd') : '');
+                            $('input[name="dateReg"]').val($objects.dateReg != null ? new Date($objects.dateReg).format('yyyy-MM-dd') : '');
+                            $('input[name="dateCertificate"]').val($objects.dateCertificate != null ? new Date($objects.dateCertificate).format('yyyy-MM-dd') : '');
+                            $('input[name="fileNo"]').val($objects.fileNo);
+                            $('select[name="frameType"]').val($objects.frameType);
+                            $('input[name="power"]').val($objects.power);
+                            $('select[name="expresswayPriceNormal"]').val($objects.expresswayPriceNormal);
+                            $('select[name="hasImport"]').val($objects.hasImport);
+                            $('input[name="carBodyColor"]').val($objects.carBodyColor);
+                            $('input[name="customsVehicleNo"]').val($objects.customsVehicleNo);
+                            $('input[name="hkCarNo"]').val($objects.hkCarNo);
+                            $('input[name="hkExpressNo"]').val($objects.hkExpressNo);
+                            $('input[name="gpsDeviceNo"]').val($objects.gpsDeviceNo);
+
+                            //GPS
+                            $("select[name='gpsCompany']").empty();
+                            $("select[name='gpsCompany']").append("<option value=''></option>");
+                            $.get('/ucenter/crm/supplier/supplier/showInsure.shtml?type=556', function(d) {
+                                var $code = d.code,
+                                    $msg = d.msg,
+                                    $objects = d.objects;
+                                if ($code == 'SUCCESS') {
+
+                                    for (var i = 0; i < $objects.length; i++) {
+                                        $("select[name='gpsCompany']").append("<option value='" + $objects[i].id + "'>" + $objects[i].nameShort + "</option>");
+                                    }
+                                } else {
+                                    $('select[name="gpsCompany"]').append('<option></option>');
+                                }
+                                form.render('select');
+                                $('select[name="gpsCompany"]').val($gpssupplieId);
+                                form.render();
+                            }, 'json');
+                            // $('select[name="gpsCompany"]').val($objects.gpssupplieId);
+                            // gpsSupplieId: $.trim(data.field.gpsCompany),
+                            $('textarea[name="remarks"]').val($objects.remarks);
+                            $('input[name="bizWarrantyNo"]').val($objects.bizWarrantyNo);
+                            $('input[name="forceWarrantyNo"]').val($objects.forceWarrantyNo);
+                            $('input[name="bizInsuranceE"]').val($objects.bizInsuranceE != null ? new Date($objects.bizInsuranceE).format('yyyy-MM-dd') : '');
+                            $('input[name="forceInsuranceE"]').val($objects.forceInsuranceE != null ? new Date($objects.forceInsuranceE).format('yyyy-MM-dd') : '');
+                            $('input[name="bizPremium"]').val($objects.bizPremium);
+                            $('input[name="forcePremium"]').val($objects.forcePremium);
+
+                            //处理附件
+                            bizUtil.data.createFileItemsByObject($('.file-line').eq(0), $objects, {
+                                fileUrlField: 'drivingAttIds',
+                                fileNameField: 'drivingAttNames'
+                            });
+                            bizUtil.data.createFileItemsByObject($('.file-line').eq(1), $objects, {
+                                fileUrlField: 'operateAttIds',
+                                fileNameField: 'operateAttNames'
+                            });
+                            bizUtil.data.createFileItemsByObject($('.file-line').eq(2), $objects, {
+                                fileUrlField: 'registerAttIds',
+                                fileNameField: 'registerAttNames'
+                            });
+                            bizUtil.data.createFileItemsByObject($('.file-line').eq(3), $objects, {
+                                fileUrlField: 'agreementAttIds',
+                                fileNameField: 'agreementAttNames'
+                            });
+                            bizUtil.data.createFileItemsByObject($('.file-line').eq(4), $objects, {
+                                fileUrlField: 'otherAttIds',
+                                fileNameField: 'otherAttNames'
+                            });
+
+                            //公司名称
+                            $('input[name="ownerCompanyName"]').val($objects.ownerCompanyName);
+
+                            form.render();
+                            if ($type == 'info') {
+                                $('form select').prop('disabled', true);
+                                //查看时 不允许上传
+                                $('form').addClass('form--detail');
+                            }
+                        } else {
+                            parent.layer.alert('数据异常');
+                            return false;
+                        }
+                    }, 'json');
+
+                    //获取结算对象
+                    HC.ajax.get({
+                        url: '/ucenter/tms/capacity/trailerSettlement/bytargetId.shtml',
+                        data: {
+                            id: $id
+                        },
+                        success: function(data) {
+                            calculationObj.initiTable(data, $type);
+                            $('.existedCkdObj').text('').text(JSON.stringify(data));
+                            $('.ckObj').text('').text(JSON.stringify(data));
+                        }
+                    });
+                }
+            }
+
+            if ($type == 'info') {
+                layIdID = $('.layui-this', window.parent.document).attr('lay-id');
+                $("input,textarea,select").prop("disabled", true);
+                $(".div-add").hide();
+                $(".div-info").show();
+                $("a").css("display", "none");
+                $('#btn-add').parent().css("display", "none");
+                $("#insuranceInfo").show();
+                form.render();
+            }
+
+            var carNoObj = {
+                target: $('#carNo'),
+                notice: 1,
+                callBack: function() {
+                    return {
+                        'firstWord': $('select[name="carShort"]').val(),
+                        'signVal': $('#carNo').val()
+                    }
+                }
+            }
+
+            var frameNoObj = {
+                target: $('#frameNo'),
+                notice: 1,
+                callBack: function() {
+                    return {
+                        'firstWord': $('select[name="frameShort"]').val(),
+                        'signVal': $('#frameNo').val()
+                    }
+                }
+            }
+            verifyCarNuber(carNoObj);
+            verifyCarNuber(frameNoObj);
+
+            //监听提交
+            form.on('submit(submit)', function(data) {
+                carNoObj.notice = 2;
+                if (!verifyCarNuber(carNoObj)) {
+                    return false;
+                }
+                frameNoObj.notice = 2;
+                if (!verifyCarNuber(frameNoObj)) {
+                    return false;
+                }
+
+                if (!bizUtil.validator.verifyContainer($('form'))) {
+                    return false;
+                }
+
+                var $index1 = $('#userDistrict select').not(':disabled').length - 1,
+                    $ownerAreaId = $('#userDistrict select').eq($index1).val();
+                var carColor = $.trim(data.field.carColor);
+
+                var frameNo = $.trim(data.field.frameNo) != "" ? data.field.frameShort + $.trim(data.field.frameNo) : "";
+                var carNo = $.trim(data.field.carNo) != "" ? data.field.carShort + $.trim(data.field.carNo) : "";
+                if ($type == 'edit' || $type == 'info') {
+                    if (frameNo !== "") {
+                        if (!($carColor === carColor && $carNo === carNo)) {
+                            parent.layer.alert("拖车车牌有更改，是否继续? ", {
+                                btn: ["继续", "取消"],
+                                btn1: function(index) {
+                                    actionAjax(data, $ownerAreaId);
+                                },
+                                btn2: function(index) {
+                                    parent.layer.close(index);
+                                }
+                            });
+                            return false;
+                        }
+                    }
+                }
+
+                if ($('#userDistrict').find('select').eq(0).val() != "") {
+                    if ($ownerAreaId == "") {
+                        parent.layer.alert("所有人地址请选择完整！");
+                        return false;
+                    }
+                }
+
+
+                actionAjax(data, $ownerAreaId);
+                return false;
+            });
+
+            function actionAjax(data, $ownerAreaId) {
+                //数据源
+                var $saveData = {
+                    carNo: $.trim(data.field.carNo) != "" ? data.field.carShort + $.trim(data.field.carNo) : "",
+                    carColor: $.trim(data.field.carColor),
+                    frameNo: $.trim(data.field.frameNo) != "" ? data.field.frameShort + $.trim(data.field.frameNo) : "",
+                    frameColor: $.trim(data.field.frameColor),
+                    carBelong: $.trim(data.field.carBelong),
+                    ownerSupplierId: $.trim(requireJudge.getOwnerCompanyId()),
+                    ownerCompanyName: $.trim(requireJudge.getOwnerCompanyName()),
+                    driverId: $.trim(data.field.driverId),
+                    driverName: $.trim($('select[name="driverId"]').find("option:selected").text()),
+                    fuelTypesDcode: $.trim(data.field.fuelTypesDcode),
+                    operateRoadNo: $.trim(data.field.operateRoadNo),
+                    operateDangerousNo: $.trim(data.field.operateDangerousNo),
+                    frameDcode: $.trim(data.field.frameDcode),
+                    engineNo: $.trim(data.field.engineNo),
+                    loadPeopleNumber: $.trim(data.field.loadPeopleNumber),
+                    qualityTotal: $.trim(data.field.qualityTotal),
+                    qualityFullPrep: $.trim(data.field.qualityFullPrep),
+                    qualityLoad: $.trim(data.field.qualityLoad),
+                    gabariteLength: $.trim(data.field.gabariteLength),
+                    gabariteWidth: $.trim(data.field.gabariteWidth),
+                    gabariteHeight: $.trim(data.field.gabariteHeight),
+                    towWeight: $.trim(data.field.towWeight),
+                    ownerAreaId: $.trim($ownerAreaId),
+                    ownerAddress: $.trim(data.field.ownerAddress),
+                    brandNo: $.trim(data.field.brandNo),
+                    dateRetirement: $.trim(data.field.dateRetirement),
+                    dateReg: $.trim(data.field.dateReg),
+                    dateCertificate: $.trim(data.field.dateCertificate),
+                    fileNo: $.trim(data.field.fileNo),
+                    frameType: $.trim(data.field.frameType),
+                    power: $.trim(data.field.power),
+                    expresswayPriceNormal: $.trim(data.field.expresswayPriceNormal),
+                    hasImport: $.trim(data.field.hasImport),
+                    carBodyColor: $.trim(data.field.carBodyColor),
+                    customsVehicleNo: $.trim(data.field.customsVehicleNo),
+                    hkCarNo: $.trim(data.field.hkCarNo),
+                    hkExpressNo: $.trim(data.field.hkExpressNo),
+                    gpsDeviceNo: $.trim(data.field.gpsDeviceNo),
+                    gpsSupplieId: $.trim(data.field.gpsCompany),
+                    remarks: $.trim(data.field.remarks),
+                    //结算对象
+                    trailerSettlement: calculationObj.parseTextToObj($('.existedCkdObj').text())
+
+                }
+
+                $.extend($saveData,
+                    bizUtil.data.getAttrDataObject($('.file-line').eq(0), {
+                        fileUrlField: 'drivingAttIds',
+                        fileNameField: 'drivingAttNames'
+                    }),
+                    bizUtil.data.getAttrDataObject($('.file-line').eq(1), {
+                        fileUrlField: 'operateAttIds',
+                        fileNameField: 'operateAttNames'
+                    }),
+                    bizUtil.data.getAttrDataObject($('.file-line').eq(2), {
+                        fileUrlField: 'registerAttIds',
+                        fileNameField: 'registerAttNames'
+                    }),
+                    bizUtil.data.getAttrDataObject($('.file-line').eq(3), {
+                        fileUrlField: 'agreementAttIds',
+                        fileNameField: 'agreementAttNames'
+                    }),
+                    bizUtil.data.getAttrDataObject($('.file-line').eq(4), {
+                        fileUrlField: 'otherAttIds',
+                        fileNameField: 'otherAttNames'
+                    })
+                );
+
+                var $url, $method;
+                if ($type == 'edit') {
+                    $url = '/ucenter/tms/capacity/trailer/' + $.trim(data.field.id) + '.shtml';
+                    $method = 'PUT';
+                    $saveData.id = $('input[name="id"]').val();
+                } else {
+                    $url = '/ucenter/tms/capacity/trailer/add.shtml';
+                    $method = 'POST';
+                }
+
+                //调用接口
+                HC.ajax[$method.toLowerCase()]({
+                    url: $url,
+                    data: JSON.stringify($saveData),
+                    success: function(d) {
+                        parent.layer.alert("保存成功", {
+                            closeBtn: 0,
+                            yes: function(index) {
+                                parent.layer.close(index);
+                                if ($("#continue").is(":checked")) { //保存后继续新增
+                                    $(window.parent['f1'].document).find('.btn-search').click();
+                                    if ($type == 'edit') {
+                                        bizUtil.frame.closeCurrentIframeTab(window.parent);
+                                    } else {
+                                        window.location.reload();
+                                    }
+                                } else {
+                                    $(window.parent['f1'].document).find('.btn-search').click();
+                                    bizUtil.frame.closeCurrentIframeTab(window.parent);
+                                }
+                            }
+                        });
+                    }
+                });
+
+            }
+            //取消
+            $(".btn-cancel").click(function() {
+                bizUtil.frame.closeCurrentIframeTab(window.parent);
+            });
+
+            //修改拖车
+            $(".btn-modify").click(function() {
+                tmsTab.add($(this), "编辑拖车", "modify.html?type=edit&id=" + $('input[name="id"]').val());
+                layui.tms_tab.del(layIdID);
+            });
+
+            //返回
+            $(".btn-back").click(function() {
+                bizUtil.frame.closeCurrentIframeTab(window.parent);
+            });
+
+
+            calculationObj = {
+                open: function(title, url, endFn) {
+                    parent.layer.open({
+                        type: 2,
+                        title: title,
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['1000px', '600px'],
+                        content: url,
+                        end: endFn
+                    });
+                },
+                parseTextToObj: function(text) {
+                    if (!text) {
+                        return [];
+                    }
+                    return JSON.parse(text);
+                },
+                getckObj: function() {
+                    var tableCols = calculationObj.parseTextToObj($('.ckObj').text());
+                    var existedCols = calculationObj.parseTextToObj($('.existedCkdObj').text());
+
+                    if (!tableCols.length) {
+                        return;
+                    }
+                    var param = ['targetType', 'targetName', 'channelType', 'bankName', 'accountName', 'accountNo', 'status', 'settlementChannelId', 'targetId', 'bankBranchName', 'bankBranchNo', 'id'];
+                    var machiningArr = [];
+                    $.each(tableCols, function(i, d) {
+                        var obj = {};
+                        $.each(param, function(i2, d2) {
+                            obj[d2] = d[d2];
+                        });
+                        machiningArr.push(obj);
+                    });
+
+                    return machiningArr.concat(existedCols);
+                },
+                initiTable: function(colsData, type) {
+                    var cols = [{
+                        field: 'targetType',
+                        title: '类型',
+                        width: 180,
+                        templet: "#typeTpl"
+                    }, {
+                        field: 'targetName',
+                        title: '供应商名称',
+                        width: 180
+                    }, {
+                        field: 'channelType',
+                        title: '结算渠道',
+                        width: 100,
+                        templet: "#channelTypeTpl"
+                    }, {
+                        field: 'bankName',
+                        title: '银行',
+                        width: 150
+                    }, {
+                        field: 'accountName',
+                        title: '账户名称',
+                        width: 120
+                    }, {
+                        field: 'accountNo',
+                        title: '账号',
+                        width: 200
+                    }, {
+                        field: 'status',
+                        title: '状态',
+                        width: 200,
+                        templet: "#statusTpl"
+                    }, {
+                        field: 'g',
+                        title: '操作',
+                        width: 120,
+                        align: 'center',
+                        templet: "#bar"
+                    }];
+                    if (type === 'info') {
+                        cols.pop();
+                    }
+                    table.init('table_list', {
+                        cols: [cols],
+                        id: 'dataReload',
+                        data: colsData,
+                        page: false,
+                        limit: 9999
+                    });
+
+                }
+            }
+
+
+            //结算对象跳转
+            $('.calculationObj').click(function() {
+                var driverId = $('select[name="driverId"]').val();
+                var carBelong = $('select[name="carBelong"]').val();
+                var driverName = encodeURI($('select[name="driverId"]').find("option:selected").text());
+
+                calculationObj.open(
+                    '增加结算对象',
+                    './calculationObj.html?do=add&driverId=' + driverId + '&type=' + $type + '&driverName=' + driverName + '&carBelong=' + carBelong,
+                    function() {
+                        var ckObj = calculationObj.getckObj();
+
+                        if (!ckObj) {
+                            return;
+                        }
+                        calculationObj.initiTable(ckObj);
+                        $('.ckObj').text(JSON.stringify(ckObj));
+                        $('.existedCkdObj').text(JSON.stringify(ckObj));
+                    }
+                );
+            });
+
+            var statusMap = {
+                "1": {
+                    text: "启用",
+                    status: 3
+                },
+                "3": {
+                    text: "停用",
+                    status: 1
+                }
+            }
+            table.on('tool(table_list)', function(obj) {
+                var data = obj.data;
+                var layEvent = obj.event;
+
+                if (layEvent === 'edit') {
+                    calculationObj.open('编辑结算对象', './calculationObj.html?do=edit&targetId=' + data.targetId +
+                        '&targetType=' + data.targetType + '&targetName=' + encodeURI(data.targetName) + '&accountNo=' + data.accountNo,
+                        function() {
+                            var tableCols = calculationObj.parseTextToObj($('.ckObj').text());
+                            var existedCols = calculationObj.parseTextToObj($('.existedCkdObj').text());
+                            if (!tableCols) {
+                                return;
+                            }
+                            $.each(tableCols, function(i, d) {
+                                $.each(existedCols, function(i2, d2) {
+                                    if (d.targetId == d2.targetId) {
+                                        existedCols.splice(i2, 1);
+                                        existedCols.push(d);
+                                    }
+                                });
+                            });
+                            calculationObj.initiTable(existedCols);
+                            $('.ckObj').text(JSON.stringify(existedCols));
+                            $('.existedCkdObj').text(JSON.stringify(existedCols));
+
+                        });
+                } else if (layEvent === 'frozen') {
+                    var sMap = statusMap[data.status || 1];
+                    $(this).text(sMap.text);
+                    data.status = sMap.status;
+                    obj.update(data);
+
+                    var existedCols = calculationObj.parseTextToObj($('.existedCkdObj').text());
+                    $.each(existedCols, function(i, d) {
+                        if (d.targetId == data.targetId) {
+                            existedCols[i].status = sMap.status;
+                        }
+                    });
+                    $('.existedCkdObj').text(JSON.stringify(existedCols));
+                } else {
+
+                }
+
+            });
+
+
+        });
+    });
+</script>
+
+<script type="text/html" id="bar">
+    {{# if(d.status == 1){ }}
+    <a class="layui-btn layui-btn-mini btn-edit" lay-event="edit">编辑</a><a class="layui-btn layui-btn-danger layui-btn-mini btn-delete" lay-event="frozen">停用</a> {{# }else{ }}
+    <a class="layui-btn layui-btn-mini btn-edit" lay-event="edit">编辑</a><a class="layui-btn layui-btn-danger layui-btn-mini btn-delete" lay-event="frozen">启用</a> {{# } }}
+
+
+
+</script>
+<script type="text/html" id="channelTypeTpl">
+    {{# if(d.channelType == 0){ }}
+    <div>银行</div>
+    {{# }else if(d.channelType == 1){ }}
+    <div>支付宝</div>
+    {{# }else if(d.channelType == 2){ }}
+    <div>微信</div>
+    {{# } }}
+</script>
+<script type="text/html" id="typeTpl">
+    {{# if(d.targetType == 1){ }}
+    <div>供应商</div>
+    {{# }else if(d.targetType == 2){ }}
+    <div>司机</div>
+    {{# } }}
+</script>
+<script type="text/html" id="statusTpl">
+    {{# if(d.status == 1){ }}
+    <a lay-event="statusCancel" style="color:#1E9FFF;">启用</a> {{# }else{ }}
+    <a lay-event="statusStart" style="color:#FF5722;">停用</a> {{# } }}
+</script>
+
+</html>

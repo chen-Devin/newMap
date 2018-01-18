@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>新增装卸单位</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+</head>
+
+<body>
+    <form class="layui-form" autocomplete="off" style="min-width:800px;">
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">装卸单位名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="coName" class="layui-input" maxlength="50" lay-verify="required" hc-verify="companyRegex|companySize" hc-verify_field="装卸单位名称">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">装卸单位简称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="coNameShort" class="layui-input" maxlength="20" lay-verify="required" hc-verify="companyRegex|abbreviation" hc-verify_field="装卸单位简称">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm12">
+                    <div class="layui-form-item layui-form-item--require" id="juryDistrict">
+                        <label class="layui-form-label">装卸地址</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="juryProvince" lay-filter="juryProvince">
+                                      <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="juryCity" lay-filter="juryCity">
+                                      <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="juryCounty" lay-filter="juryCounty">
+                                      <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div>
+                                    <select name="juryStreet" lay-filter="juryStreet">
+                                      <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm12">
+                    <div class="layui-form-item layui-form-item--require">
+                        <div class="layui-input-block">
+                            <input type="hidden" name="addressAreaId">
+                            <input type="text" name="address" placeholder="详细装卸地址" class="layui-input" maxlength="255" lay-verify="required">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">联系人姓名</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="uname" class="layui-input" maxlength="20" lay-verify="required" hc-verify="userName|nameSize" hc-verify_field="联系人姓名">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">手机号码</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="mobile" class="layui-input" maxlength="20" lay-verify="required" hc-verify="mobile">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">电话</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="tel" class="layui-input" maxlength="20" hc-verify="tele">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">微信</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="wechat" class="layui-input" maxlength="20" hc-verify="wechat">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">QQ</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="qq" class="layui-input" maxlength="20" hc-verify="qq">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">电子邮箱</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="email" class="layui-input" maxlength="100" hc-verify="email">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm12">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">注意事项</label>
+                        <div class="layui-input-block">
+                            <textarea name="notes" placeholder="0~1000字符之间" class="layui-textarea" maxlength="1000" hc-verify="remarkSize"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm12">
+                    <div class="layui-form-item">
+                        <div class="layui-input-block" id="inputEdit">
+                            <input type="checkbox" name="conAdd" lay-verify="conAdd" value="1" title="保存后继续新增" lay-skin="primary">
+                            <input type="button" class="layui-btn" id="vsubmit" lay-submit lay-filter="submit" style="display: none;" value="保存">
+                            <input type="button" class="layui-btn" style="display:none;" value="取消">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/layui.district_1.js?v=1.0"></script>
+<!-- 工具库依赖 -->
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            layedit = layui.layedit,
+            laydate = layui.laydate,
+            $ = layui.jquery;
+
+        var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+
+        var $type = $.trim(getUrlParam('do'));
+        var $id = $.trim(getUrlParam('id'));
+        var $idD = $.trim(getUrlParam('idD'));
+        var $addressId = $.trim(getUrlParam('addressId'));
+        var $onlyId = $.trim(getUrlParam('onlyId'));
+
+        if ($type == 'add') $('#juryDistrict').district(form);
+
+        if ($type == 'edit' && $onlyId == 'aa') {
+            $('#inputEdit').hide();
+            // console.log($id);
+            // var addressId = $('input[name="addressAreaId"]').val();
+            // console.log(addressId);
+            // console.log($addressId);
+            // console.log("切换到fix");
+            // $('input[name="addressAreaId"]').val($addressId)
+            $('#juryDistrict').district(form, $addressId);
+        }
+        var datas;
+        //监听提交
+        if ($type == 'edit' || $type == 'add') {
+            form.on('submit(submit)', function(data) {
+                if (!bizUtil.validator.verifyContainer($('form'))) {
+                    return false;
+                }
+
+                var $index1 = $('#juryDistrict select').not(':disabled').length - 1,
+                    $indexVal1 = $('#juryDistrict select').eq($index1).val();
+                $('input[name="addressAreaId"]').val($indexVal1);
+                if ($('input[name="addressAreaId"]').val().length == 0) {
+                    parent.layer.msg('请选择城市');
+                    return false;
+                }
+
+                var $addressAreaId = $('input[name="addressAreaId"]').val().length > 0 ? parseInt($.trim($('input[name="addressAreaId"]').val())) : '';
+
+                var $saveDataHD = {
+                    address: $.trim(data.field.address),
+                    addressAreaId: $addressAreaId,
+                    coName: $.trim(data.field.coName),
+                    coNameShort: $.trim(data.field.coNameShort), 
+                    email: $.trim(data.field.email),
+                    id: $idD,
+                    conAdd: parseInt($.trim(data.field.conAdd)),
+                    mobile: $.trim(data.field.mobile),
+                    notes: $.trim(data.field.notes),
+                    qq: $.trim(data.field.qq),
+                    tel: $.trim(data.field.tel),
+                    uname: $.trim(data.field.uname),
+                    status: 3,
+                    wechat: $.trim(data.field.wechat),
+                };
+                if ($type == 'edit') {
+                    $saveDataHD.$id = parseInt($id);
+                }
+                // data.field
+                var datas = JSON.stringify($saveDataHD)
+                $(window.parent['f' + $layId].document).find('.tableHS').attr('data-func', 'callback(' + datas + ')');
+                if ($saveDataHD.id != '') {
+                    window.parent.frames['f' + $layId].aaa();
+                }
+                if ($saveDataHD.conAdd == 1) {
+                    $id++;
+                    $('form.layui-form')[0].reset();
+                    return false;
+                }
+            });
+
+        }
+        if ($type == 'edit' && $idD != '') {
+            $('#inputEdit').hide();
+            console.log('bbb');
+            $.get('/ucenter/crm/customers/customersAddress/' + $idD + '.shtml', function(d) {
+                var $code = d.code,
+                    $msg = d.msg,
+                    $objects = d.objects;
+                if ($code === 'SUCCESS') {
+                    $('input[name=coName]').val($objects.coName);
+                    $('input[name=coNameShort]').val($objects.coNameShort);
+                    $('input[name=uname]').val($objects.uname);
+                    $('input[name=mobile]').val($objects.mobile);
+                    $('input[name=tel]').val($objects.tel);
+                    $('input[name=wechat]').val($objects.wechat);
+                    $('input[name=qq]').val($objects.qq);
+                    $('input[name=email]').val($objects.email);
+                    $('textarea[name=notes]').val($objects.notes);
+                    $objects.addressAreaId != null ? $('input[name="addressAreaId"]').val($objects.addressAreaId) : '';
+                    $objects.addressAreaId != null ? $('#juryDistrict').district(form, $objects.addressAreaId) : $('#juryDistrict').district(form);
+                    $('input[name=address]').val($objects.address);
+                    form.render();
+                }
+            })
+        };
+    });
+</script>
+
+</html>

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>员工管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+    <style>
+        body {
+            margin: 0 0 0 15px;
+        }
+        
+        .organize-title {
+            height: 58px;
+            line-height: 58px;
+            border-bottom: #ddd 1px dotted;
+            font-size: 20px;
+        }
+        
+        .organize {
+            margin: 10px 0;
+        }
+        
+        #menus cite p {
+            margin: 0;
+            padding: 0;
+            display: inline;
+        }
+        
+        #menus cite p.current {
+            color: #f60 !important;
+        }
+        
+        #menus cite p span.manager,
+        #menus cite p.current span.manager {
+            color: #777;
+        }
+        
+        #menus cite p.cancel {
+            color: #999;
+        }
+        
+        #menus cite p.cancel span.manager {
+            color: #999;
+        }
+        
+        #menus cite p.cancel span.status {
+            color: #999;
+        }
+        
+        .left-panel {
+            padding: 0 15px 0 0;
+            overflow: auto;
+        }
+        
+        .right-panel {
+            padding: 0 15px 3px;
+            border-left: #ddd 1px solid;
+            overflow: auto;
+        }
+        
+        .btns-bar .fl button {
+            margin-left: 1px;
+        }
+        
+        .btns-bar .fl button:first-child {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layui-row">
+        <div class="layui-col-lg3 layui-col-md3 layui-col-sm4 left-panel">
+            <h4 class="organize-title">组织架构</h4>
+            <div class="organize">
+                <ul id="menus"></ul>
+            </div>
+        </div>
+        <div class="layui-col-lg9 layui-col-md9 layui-col-sm8 right-panel">
+            <div class="panel-handle search-bar">
+                <form class="layui-form layui-form-pane">
+                    <div class="layui-input-inline">
+                        <label class="layui-form-label">员工姓名</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="userName" placeholder="员工姓名" autocomplete="off" class="layui-input">
+                            <input type="hidden" name="organizeId">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-inline">
+                            <select name="status">
+                                <option value="" selected="selected">全部</option>
+                                <option value="1">启用</option>
+                                <option value="0">停用</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                    <button class="layui-btn layui-btn-primary" type="reset" style="margin:0;">重置</button>
+                </form>
+            </div>
+
+            <!--start: 按钮组-->
+            <div class="panel-handle btns-bar">
+                <div class="layui-btn-group fl">
+                    <button class="layui-btn layui-btn-normal" data-type="addData">新增</button>
+                    <button class="layui-btn layui-btn-normal" data-type="editData">编辑</button>
+                    <button class="layui-btn layui-btn-normal" data-type="detailData">查看</button>
+                    <button class="layui-btn layui-btn-normal" data-type="statusCancel">停用</button>
+                    <button class="layui-btn layui-btn-normal" data-type="statusStart">启用</button>
+                    <button class="layui-btn layui-btn-normal" data-type="resetPwd">重置密码</button>
+                    <button class="layui-btn layui-btn-normal" data-type="setRolePermi">设置角色</button>
+                    <button class="layui-btn layui-btn-normal" data-type="setMenuPermi">设置权限</button>
+                </div>
+                <div class="clr"></div>
+            </div>
+            <!--end: 按钮组-->
+
+            <!--start:表格列表-->
+            <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+            <!--end:表格列表-->
+        </div>
+    </div>
+</body>
+<!-- <script type="text/html" id="toolBar">
+    <a lay-event="edit" style="color:#2F4056;" title="编辑"><i class="layui-icon" style="font-size:19px;">&#xe642;</i></a>&nbsp;
+    <a lay-event="detail" style="color:#2F4056;" title="查看详情"><i class="layui-icon" style="font-size:19px;">&#xe630;</i></a>&nbsp;
+    <a lay-event="resetPwd" style="color:#2F4056;" title="重置密码"><i class="layui-icon" style="font-size:19px;">&#xe631;</i></a>&nbsp;
+    <a lay-event="rolePermi" style="color:#2F4056;" title="设置角色&权限"><i class="layui-icon" style="font-size:19px;">&#xe614;</i></a>&nbsp;
+</script> -->
+<script type="text/html" id="statusTpl">
+    {{# if(d.status == 1){ }}
+    <a lay-event="statusCancel" style="color:#1E9FFF;">启用</a> {{# }else{ }}
+    <a lay-event="statusStart" style="color:#FF5722;">停用</a> {{# } }}
+</script>
+<script type="text/html" id="loginDateTpl">
+    {{# if(d.loginDate != null){ }} {{new Date(d.loginDate).format('yyyy-MM-dd hh:mm:ss')}} {{# }else{ }} -- {{# } }}
+</script>
+<script type="text/html" id="idTpl">
+    {{d.LAY_TABLE_INDEX+1}}
+</script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_company.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<!-- <script charset="utf-8" src="/view/tms/static/js/tms_funcPermi.js?v=1.0"></script> -->
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    $(function() {
+        autoHeight();
+        $(window).on('resize', function() {
+            autoHeight();
+        });
+
+        //组织架构右边内容高度
+        function autoHeight() {
+            var $winHeight = $(window.parent.document).height() - 110 - 39;
+            $('.left-panel').height($winHeight);
+        }
+    });
+
+    layui.use(['form', 'layer', 'table', 'tree', 'tms_tab'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            tmsTab = layui.tms_tab,
+            $ = layui.jquery;
+
+        //获取组织架构
+        var setMenus = function() {
+            $.get('/ucenter/centre/core/organization/all.shtml', function(d) {
+                var $code = d.code,
+                    $msg = d.msg,
+                    $objects = d.objects;
+
+                if ($code != 'SUCCESS') return false;
+
+                //重新编绎json
+                var $allArr = setTreeData(0, $objects);
+
+                //参数设置
+                var $options = {
+                        elem: '#menus',
+                        click: function(item) {
+                            if (item.status != 3) {
+                                $('#menus cite p').removeClass('current');
+                                $('#cc' + item.rid + ' p').addClass('current');
+                                $('input[name="organizeId"]').val(item.rid);
+                                setTableData(item.rid);
+                            }
+                        },
+                        nodes: $allArr
+                    }
+                    //树形菜单
+                layui.tree($options);
+            }, 'json');
+        }
+
+        //初始化
+        setMenus();
+        setTableData();
+
+        //监听提交
+        form.on('submit(search)', function(data) {
+            var $organizeId = $.trim(data.field.organizeId),
+                $userName = $.trim(data.field.userName),
+                $status = $.trim(data.field.status);
+            setTableData($organizeId, $userName, $status);
+            return false;
+        });
+
+        //方法级渲染
+        function setTableData($organizeId, $userName, $status) {
+            $organizeId = $organizeId || '';
+            $userName = $userName || '';
+            $status = $status || '';
+
+            var $pageSize = 15;
+
+            table.render({
+                elem: '#tableList',
+                url: '/ucenter/centre/permi/employee/page.shtml?organizeId=' + $organizeId + '&name=' + $userName + '&status=' + $status,
+                response: {
+                    statusCode: 'SUCCESS',
+                    countName: 'objects.total',
+                    dataName: 'objects.list'
+                },
+                request: {
+                    pageName: 'pageNum',
+                    limitName: 'pageSize'
+                },
+                cols: [
+                    [{
+                            checkbox: true,
+                            fixed: true
+                        }, {
+                            title: '序号',
+                            width: 80,
+                            sort: true,
+                            align: 'center',
+                            templet: '#idTpl'
+                        }, {
+                            field: 'name',
+                            title: '姓名',
+                            width: 110,
+                            align: 'center'
+                        }, {
+                            field: 'mobile',
+                            title: '手机',
+                            width: 140,
+                            align: 'center'
+                        }, {
+                            field: 'companyName',
+                            title: '所属公司',
+                            width: 200
+                        }, {
+                            field: 'departmentName',
+                            title: '所属部门',
+                            width: 120,
+                            align: 'center'
+                        }, {
+                            field: 'status',
+                            title: '状态',
+                            width: 60,
+                            templet: '#statusTpl',
+                            align: 'center'
+                        }, {
+                            field: 'accid',
+                            title: '登录账号',
+                            width: 130,
+                            align: 'center'
+                        }, {
+                            field: 'loginDate',
+                            title: '最后登录时间',
+                            width: 170,
+                            templet: '#loginDateTpl',
+                            align: 'center'
+                        }
+                        // , {
+                        //     align: 'center',
+                        //     title: '操作',
+                        //     toolbar: '#toolBar',
+                        //     width: 150,
+                        //     fixed: 'right'
+                        // }
+                    ]
+                ],
+                id: 'dataReload',
+                page: true,
+                limits: [15, 30, 50, 100],
+                limit: $pageSize,
+                height: 'full-130',
+                even: true
+            });
+        }
+
+        //监听工具条
+        table.on('tool(tbar)', function(obj) {
+            var data = obj.data;
+            // if (obj.event === 'edit') {
+            //     parent.layer.open({
+            //         type: 2,
+            //         title: '编辑员工（' + data.name + '）',
+            //         shadeClose: true,
+            //         shade: 0.8,
+            //         area: ['1200px', '750px'],
+            //         content: 'modify.html?do=edit&id=' + data.id
+            //     });
+            // } else if (obj.event === 'detail') {
+            //     parent.layer.open({
+            //         type: 2,
+            //         title: '查看员工（' + data.name + '）详情',
+            //         shadeClose: true,
+            //         shade: 0.8,
+            //         area: ['1200px', '750px'],
+            //         content: 'modify.html?do=detail&id=' + data.id
+            //     });
+            // } else if (obj.event === 'resetPwd') {
+            //     if (data.accid == null) {
+            //         setLayerAlert(parent.layer, '你还没有登录账号，无法重置密码');
+            //         return false;
+            //     }
+            //     setLayerConfirm(parent.layer, '确定要给员工姓名是 <span style="color:#1E9FFF">' + data.name + '</span>，登录帐号是 <span style="color:#FF5722">' + data.accid + '</span> 的员工重置密码吗？新密码是员工身份证后6位。', function(index) {
+            //         //重置密码接口
+            //         resetPassword(data.id);
+            //         parent.layer.close(index);
+            //     });
+            // } else if (obj.event === 'rolePermi') {
+            //     parent.layer.open({
+            //         type: 2,
+            //         title: '设置员工（' + data.name + '）角色&权限',
+            //         shadeClose: true,
+            //         shade: 0.8,
+            //         area: ['800px', '600px'],
+            //         content: 'rolePermi.html?id=' + data.id
+            //     });
+            // } else
+            if (obj.event === 'statusCancel') {
+                setLayerConfirm(parent.layer, '停用员工后，员工将无法登陆和使用系统，您确认要停用吗？', function(index) {
+                    var $ids = [];
+                    $ids.push(data.id);
+                    roleStatus($ids, 0);
+                    parent.layer.close(index);
+                });
+            } else if (obj.event === 'statusStart') {
+                setLayerConfirm(parent.layer, '确定要启用该员工吗？', function(index) {
+                    var $ids = [];
+                    $ids.push(data.id);
+                    roleStatus($ids, 1);
+                    parent.layer.close(index);
+                });
+            }
+        });
+
+        var active = {
+            //新增
+            addData: function() {
+                // parent.layer.open({
+                //     type: 2,
+                //     title: '新增员工',
+                //     shadeClose: true,
+                //     shade: 0.8,
+                //     area: ['1200px', '750px'],
+                //     content: 'modify.html?do=add'
+                // });
+                tmsTab.add($(this), '新增员工', 'modify.html?do=add');
+            },
+            //编辑
+            editData: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '你还未选择员工');
+                } else if (data.length > 1) {
+                    setLayerAlert(parent.layer, '只能选择一个员工');
+                } else {
+                    // parent.layer.open({
+                    //     type: 2,
+                    //     title: '编辑员工（' + data[0].name + '）',
+                    //     shadeClose: true,
+                    //     shade: 0.8,
+                    //     area: ['1200px', '750px'],
+                    //     content: 'modify.html?do=edit&id=' + data[0].id
+                    // });
+                    tmsTab.add($(this), '编辑员工（' + data[0].name + '）', 'modify.html?do=edit&id=' + data[0].id);
+                }
+            },
+            //详情
+            detailData: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '你还未选择员工');
+                } else if (data.length > 1) {
+                    setLayerAlert(parent.layer, '只能选择一个员工');
+                } else {
+                    // parent.layer.open({
+                    //     type: 2,
+                    //     title: '查看员工（' + data[0].name + '）详情',
+                    //     shadeClose: true,
+                    //     shade: 0.8,
+                    //     area: ['1200px', '750px'],
+                    //     content: 'modify.html?do=detail&id=' + data[0].id
+                    // });
+                    tmsTab.add($(this), '查看员工（' + data[0].name + '）', 'modify.html?do=detail&id=' + data[0].id);
+                }
+            },
+            //重置密码
+            resetPwd: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '你还未选择员工');
+                } else if (data.length > 1) {
+                    setLayerAlert(parent.layer, '只能选择一个员工');
+                } else {
+                    if (data[0].accid == null) {
+                        setLayerAlert(parent.layer, '你还没有登录账号，无法重置密码');
+                        return false;
+                    }
+                    setLayerConfirm(parent.layer, '确定要给员工姓名是 <span style="color:#1E9FFF">' + data[0].name + '</span>，登录帐号是 <span style="color:#FF5722">' + data[0].accid + '</span> 的员工重置密码吗？新密码是员工身份证后6位。', function(index) {
+                        //重置密码接口
+                        resetPassword(data[0].id);
+                        parent.layer.close(index);
+                    });
+                }
+            },
+            //停用
+            statusCancel: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '请选择需停用的员工');
+                } else {
+                    setLayerConfirm(parent.layer, '停用员工后，员工将无法登陆和使用系统，您确认要停用吗？', function(index) {
+                        var $ids = [];
+                        for (var $i = 0; $i < data.length; $i++) {
+                            $ids.push(data[$i].id);
+                        }
+                        roleStatus($ids, 0);
+                        parent.layer.close(index);
+                    });
+                }
+            },
+            //启用
+            statusStart: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '请选择需启用的员工');
+                } else {
+                    setLayerConfirm(parent.layer, '确定要启用选中的员工吗？', function(index) {
+                        var $ids = [];
+                        for (var $i = 0; $i < data.length; $i++) {
+                            $ids.push(data[$i].id);
+                        }
+                        roleStatus($ids, 1);
+                        parent.layer.close(index);
+                    });
+                }
+            },
+            //设置角色
+            setRolePermi: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '你还未选择员工');
+                } else if (data.length > 1) {
+                    setLayerAlert(parent.layer, '只能选择一个员工');
+                } else {
+                    parent.layer.open({
+                        type: 2,
+                        title: '设置员工（' + data[0].name + '）角色',
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['800px', '600px'],
+                        content: 'rolePermi.html?id=' + data[0].id
+                    });
+                }
+            },
+            //设置权限
+            setMenuPermi: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '你还未选择员工');
+                } else if (data.length > 1) {
+                    setLayerAlert(parent.layer, '只能选择一个员工');
+                } else {
+                    parent.layer.open({
+                        type: 2,
+                        title: '设置员工（' + data[0].name + '）权限',
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['800px', '650px'],
+                        content: 'menuPermi.html?id=' + data[0].id
+                    });
+                }
+            }
+        };
+
+        $('.btns-bar .layui-btn').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //改变状态，0停用，1启用
+        function roleStatus($ids, $status) {
+            var $saveData = {
+                ids: $ids,
+                status: $status
+            }
+
+            $.ajax({
+                type: 'PUT',
+                url: '/ucenter/centre/permi/employee/status.shtml',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify($saveData),
+                success: function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code === 'SUCCESS') {
+                        window.location.reload();
+                    } else {
+                        setLayerAlert(parent.layer, '状态改变失败');
+                    }
+                }
+            });
+        }
+
+        //重置密码
+        function resetPassword($id) {
+            $.post('/ucenter/centre/permi/employee/' + $id + '/resetPwd.shtml', function(d) {
+                var $code = d.code;
+                if ($code === 'SUCCESS') {
+                    setLayerAlert(parent.layer, '重置密码成功');
+                } else {
+                    setLayerAlert(parent.layer, '重置密码失败');
+                }
+            }, 'json');
+        }
+    });
+</script>
+
+</html>

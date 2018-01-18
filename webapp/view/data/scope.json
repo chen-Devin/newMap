@@ -1,0 +1,47 @@
+{"data":[
+	{"id":11000, "name":"拖车行", "isDefault":0, "isCheck":0, "children":[
+		{"id":11001, "name":"陆路运输", "isDefault":1, "isCheck":0},
+		{"id":11002, "name":"报关", "isDefault":1, "isCheck":0},
+		{"id":11003, "name":"订舱", "isDefault":0, "isCheck":0},
+		{"id":11004, "name":"操作", "isDefault":0, "isCheck":0}
+		]
+	},
+	{"id":22000, "name":"货主", "isDefault":0, "isCheck":0, "children":[
+		{"id":22001, "name":"工厂", "isDefault":1, "isCheck":0},
+		{"id":22002, "name":"贸易", "isDefault":1, "isCheck":1},
+		{"id":22003, "name":"报关", "isDefault":1, "isCheck":0},
+		{"id":22004, "name":"运输", "isDefault":1, "isCheck":0},
+		{"id":22005, "name":"订舱", "isDefault":0, "isCheck":0},
+		{"id":22006, "name":"拼箱", "isDefault":0, "isCheck":0}
+		]
+	},
+	{"id":33000, "name":"货代", "isDefault":0, "isCheck":0, "children":[
+		{"id":33001, "name":"订舱", "isDefault":1, "isCheck":0},
+		{"id":33002, "name":"操作", "isDefault":1, "isCheck":1},
+		{"id":33004, "name":"报关", "isDefault":0, "isCheck":0},
+		{"id":33004, "name":"陆路运输", "isDefault":1, "isCheck":0},
+		{"id":33005, "name":"仓储", "isDefault":0, "isCheck":0},
+		{"id":33006, "name":"拼箱", "isDefault":0, "isCheck":0}
+		]
+	},
+	{"id":44000, "name":"报关行", "isDefault":0, "isCheck":1, "children":[
+		{"id":44001, "name":"陆路运输", "isDefault":1, "isCheck":0},
+		{"id":44002, "name":"报关", "isDefault":1, "isCheck":0},
+		{"id":44003, "name":"订舱", "isDefault":0, "isCheck":0},
+		{"id":44004, "name":"操作", "isDefault":0, "isCheck":0}
+		]
+	},
+	{"id":55000, "name":"仓储", "isDefault":0, "isCheck":0, "children":[
+		{"id":55001, "name":"普通仓", "isDefault":1, "isCheck":0},
+		{"id":55002, "name":"冷冻仓", "isDefault":0, "isCheck":0},
+		{"id":55003, "name":"监管仓", "isDefault":0, "isCheck":0},
+		{"id":55004, "name":"电商仓", "isDefault":0, "isCheck":0},
+		{"id":55005, "name":"保税仓", "isDefault":0, "isCheck":0},
+		{"id":55006, "name":"仓内作业", "isDefault":0, "isCheck":0},
+		{"id":55007, "name":"报关", "isDefault":0, "isCheck":0},
+		{"id":55008, "name":"陆路运输", "isDefault":0, "isCheck":0},
+		{"id":55009, "name":"订舱", "isDefault":0, "isCheck":0},
+		{"id":55010, "name":"拼箱", "isDefault":0, "isCheck":0}
+		]
+	}
+]}

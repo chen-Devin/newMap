@@ -1,0 +1,99 @@
+<!--start:顶部信息-->
+<div class="sys-toper">
+    <div class="panel-left"><img src="/view/tms/static/images/logo.png" alt="运输管理中心"></div>
+    <div class="panel-system">
+        <div class="system-group">
+            <div class="system-text">TMS运输管理系统</div>
+            <!-- <div class="system-arrow"></div>
+          <ul>
+            <li><a href="#">TMS运输管理系统</a></li>
+            <li><a href="#">报关报检系统</a></li>
+            <li><a href="#">财务管理系统</a></li>
+          </ul> -->
+        </div>
+    </div>
+    <div class="panel-right">
+        <ul>
+            <!-- <li class="l1"><div class="links"><a href="" target="_blank">关于</a> - <a href="" target="_blank">帮助</a></div></li> -->
+            <!-- <li class="l2"><a href="/view/tms/map/index.html"><i class="icon7"></i>GPS地图</a></li> -->
+            <li class="l2"><a href="/view/tms/map/index.html"  onclick="$('#hide-btn').click()"><i class="icon7"></i>GPS地图</a></li>
+            <li class="l2"><a href="/view/index.html"><i class="icon1"></i>控制台</a></li>
+            <!-- <li class="l2 skin"><i class="icon2"></i>皮肤
+            <dl>
+              <dd class="active"><span class="layui-icon">&#xe618;</span> 深蓝色 <u class="u1">■</u></dd>
+              <dd><span class="layui-icon">&#xe618;</span> 酒红色 <u class="u2">■</u></dd>
+              <dd><span class="layui-icon">&#xe618;</span> 天蓝色 <u class="u3">■</u></dd>
+              <dd><span class="layui-icon">&#xe618;</span> 橙红色 <u class="u4">■</u></dd>
+            </dl>
+          </li> -->
+            <!-- <li class="l2 message"><a href=""><i class="icon3"></i>消息</a><span></span></li> -->
+            <li class="l2 user"><i class="icon4"></i><span id="accountName" class="user-account-name">...</span>
+                <dl>
+                    <dd><a href="/view/tms/system/user/index.html">编辑密码</a></dd>
+                    <!-- <dd><a href="">编辑手机号</a></dd>
+              <dd><a href="">个性化设置</a></dd> -->
+                </dl>
+            </li>
+            <li class="l2"><a id="logout"><i class="icon5"></i>注销</a></li>
+            <li class="l2 message"><a id="updateLog" title="更新日志"><i class="icon6"></i>V1.0.5</a><span style="right:8px; top:32px;"></span></li>
+        </ul>
+    </div>
+</div>
+<!--end:顶部信息-->
+<!--start:中间菜单信息-->
+<div class="sys-middler">
+    <div class="panel-left">
+        <ul class="panel-menu"></ul>
+    </div>
+    <div class="panel-right">
+        <div class="panel-text">
+            <!-- <a href="aboutUs.html" target="_blank">关于我们</a>
+          <a href="news.html" target="_blank">更新日志</a>
+          <a href="help.html" target="_blank">帮助中心</a> -->
+        </div>
+    </div>
+</div>
+<!--end:中间菜单信息-->
+<!--start:左边菜单框-->
+<i class="hide" id="hide-btn" title="缩进"></i>
+<div class="sys-lefter">
+    <h1>功能菜单</h1>
+    <div class="panel-nav sub-nav"></div>
+    <!-- <div class="panel-info">
+        <h2>统计信息<i class="icon-up"></i></h2>
+        <ul>
+          <li><a href="">聘用</a><span class="layui-badge">195人</span></li>
+          <li><a href="">挂靠</a><span class="layui-badge">20人</span></li>
+          <li><a href="">外协</a><span class="layui-badge">6人</span></li>
+        </ul>
+      </div> -->
+</div>
+<!--end:左边菜单框-->
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_nav.js?v=1219"></script>
+<script>
+    $(function() {
+        layui.use('layer', function() {
+            //注销
+            $('#logout').on('click', function() {
+                setLayerConfirm(parent.layer, '确定要注销账号吗？', function() {
+                    logout();
+                });
+            });
+
+            //更新日志
+            $('#updateLog').on('click', function() {
+                $(this).next('span').remove();
+                parent.layer.open({
+                    type: 2,
+                    title: '更新日志',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['600px', '90%'],
+                    content: '/view/tms/updateLog.html'
+                });
+            });
+        });
+    });
+</script>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>XXX协议</title>
+    <style>
+        html{
+            height: 100%;   
+        }
+        body{
+            height: 100%;   
+            overflow: hidden;
+            font-size: 14px;
+        }
+        .contanier{
+            width: 90%;
+            height: 90%;
+            border: 1px solid #dddddd;
+            margin: 3% auto;  
+            text-align: left;   
+        }
+        .content{
+            line-height: 28px;
+            padding: 0 20px 20px 20px;
+        }
+        .center{           
+            text-align: center;   
+        }
+    </style>
+  </head>
+  <body>
+      <div class="contanier">
+        <article>
+            <h1 class="center">XXX服务协议</h1>
+            <p class="content"> 
+                    1.HTML 经过解析生成 DOM Tree（这个我们比较熟悉）；而在 CSS 解析完毕后，需要将解析的结果与 DOM Tree 的内容一起进行分析建立一棵 Render Tree，最终用来进行绘图。Render Tree 中的元素（WebKit 中称为「renderers」，Firefox 下为「frames」）与 DOM 元素相对应，但非一一对应：一个 DOM 元素可能会对应多个 renderer，如文本折行后，不同的「行」会成为 render tree 种不同的 renderer。也有的 DOM 元素被 Render Tree 完全无视，比如 display:none 的元素。
+                    <br/>
+                    2.在建立 Render Tree 时（WebKit 中的「Attachment」过程），浏览器就要为每个 DOM Tree 中的元素根据 CSS 的解析结果（Style Rules）来确定生成怎样的 renderer。对于每个 DOM 元素，必须在所有 Style Rules 中找到符合的 selector 并将对应的规则进行合并。选择器的「解析」实际是在这里执行的，在遍历 DOM Tree 时，从 Style Rules 中去寻找对应的 selector。
+                    <br/>
+                    3.因为所有样式规则可能数量很大，而且绝大多数不会匹配到当前的 DOM 元素（因为数量很大所以一般会建立规则索引树），所以有一个快速的方法来判断「这个 selector 不匹配当前元素」就是极其重要的。
+            </p>
+        </article>
+      </div>
+  </body>
+  </html>

@@ -1,0 +1,12 @@
+{"code":"SUCCESS","msg":"成功","objects":[
+    {"id":10000,"creator":null,"createDate":1506667123000,"modifier":null,"modifyDate":1506667123000,"platformId":1,"parentId":null,"name":"广东航程科技有限公司（200）","url":"","sort":0,"dataFromId":0,"status":0},
+    {"id":2,"creator":null,"createDate":1506676078000,"modifier":null,"modifyDate":1506676078000,"platformId":1,"parentId":10000,"name":"总部(150)","url":"","sort":0,"dataFromId":0,"status":0},
+    {"id":3,"creator":null,"createDate":1507690375000,"modifier":null,"modifyDate":1507690375000,"platformId":1,"parentId":2,"name":"财务部(20)","url":null,"sort":0,"dataFromId":0,"status":0},
+    {"id":4,"creator":null,"createDate":1507690437000,"modifier":null,"modifyDate":1507690437000,"platformId":1,"parentId":3,"name":"李四","url":null,"sort":0,"dataFromId":0,"status":0},
+    {"id":5,"creator":"","createDate":1507690437000,"modifier":"","modifyDate":1507690437000,"platformId":1,"parentId":3,"name":"张三","url":"","sort":0,"dataFromId":0,"status":0},
+    {"id":6,"creator":"","createDate":1507690437000,"modifier":"","modifyDate":1507690437000,"platformId":1,"parentId":2,"name":"信息部(130)","url":null,"sort":0,"dataFromId":0,"status":0},
+    {"id":7,"creator":"","createDate":1507690437000,"modifier":"","modifyDate":1507690437000,"platformId":1,"parentId":10000,"name":"盐田分公司(15)","url":"","sort":0,"dataFromId":0,"status":0},
+    {"id":8,"creator":"","createDate":1507690437000,"modifier":"","modifyDate":1507690437000,"platformId":1,"parentId":10000,"name":"广州分公司(35)","url":"","sort":0,"dataFromId":0,"status":0},
+    {"id":20000,"creator":null,"createDate":1506667123000,"modifier":null,"modifyDate":1506667123000,"platformId":1,"parentId":null,"name":"深圳腾讯科技有限公司（165）","url":"","sort":0,"dataFromId":0,"status":0},
+    {"id":9,"creator":null,"createDate":1506667123000,"modifier":null,"modifyDate":1506667123000,"platformId":1,"parentId":20000,"name":"业务部（165）","url":"","sort":0,"dataFromId":0,"status":0}
+]}

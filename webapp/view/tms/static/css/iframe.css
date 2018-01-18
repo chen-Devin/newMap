@@ -1,0 +1,116 @@
+body {
+    margin: 0 15px;
+    background: #fff;
+}
+
+.fl {
+    float: left;
+}
+
+.fr {
+    float: right;
+}
+
+.clr {
+    clear: both;
+    height: 0;
+    overflow: hidden;
+}
+
+.panel-handle {
+    padding: 10px 0;
+    border-bottom: #ddd 1px dotted;
+}
+
+.btns-bar {
+    padding: 10px 0 0;
+    border: 0;
+}
+
+.layui-table-page {
+    float: right;
+}
+
+.short-search-bar {
+    position: absolute;
+    left: 30px;
+    bottom: 21px;
+}
+
+.short-search-bar dl {
+    display: inline-block;
+    font-size: 12px;
+}
+
+.short-search-bar dl span {
+    margin-left: 5px;
+}
+
+.short-search-bar dl dt,
+.short-search-bar dl dd {
+    float: left;
+    margin-right: 15px;
+}
+
+.short-search-bar dl dd a {
+    color: #f60;
+}
+
+.short-search-bar dl dd a:hover {
+    color: #055bae;
+}
+
+.short-bar {
+    margin: 4px 15px;
+    float: left;
+}
+
+.short-bar dl {
+    display: inline-block;
+    font-size: 12px;
+}
+
+.short-bar dl span {
+    margin-left: 5px;
+}
+
+.short-bar dl dt,
+.short-bar dl dd {
+    float: left;
+    margin-right: 15px;
+}
+
+.short-bar dl dd a {
+    color: #f60;
+}
+
+.short-bar dl dd a:hover {
+    color: #055bae;
+}
+
+
+/*搜索区*/
+
+.layui-form-item .layui-form-label {
+    width: 80px;
+    padding: 8px 5px;
+}
+
+.layui-form-item .layui-input-block {
+    margin-left: 80px;
+}
+
+.time-btns .layui-btn-group {
+    width: 100%;
+}
+
+.time-btns .layui-btn-group a {
+    line-height: 36px;
+    width: 33%;
+    padding: 0 5px;
+}
+
+.time-btn-sel {
+    background: #cecece;
+    color: #000;
+}

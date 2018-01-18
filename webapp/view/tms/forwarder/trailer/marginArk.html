@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>确认撤柜 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+        body {
+            margin: 20px;
+        }
+        
+        span.required {
+            color: #f00;
+            font-family: 'simsun', '宋体';
+            margin-right: 5px;
+            font-size: 15px;
+        }
+        
+        .form-txt {
+            color: #999;
+            font-size: 12px;
+            margin-top: 10px;
+            display: block;
+        }
+        
+        .layui-form-item .layui-inline .layui-input-inline {
+            margin-right: 4px;
+            width: 244px;
+        }
+        
+        .layui-form-item .layui-inline .layui-input-inline input {
+            background: #efefef;
+        }
+        
+        .main-ark th,
+        .main-ark td {
+            text-align: center;
+        }
+        
+        .hide-btn {
+            text-align: right;
+            margin: -5px 0 5px;
+        }
+        
+        .hide-btn a {
+            font-size: 12px;
+            color: #1E9FFF;
+        }
+        
+        .hide-btn a i {
+            margin-left: 5px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top:20px;">
+        <legend>主柜信息</legend>
+    </fieldset>
+    <table class="layui-table main-ark">
+        <thead>
+            <tr>
+                <th>做柜时间</th>
+                <th>摆柜位置</th>
+                <th>货重(吨)</th>
+                <th>返柜地点</th>
+                <th>提柜地点</th>
+                <th>外堆约柜</th>
+                <th>急单类型</th>
+                <th>运单类型</th>
+                <th>截关(补料)时间</th>
+                <th>报关方式</th>
+                <th>封关地</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="doarkDate"></td>
+                <td id="putarkPosition"></td>
+                <td id="goodsWeight"></td>
+                <td id="heavyAddress"></td>
+                <td id="emptyAddress"></td>
+                <td id="feeArk">已缴费</td>
+                <td id="singleBilltype"></td>
+                <td id="waybillType"></td>
+                <td id="cutoffTime"></td>
+                <td>清关</td>
+                <td id="toStartWith"></td>
+            </tr>
+            <tr>
+                <td>装卸地点</td>
+                <td colspan="5" style="text-align:left;" id="address"></td>
+                <td>做柜备注</td>
+                <td colspan="4" style="text-align:left;" id="doarkRemark"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top:20px;">
+        <legend>孖柜信息</legend>
+    </fieldset>
+    <table class="layui-hide" id="tableList"></table>
+
+    <div class="layui-form-item" style="text-align:center; margin:20px 0 50px;">
+        <button class="layui-btn layui-btn-normal" id="vsubmit" type="button" style="min-width:130px;" data-type="onSubmit">孖柜</button>
+        <button class="layui-btn layui-btn-primary" id="vclose" type="button" style="min-width:130px;">取消</button>
+    </div>
+</body>
+<script type="text/html" id="doarkDateTpl">
+    {{setTimeFormat(d.doarkDate, 'MM-dd hh:mm')}}
+</script>
+<script type="text/html" id="cutoffTimeTpl">
+    {{setTimeFormat(d.cutoffTime, 'MM-dd hh:mm')}}
+</script>
+<script type="text/html" id="putarkPositionTpl">
+    {{setPutarkPosition(d.putarkPosition)}}
+</script>
+<script type="text/html" id="singleBilltypeTpl">
+    {{setSingleType(d.singleBilltype)}}
+</script>
+<script type="text/html" id="waybillTypeTpl">
+    {{setWaybillType(d.waybillType)}}
+</script>
+<script type="text/html" id="brokenStyleTpl">
+    清关
+</script>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'table'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            $ = layui.jquery;
+
+        var $id = getUrlId($.trim(getUrlParam('id')));
+
+        //获取主柜信息
+        $.get('/ucenter/tms/waybill/waybill/searchLoardArk.shtml', {
+            waybillId: $id
+        }, function(d) {
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+
+            if ($code === 'SUCCESS') {
+                $('#doarkDate').text(setTimeFormat($objects[0].doarkDate, 'MM-dd hh:mm'));
+                $('#putarkPosition').text(setPutarkPosition($objects[0].putarkPosition));
+                $('#goodsWeight').text($objects[0].goodsWeight || '-');
+                $('#heavyAddress').text($objects[0].heavyAddress || '-');
+                $('#emptyAddress').text($objects[0].emptyAddress || '-');
+                $('#singleBilltype').text(setSingleType($objects[0].singleBilltype));
+                $('#waybillType').text(setWaybillType($objects[0].waybillType));
+                $('#cutoffTime').text(setTimeFormat($objects[0].cutoffTime, 'MM-dd hh:mm'));
+                $('#toStartWith').text($objects[0].toStartWith || '-');
+                $('#address').text(setGoodsAddress($objects[0].address));
+                $('#doarkRemark').text($objects[0].doarkRemark || '-');
+            }
+        }, 'JSON');
+
+        //初始化表格数据
+        setTableData($id);
+
+        //方法级渲染
+        function setTableData(id) {
+            table.render({
+                elem: '#tableList',
+                url: '/ucenter/tms/waybill/waybill/searchMarginArk.shtml?waybillId=' + id,
+                method: 'GET',
+                response: {
+                    statusCode: 'SUCCESS',
+                    dataName: 'objects'
+                },
+                cols: [
+                    [{
+                        checkbox: true,
+                        fixed: true
+                    }, {
+                        field: 'doarkDate',
+                        title: '做柜时间',
+                        width: 130,
+                        align: 'center',
+                        templet: '#doarkDateTpl'
+                    }, {
+                        field: 'putarkPosition',
+                        title: '摆放位置',
+                        width: 100,
+                        align: 'center',
+                        templet: '#putarkPositionTpl'
+                    }, {
+                        field: 'goodsWeight',
+                        title: '货重(吨)',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'heavyAddress',
+                        title: '返柜地点',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'emptyAddress',
+                        title: '提柜地点',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'address',
+                        title: '装卸地点',
+                        width: 180,
+                        align: 'left'
+                    }, {
+                        field: 'feeArk',
+                        title: '外堆约柜',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'singleBilltype',
+                        title: '急单类型',
+                        width: 100,
+                        align: 'center',
+                        templet: '#singleBilltypeTpl'
+                    }, {
+                        field: 'waybillType',
+                        title: '运单类型',
+                        width: 100,
+                        align: 'center',
+                        templet: '#waybillTypeTpl'
+                    }, {
+                        field: 'cutoffTime',
+                        title: '截关(补料)时间',
+                        width: 150,
+                        align: 'center',
+                        templet: '#cutoffTimeTpl'
+                    }, {
+                        title: '报关方式',
+                        width: 100,
+                        align: 'center',
+                        templet: '#brokenStyleTpl'
+                    }, {
+                        field: 'doarkRemark',
+                        title: '做柜备注',
+                        width: 150,
+                        align: 'left'
+                    }]
+                ],
+                id: 'dataReload',
+                page: false,
+                height: '350',
+                even: true
+            });
+        }
+
+        var active = {
+            //提交
+            onSubmit: function() { //获取选中数据
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '你还未选中数据');
+                } else if (data.length > 1) {
+                    setLayerAlert(parent.layer, '只能选择一条数据');
+                } else {
+                    var $saveData = {
+                        lordWaybillId: parseInt($id),
+                        viceWaybillId: parseInt(data[0].id)
+                    };
+
+                    //console.log($saveData);
+                    //return false;
+
+                    //保存数据，调用接口
+                    HC.ajax['post']({
+                        url: '/ucenter/tms/waybill/waybill/updateMarginArk.shtml',
+                        data: $saveData,
+                        success: function() {
+                            setLayerAlert(parent.layer, '孖柜成功', {
+                                yes: function() {
+                                    parent.layer.closeAll();
+                                    var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+                                    parent['f' + $layId].refreshTableList();
+                                }
+                            });
+                        }
+                    });
+                    // $.ajax({
+                    //     type: 'POST',
+                    //     url: '/ucenter/tms/waybill/waybill/updateMarginArk.shtml',
+                    //     dataType: "json",
+                    //     contentType: "application/json",
+                    //     data: JSON.stringify($saveData),
+                    //     success: function(d) {
+                    //         var $code = d.code,
+                    //             $msg = d.msg,
+                    //             $objects = d.objects;
+
+                    //         if ($code === 'SUCCESS') {
+                    //             setLayerAlert(parent.layer, '孖柜成功！', {
+                    //                 yes: function() {
+                    //                     //关闭窗口
+                    //                     parent.layer.closeAll();
+                    //                     //获取当前框架ID并刷新
+                    //                     var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+                    //                     parent['f' + $layId].refreshTableList();
+                    //                 }
+                    //             });
+                    //         } else {
+                    //             parent.layer.msg('孖柜失败！');
+                    //         }
+                    //     }
+                    // });
+                    return false;
+                }
+            }
+        }
+
+        $('#vsubmit').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //取消按钮
+        $('#vclose').on('click', function() {
+            parent.layer.closeAll();
+        });
+    });
+</script>
+
+</html>

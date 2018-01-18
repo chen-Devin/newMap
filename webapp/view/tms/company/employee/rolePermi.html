@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>员工管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+    <style>
+        .layui-elem-field legend {
+            font-size: 16px;
+        }
+        
+        .layui-field-box ul {
+            margin: 0 0 10px;
+        }
+        
+        .layui-field-box ul li {
+            width: 25%;
+            float: left;
+            line-height: 26px;
+        }
+        
+        .layui-field-box ul li input[type=checkbox] {
+            vertical-align: -1px;
+        }
+    </style>
+</head>
+
+<body>
+    <blockquote class="layui-elem-quote layui-quote-nm" style="margin:0 2px 10px;">
+        <b>注：</b><br> 1、当给员工赋予一个角色时，将具有这个角色所对应的权限，当给员工赋予多个角色时，将拥有多个角色的权限之和；<br> 2、特殊情况，想给某员工设置角色之外的权限，可在列表中点击“另设权限”进行设置。
+    </blockquote>
+    <div id="systemRole"></div>
+    <div class="button-bar" style="margin:0 0 25px;">
+        <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit">保存</button>
+        <button class="layui-btn layui-btn-primary" id="vclose">关闭</button>
+    </div>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/menuPermi.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+<script>
+    layui.use('form', function() {
+        var $id = getUrlId($.trim(getUrlParam('id')));
+        var form = layui.form;
+        var $url = '/ucenter/centre/permi/employee/' + $id + '/authorization.shtml';
+
+        //获取员工角色和权限
+        $.get($url, function(d) {
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+
+            if ($code != 'SUCCESS') return false;
+
+            if ($objects != null) {
+                var $roleIds = $objects.roleIds;
+                getSystemRole($roleIds);
+            }
+        }, 'json');
+
+        form.on('submit(submit)', function(data) {
+            var $selRoleObjs = $('#systemRole input[name="rolePermi"]:checked'),
+                $notSelRoleObjs = $('#systemRole input[name="rolePermi"]').not(':checked'),
+                $addRoleIds = [],
+                $removeRoleIds = [],
+                $addFunctionIds = [],
+                $removeFunctionIds = [];
+
+            $selRoleObjs.each(function() {
+                $addRoleIds.push(parseInt($(this).val()));
+            });
+
+            $notSelRoleObjs.each(function() {
+                $removeRoleIds.push(parseInt($(this).val()));
+            });
+
+            //数据源
+            var $saveData = {
+                addRoleIds: $addRoleIds,
+                removeRoleIds: $removeRoleIds,
+                addFunctionIds: $addFunctionIds,
+                removeFunctionIds: $removeFunctionIds
+            }
+
+            // console.log($saveData);
+            // return false;
+
+            //保存数据，调用接口
+            $.ajax({
+                type: 'PUT',
+                url: $url,
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify($saveData),
+                success: function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code === 'SUCCESS') {
+                        setLayerAlert(parent.layer, '保存成功', {
+                            yes: function() {
+                                parent.layer.closeAll();
+
+                                //获取当前框架ID
+                                var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+                                parent['f' + $layId].location.reload();
+                            }
+                        });
+                    } else {
+                        setLayerAlert(parent.layer, '保存失败');
+                    }
+                }
+            });
+
+            return false;
+        });
+
+        //获取系统和角色
+        function getSystemRole($vals) {
+            $vals = $vals || [];
+            //系统
+            $.get('/ucenter/code/common/system/search.shtml', function(d) {
+                var $code = d.code,
+                    $msg = d.msg,
+                    $objects = d.objects;
+
+                if ($code != 'SUCCESS') return false;
+
+                if ($objects.length > 0) {
+                    for (var $i = 0; $i < $objects.length; $i++) {
+                        if ($objects[$i].id != 1) continue;
+                        $('#systemRole').append('<fieldset class="layui-elem-field" id="k' + $objects[$i].id + '"><legend>' + $objects[$i].name + '</legend><div class="layui-field-box"><ul></ul><div class="clr"></div></div></fieldset>');
+                        //角色
+                        $.get('/ucenter/centre/permi/role/search.shtml', {
+                            platformId: $objects[$i].id
+                        }, function(e) {
+                            var $roleCode = e.code,
+                                $roleMsg = e.msg,
+                                $roleData = e.objects;
+
+                            if ($roleCode === 'SUCCESS') {
+                                if ($roleData.length > 0) {
+                                    for (var $j = 0; $j < $roleData.length; $j++) {
+                                        $('#k' + $roleData[$j].platformId + ' ul').append('<li><label><input type="checkbox" name="rolePermi" id="r' + $roleData[$j].id + '" value="' + $roleData[$j].id + '"> ' + $roleData[$j].name + '</label></li>');
+                                    }
+                                    if ($vals.length > 0) {
+                                        $.each($vals, function($key, $val) {
+                                            $('#r' + $val).prop('checked', true);
+                                        });
+                                    }
+                                }
+                            }
+                        }, 'json');
+                    }
+                }
+            }, 'json');
+        }
+
+        $('#vclose').on('click', function() {
+            parent.layer.closeAll();
+        });
+    });
+</script>
+
+</html>

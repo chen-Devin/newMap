@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>堆场信息 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+      <form class="layui-form layui-form-pane">
+        <div class="layui-inline">
+          <div class="layui-input-inline">
+            <select name="exact">
+              <option value="0" selected="selected">模糊查询</option>
+              <option value="1">精确查询</option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <div class="layui-input-inline">
+            <select name="type">
+              <option value="0" selected="selected">堆场名称</option>
+              <option value="1">地点</option>
+              <option value="2">所属船公司</option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <div class="layui-input-inline">
+            <input type="text" name="name" lay-verify="title" autocomplete="off" placeholder="" class="layui-input">
+          </div>
+        </div>
+        <button type="button" class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+      </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="table_list"></table>
+    <!--end:表格列表-->
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/tms_common/utils.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table'], function(){
+    var $form = layui.form,
+        $layer = layui.layer,
+        $table = layui.table,
+        $ = layui.jquery;
+
+    var options = {
+      "seachOptions":{
+        "rely": $form,
+        "condition": ["exact","type","name"],
+        "type": ["name","place","shipping"],
+        "getParameter": ""
+      },
+
+      "tableOptions": {
+        cols: [[
+          {field:'id', title: '序号', width:70, sort: true},
+          {field:'code', title: '堆场代码', width:100},
+          {field:'name', title: '堆场名称', width:120},
+          {field:'shippingCodes', title: '所属船公司', width:350},
+          {field:'place', title: '地点', width:100},
+          {field:'address', title: '详细地址', width:350},
+          {field:'phone', title: '联系电话', width:300},
+          {field:'city', title: '所在城市', width:100}
+        ]],
+        url: '/ucenter/code/common/stack/page.shtml',
+        where: {"exact" : false, "name" : ""}
+      }   
+    }
+
+    tmsCommonTable.init(options, $table);
+  });
+  </script>
+</html>

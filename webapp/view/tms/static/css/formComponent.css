@@ -1,0 +1,248 @@
+/*
+ * 文件上传组件样式
+ */
+.file-line {
+    box-sizing: border-box;
+    min-height: 38px;
+    padding: 2px 36px 0 5px;
+    /* 与 .layui-input 样式一致 */
+    border: 1px solid #e6e6e6;
+    background-color: #fff;
+    border-radius: 2px;
+    line-height: 26px;
+}
+.file-line:empty {
+    padding: 5px 0 0 10px;
+}
+.file-line:empty::after {
+    content: '允许上传多个文件';
+    /* margin-left: 10px; */
+    color: #c2c2c2;
+}
+/* 上传按钮样式 */
+.file-line + .file-upload-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 35px;
+    z-index: 10;
+    border-left: 1px solid #e6e6e6;
+    text-align: center;
+}
+.file-line + .file-upload-button .icon-folder {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    z-index: 10;
+    height: 38px;
+    width: 100%;
+    margin-top: -19px;
+    line-height: 38px;
+    font-size: 30px;
+    color: #34a8ff;
+    cursor: pointer;
+}
+.file-line + .file-upload-button .icon-folder:hover {
+    color: #2a97f5;
+}
+/* 上传后生成的文件项样式 */
+.file-item {
+    display: inline-block;
+    margin-bottom: 2px;
+    padding: 3px 5px 3px 0;
+    transition: background .3s linear;
+}
+.file-item:hover {
+    background: #b5eaff;
+}
+.file-item .icon-file {
+    position: relative;
+    top: 8px;
+    right: -3px;
+    margin-left: -5px;
+    /* 设置 line-height 避免撑高 默认行高 */
+    font-size: 36px;
+    line-height: 0;
+    color: #14a9da;
+}
+.file-name,
+a.file-name:visited {
+    margin-right: 5px;
+    color: #999;
+}
+.file-item:hover a {
+    color: #01aaed;
+}
+a.file-name:hover {
+    color: #428bca;
+}
+.file-item a {
+    cursor: default;
+}
+.file-item a:link {
+    cursor: pointer;
+}
+/* 文件的 “×” 图标 */
+.file-item .icon-delete {
+    display: inline-block;
+    position: relative;
+    top: -3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #f62f20;
+    /* 设置 line-height 避免撑高 默认行高 */
+    line-height: 0;
+    text-align: center;
+    font-size: 30px;
+    cursor: pointer;
+}
+.file-item .icon-delete::after {
+    content: 'x';
+    display: inline-block;
+    position: relative;
+    top: 2px;
+    width: 18px;
+    height: 18px;
+    font-size: 14px;
+    color: white;
+}
+/* 文件上传状态图标 */
+.file-item .icon-loading {
+    color: #1E9FFF;
+    cursor: wait;
+}
+.file-item .icon-warn {
+    line-height: 14px;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: bold;
+    color: #FFB800;
+}
+.file-item .icon-retry {
+    color: #1E9FFF;
+    cursor: pointer;
+}
+.file-item .icon-loading,
+.file-item .icon-warn,
+.file-item .icon-retry {
+    display: none;
+}
+.file-item--loading .icon-loading,
+.file-item--fail .icon-warn,
+.file-item--fail .icon-retry {
+    /* 如果设置为 inline 的话，则无法应用CSS3动画效果 */
+    display: inline-block;
+}
+/* 上传中 */
+.file-item .icon-loading {
+    margin-left: 5px;
+}
+/* 上传失败 */
+.file-item .icon-warn {
+    padding: 0 5px;
+}
+/* 重新上传 */
+.file-item .icon-retry {
+    padding: 0 3px;
+}
+/* 图片预览样式 */
+.upload-preview-container .upload-img--preview {
+    max-width: 500px;
+    max-height: 100px;
+}
+.upload-preview-info {
+    margin-top: 8px;
+    line-height: 1;
+    text-align: center;
+}
+
+/* 编辑状态下，不允许编辑和上传 */
+.form--detail .file-line + .file-upload-button,
+.form--detail .file-line .file-item .icon-delete {
+    display: none;
+}
+
+/* 动态下拉框数据 加载中 图标 */
+.select-data-loading-icon {
+    position: absolute;
+    top: 50%;
+    right: -28px;
+    z-index: 10;
+    height: 38px;
+    margin-top: -19px;
+    line-height: 38px;
+    font-size: 22px;
+}
+
+
+/* 装卸地点行 */
+.address-detail-line {
+    position: relative;
+}
+.address-detail-line .icon-edit {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 8px;
+    z-index: 10;
+    width: 30px;
+    line-height: 38px;
+    font-size: 30px;
+    color: #34a8ff;
+    cursor: pointer;
+    transition: all .4s ease;
+}
+.address-detail-line:hover .icon-edit {
+    opacity: 1;
+}
+.address-detail-line .icon-edit:hover {
+    color: #2a97f5;
+}
+/* 装卸地点编辑状态样式 */
+.address-edit-line {
+    padding-top: 10px;
+}
+.layui-layer-tips .layui-layer-content .address-edit-line {
+    color: #333;
+}
+.address-edit-line .layui-input-inline {
+    width: 150px;
+}
+.address-edit-line .layui-input-inline:last-child {
+    margin-right: 0;
+}
+.address-edit-line .district-address-detail {
+    min-width: 470px;
+    margin-right: 10px;
+}
+/* 查看页面，隐藏编辑图标 */
+.form--detail .address-detail-line:hover .icon-edit {
+    display: none !important;
+}
+
+/* 静态图片预览样式 */
+.layer-imgs {
+    height: 40px;
+    line-height: 35px;
+    overflow: hidden;
+}
+.layer-imgs img {
+    margin-right: 5px;
+    padding: 2px;
+    border: #ddd 1px solid;
+    border-radius: 2px;
+    max-height: 34px;
+    cursor: pointer;
+}
+.layer-imgs img:last-child {
+    margin-right: 0;
+}
+
+/* 支持小图预览 */
+.layui-layer-photos .layui-layer-content {
+    min-width: 80px;
+    min-height: 80px;
+}

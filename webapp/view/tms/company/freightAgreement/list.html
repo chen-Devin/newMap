@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>价格协议管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+</head>
+<style>
+    .layui-form-item {
+        margin: 0;
+    }
+</style>
+
+<body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane" autocomplete="off">
+            <div class="layui-row layui-col-space5">
+                <div class="layui-col-sm1" style="width:25%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">做柜时间</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <input type="text" name="createDateStart" id="createDateStart" readonly placeholder="起始时间" class="layui-input" style="border-right:0; border-radius:0;">
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="createDateEnd" id="createDateEnd" readonly placeholder="截止时间" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">协议号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="agreementNo" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">单位简称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="targetName" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">单位类型</label>
+                        <div class="layui-input-block">
+                            <select name="targetType">
+                          <option value="" selected="selected">全部</option>
+                          <option value="1">供应商</option>
+                          <option value="2">客户</option>
+                        </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            <select name="status">
+                              <option value="" selected="selected">全部</option>
+                              <option value="1">启用</option>
+                              <option value="3">停用</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <button class="layui-btn layui-btn-danger btn-search" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                        <button class="layui-btn layui-btn-primary" type="reset" style="margin-left:2px; line-height:36px;">重置</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+        <div class="layui-btn-group fl">
+            <button class="layui-btn layui-btn-normal" data-type="addData">新增</button>
+            <button class="layui-btn layui-btn-normal" data-type="editData">编辑</button>
+            <button class="layui-btn layui-btn-normal" data-type="detailData">查看</button>
+            <button class="layui-btn layui-btn-normal" data-type="statusCancel">停用</button>
+            <button class="layui-btn layui-btn-normal" data-type="statusStart">启用</button>
+        </div>
+        <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+    <script type="text/html" id="statusTpl">
+        {{# if(d.status == 1){ }}
+        <a lay-event="statusCancel" style="color:#1E9FFF;">启用</a> {{# }else{ }}
+        <a lay-event="statusStart" style="color:#FF5722;">停用</a> {{# } }}
+    </script>
+    <script type="text/html" id="typeTpl">
+        {{# if(d.targetType == 1){ }}
+        <div>供应商</div>
+        {{# }else{ }}
+        <div>客户</div>
+        {{# } }}
+    </script>
+    <script type="text/html" id="nameCnTpl">
+        <a lay-event="detail">{{d.nameCn}}</a>
+    </script>
+    <script type="text/html" id="createDateTpl">
+        {{new Date(d.createDate).format('yyyy-MM-dd')}}
+    </script>
+    <script type="text/html" id="idTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</body>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'table', 'tms_tab', 'laydate'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            tmsTab = layui.tms_tab,
+            laydate = layui.laydate,
+            $ = layui.jquery;
+        //初始化日期时间
+        laydate.render({
+            elem: '#createDateStart'
+        });
+        laydate.render({
+            elem: '#createDateEnd'
+        });
+        //初始化表格   
+        setTableData();
+        var $id = $.trim(getUrlParam('id'));
+        // console.log($id);
+        //监听提交
+        form.on('submit(search)', function(data) {
+            var $createDateStart = $.trim(data.field.createDateStart),
+                $createDateEnd = $.trim(data.field.createDateEnd),
+                $agreementNo = $.trim(data.field.agreementNo),
+                $targetName = $.trim(data.field.targetName),
+                $targetType = $.trim(data.field.targetType),
+                $status = $.trim(data.field.status);
+
+            var v1 = $createDateStart,
+                v2 = $createDateEnd;
+            if (v1.length > 0 && v2.length == 0) {
+                layer.msg('请选择截止时间');
+                return false;
+            }
+            if (v1.length == 0 && v2.length > 0) {
+                layer.msg('请选择起始时间');
+                return false;
+            }
+            if (v1.length > 0 && v2.length > 0) {
+                v1 = new Date(v1);
+                v2 = new Date(v2);
+                if (v1 > v2) {
+                    layer.msg('截止时间要大于或者等于起始时间');
+                    return false;
+                }
+            }
+
+            var $parms = 'createDateStart=' + $createDateStart + '&createDateEnd=' + $createDateEnd + '&status=' + $status + '&agreementNo=' + $agreementNo + '&targetName=' + $targetName + '&targetType=' + $targetType;
+            setTableData($parms);
+            return false;
+        });
+
+        //方法级渲染
+        function setTableData($parms, $id) {
+            parms = typeof parms != 'undefined' ? parms : '';
+            var $pageSize = 15;
+
+            table.render({
+                elem: '#tableList',
+                url: '/ucenter/crm/agree/freightAgreement/page.shtml?' + $parms,
+                // where: $parms,
+                response: {
+                    statusCode: 'SUCCESS',
+                    countName: 'objects.total', //数据总数的字段名称，默认：count
+                    dataName: 'objects.list'
+                },
+                request: {
+                    pageName: 'pageNum', //页码的参数名称，默认：page
+                    limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                },
+                cols: [
+                    [{
+                            checkbox: true,
+                            fixed: true
+                        }, {
+                            title: '序号',
+                            width: 80,
+                            align: 'center',
+                            templet: '#idTpl'
+                        }, {
+                            field: 'agreementNo',
+                            title: '协议号',
+                            width: 120,
+                            align: 'center'
+                        }, {
+                            field: 'targetName',
+                            title: '单位简称',
+                            width: 150
+                        }, {
+                            field: 'targetType',
+                            title: '单位类型',
+                            templet: '#typeTpl',
+                            width: 100,
+                            align: 'center'
+                        }, {
+                            field: 'loadingTargetName',
+                            title: '装卸单位',
+                            width: 250
+                        }, {
+                            field: 'arkType',
+                            title: '箱型(GP)',
+                            width: 90,
+                            align: 'center'
+                        }, {
+                            field: 'carryName',
+                            title: '提柜地点',
+                            width: 150,
+                            align: 'center'
+                        }, {
+                            field: 'stillName',
+                            title: '还柜地点',
+                            width: 150,
+                            align: 'center'
+                        }, {
+                            field: 'contatypeSprice',
+                            title: '价格',
+                            width: 100,
+                            align: 'center'
+                        }, {
+                            field: 'status',
+                            title: '状态',
+                            width: 80,
+                            templet: '#statusTpl',
+                            align: 'center'
+                        }, {
+                            field: 'creator',
+                            title: '创建人',
+                            width: 120,
+                            align: 'center'
+                        },
+                        // {field:'createDate', title: '创建时间', width:100,align: 'center'},
+                        {
+                            field: 'createDate',
+                            title: '做柜时间',
+                            width: 130,
+                            sort: true,
+                            align: 'center',
+                            templet: '#createDateTpl'
+                        }
+                        // {field:'salesmanName', title: '业务员', width:80, align: 'center'},
+                        // {field:'addressCount', title: '装卸地址个数', width:80, align: 'center'},
+                    ]
+                ],
+                id: 'dataReload',
+                page: true,
+                limits: [15, 30, 50, 100],
+                limit: $pageSize,
+                height: 'full-130',
+                even: true
+            });
+        }
+
+        //监听每一行的事件处理
+        table.on('tool(tbar)', function(obj) {
+            var data = obj.data;
+            if (obj.event === 'detail') {
+                //事件
+            }
+        });
+
+        var active = {
+            //新增
+            addData: function() {
+                //第一种方式：tabs选项卡
+                //tmsTab.add($(this), '新增供应商', 'modify.html?do=add');
+
+                //第二种方式：弹出窗口
+                tmsTab.add($(this), '新增价格协议', 'modify.html?do=add');
+            },
+            //编辑
+            editData: function() { //获取选中数据
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                console.log(data[0]);
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('只能选择一条数据！');
+                } else {
+                    tmsTab.add($(this), '编辑价格协议（' + data[0].targetName + '）', 'modify.html?do=edit&id=' + data[0].id + '&targetType=' + data[0].targetType);
+                }
+            },
+            //查看
+            detailData: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('只能选择一条数据！');
+                } else {
+                    tmsTab.add($(this), '查看（' + data[0].targetName + '）详情', 'modify.html?do=detail&id=' + data[0].id + '&targetType=' + data[0].targetType);
+                }
+            },
+            //停用
+            statusCancel: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else {
+                    parent.layer.confirm('您确定要停用这条价格协议吗？', function(index) {
+                        var $ids = [];
+                        for (var $i = 0; $i < data.length; $i++) {
+                            if (data[$i].status == 3) {
+                                parent.layer.alert(data[$i].agreementNo + '已经是停用状态！');
+                                return;
+                            }
+                            $ids.push(data[$i].id);
+                        }
+                        roleStatus($ids, 3);
+                        parent.layer.close(index);
+                    });
+                }
+            },
+            //启用
+            statusStart: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else {
+                    parent.layer.confirm('您确定要启用这条价格协议吗？', function(index) {
+                        var $ids = [];
+                        for (var $i = 0; $i < data.length; $i++) {
+                            if (data[$i].status == 1) {
+                                parent.layer.alert(data[$i].agreementNo + '已经是启用状态！');
+                                return;
+                            }
+                            $ids.push(data[$i].id);
+                        }
+                        roleStatus($ids, 1);
+                        parent.layer.close(index);
+                    });
+                }
+            }
+        };
+
+        $('.btns-bar .layui-btn').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //改变状态，1正常，2删除
+        function roleStatus($ids, $status) {
+            var $saveData = {
+                ids: $ids,
+                status: $status
+            }
+
+            $.ajax({
+                type: 'post',
+                url: '/ucenter/crm/agree/freightAgreement/use.shtml',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify($saveData),
+                success: function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code === 'SUCCESS') {
+                        window.location.reload();
+                    } else {
+                        parent.layer.alert('操作失败！');
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+</html>

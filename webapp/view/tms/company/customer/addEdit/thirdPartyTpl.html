@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>添加第三方平台帐号</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+</head>
+
+<body>
+    <form class="layui-form" autocomplete="off" style="min-width:800px;">
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">业务类型</label>
+                        <div class="layui-input-block">
+                            <select name="businessType" lay-verify="businessType">
+                                <option value="" selected="selected">全部</option>
+                                <option value="1">打EIR单</option>
+                                <option value="2">缴上下车费</option>
+                                <option value="3">报关</option>
+                                <option value="4">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">平台选择</label>
+                        <div class="layui-input-block">
+                            <select name="platformDcode" lay-verify="platformDcode">
+                              <option value="" selected="selected">请选择</option>
+                              <option value="1">阿丽</option>
+                              <option value="2">阿红</option>
+                              <option value="3">阿超</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">网址</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="weburl" lay-verify="weburl" placeholder="" class="layui-input" maxlength="40">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">操作类型</label>
+                        <div class="layui-input-block">
+                            <select name="operateType" lay-verify="operateType">
+                              <option value="0" selected="selected">客户自己操作</option>
+                              <option value="1">客户账号操作</option>
+                              <option value="2">我司账号操作</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">登录账号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="loginAccid" style="display:none;">
+                            <input type="text" name="loginAccid" lay-verify="loginAccid" class="layui-input" maxlength="20">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">登录密码</label>
+                        <div class="layui-input-block">
+                            <input type="password" name="loginPwd" style="display:none;">
+                            <input type="password" name="loginPwd" lay-verify="loginPwd" class="layui-input" maxlength="20">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">支付方式</label>
+                        <div class="layui-input-block">
+                            <select name="payDcode" lay-verify="payDcode">
+                                <option value="0" selected="selected">epay</option>
+                                <option value="1">微信</option>
+                                <option value="2">支付宝</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">支付账号/密码</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <div class="margin-right10">
+                                    <input type="text" name="payAccid" style="display:none;">
+                                    <input type="text" name="payAccid" lay-verify="payAccid" placeholder="支付账号" class="layui-input" maxlength="20">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="password" name="payPwd" style="display:none;">
+                                <input type="password" name="payPwd" lay-verify="payPwd" placeholder="支付密码" class="layui-input" maxlength="20">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm12">
+                    <div class="layui-form-item">
+                        <div class="layui-input-block" id="inputEdit">
+                            <input type="checkbox" name="conAdd" lay-verify="conAdd" value="1" title="保存后继续新增" lay-skin="primary">
+                            <input type="button" class="layui-btn" id="vsubmit" lay-submit lay-filter="submit" style="display: none;" value = "保存">
+                            <input type="button" class="layui-btn" style="display:none;" value = "取消">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+
+<!-- 工具库依赖 -->
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+<script>
+    layui.use(['form', 'layer'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery;
+
+        //监听提交
+        var datas,
+            $type = $.trim(getUrlParam('do')),
+            $id = $.trim(getUrlParam('id')),
+            $idD = $.trim(getUrlParam('idD')),
+            $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+        //监听提交
+        if ($type == 'edit') {
+            $('#inputEdit').hide()
+        };
+        if ($type == 'edit' || $type == 'add') {
+            form.on('submit(submit)', function(data) {
+                if (!bizUtil.validator.verifyContainer($('form'))) {
+                    return false;
+                }
+
+                var $saveDataHD = {
+                    businessType: parseInt($.trim(data.field.businessType)),
+                    loginAccid: $.trim(data.field.loginAccid),
+                    loginPwd: $.trim(data.field.loginPwd),
+                    operateType: parseInt($.trim(data.field.operateType)),
+                    payAccid: $.trim(data.field.payAccid),
+                    payDcode: parseInt($.trim(data.field.payDcode)),
+                    conAdd: parseInt($.trim(data.field.conAdd)),
+                    payDcodeName: $.trim(data.field.payDcodeName),
+                    id: $idD,
+                    payPwd: $.trim(data.field.payPwd),
+                    status: 3,
+                    platformDcode: parseInt($.trim(data.field.platformDcode)),
+                    platformDcodeName: $.trim(data.field.platformDcodeName),
+                    remarks: $.trim(data.field.remarks),
+                    weburl: $.trim(data.field.weburl)
+                };
+                if ($type == 'edit') {
+                    $saveDataHD.$id = parseInt($id);
+                }
+                // data.field
+                var datas = JSON.stringify($saveDataHD)
+                $(window.parent['f' + $layId].document).find('.tableTP').attr('data-func', 'callback(' + datas + ')');
+                if ($type == 'add') {
+                    window.parent.frames['f' + $layId].handAdd()
+                }
+                if ($type == 'edit') {
+                    window.parent.frames['f' + $layId].handEdit()
+                }
+            });
+
+        }
+    });
+</script>
+
+</html>

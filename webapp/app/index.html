@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <title>hello_vue</title>
+    <script>
+      (function () {
+        // 参数：设计稿宽度、rem转换为px的倍数
+        var setBaseFontSize = function (designWidth, rem2px) {
+            var d = window.document.createElement("div");
+            d.style.width = "1rem";
+            d.style.display = "none";
+
+            var head = window.document.getElementsByTagName("head")[0];
+            head.appendChild(d);
+
+            var defaultFontSize = parseFloat(window.getComputedStyle(d, null).getPropertyValue("width"));
+
+            d.remove();
+            document.documentElement.style.fontSize = window.innerWidth / designWidth * rem2px / defaultFontSize * 100 + "%";
+
+            var st = document.createElement("style");
+            var portrait = "@media screen and (min-width: " + window.innerWidth + "px) {html{font-size:" + ((window.innerWidth / (designWidth / rem2px) / defaultFontSize) * 100) + "%;}}";
+            var landscape = "@media screen and (min-width: " + window.innerHeight + "px) {html{font-size:" + ((window.innerHeight / (designWidth / rem2px) / defaultFontSize) * 100) + "%;}}"
+
+            st.innerHTML = portrait + landscape;
+            head.appendChild(st);
+
+            return defaultFontSize
+        };
+
+        // 720px的设计稿，以 100px=1rem 的比例调整
+        setBaseFontSize(1080, 100);
+    })();
+    
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <div id="userToken" style="display: none;" hc="%E6%88%91%E4%B8%8D%E5%91%8A%E8%AF%89%E4%BD%A0%E8%BF%99%E9%87%8C%E6%98%AFToken">{#hc_token#}</div>
+
+    <!-- built files will be auto injected -->
+
+  <script type="text/javascript" src="/app/_package_/libs.js?4c099b1a414b2b644094"></script><script type="text/javascript" src="/app/app.js?4c099b1a414b2b644094"></script></body>
+</html>

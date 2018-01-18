@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>核销费用 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+    <style>
+      body {width:1000px;}
+      span.required {color:#f00; font-family:'simsun', '宋体'; margin-right:5px; font-size:15px;}
+      .layui-form-label {width:150px;}
+      span{height: 38px;line-height:38px}
+      .layui-form-item .layui-input-inline {padding-top: 10px; width:240px;}
+      .pointer{color:#51a2f7; cursor:pointer ; width:270px; overflow: hidden;white-space:nowrap;text-overflow:ellipsis;}
+       .no-drop{cursor:no-drop;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off" style="min-width:800px;">
+            <div class="layui-fluid">
+                <div class="layui-row">
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">账期期间</label>
+                            <div class="layui-input-block">
+                                <span name="billMonth" id="billMonth"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm6">
+                            <div class="layui-form-item">
+                            <label class="layui-form-label">账单号</label>
+                            <div class="layui-input-block">
+                                <span id="billNo" name="billNo"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">结算方式(天)</label>
+                            <div class="layui-input-block">
+                                <span id="paymentType" name="paymentType"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm6">
+                            <div class="layui-form-item">
+                            <label class="layui-form-label">总金额(元)</label>
+                            <div class="layui-input-block">
+                                <span id="receiveCost" name="receiveCost"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">已收金额(元)</label>
+                            <div class="layui-input-block">
+                                <span id="receivedCost" name="receivedCost"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm6">
+                            <div class="layui-form-item">
+                            <label class="layui-form-label">未收金额(元)</label>
+                            <div class="layui-input-block">
+                                <span id="receivCost" name="receivCost"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">操作类型</label>
+                            <div class="layui-input-block">
+                                <div class="layui-col-sm8">
+                                    <select name="operationType" lay-filter="operationType">
+                                        <option value="0">核销同时生成收支记录</option>
+                                        <option value="1">关联收支记录进行核销</option>
+                                    </select>
+                                </div>
+                                <div class="layui-col-sm4 ">
+                                    <div class="margin-left10 collectionRecord" style="height:38px;line-height:38px">选择银行收支</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm6">
+                            <div class="layui-form-item">
+                            <label class="layui-form-label"><span class="required">*</span>收款账户</label>
+                            <div class="layui-input-block">
+                                    <select name="channel">
+                                        <option value="">请选择</option>
+                                    </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">收款日期</label>
+                            <div class="layui-input-block">
+                                    <input type="text" id="receiveTime" name="receiveTime"  placeholder="" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm6">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label"><span class="required">*</span>收款金额(元)</label>
+                            <div class="layui-input-block">
+                                    <input type="text"  name="receivePay" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">摘要</label>
+                            <div class="layui-input-block">
+                                    <textarea id="described" name="described" maxlength="1000" placeholder="" class="layui-textarea" style="min-height:50px;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm6">
+                            <div class="layui-form-item">
+                            <label class="layui-form-label">备注</label>
+                            <div class="layui-input-block">
+                                <textarea name="remark" id="remark" style="min-height:50px;" class="layui-textarea"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                        <div class="layui-col-md12">
+                            <div class="layui-form-item"  style="text-align:center;margin-left:-80px">
+                                <div class="layui-input-block button-bar">
+                                        <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit" >保存</button>
+                                        <button class="layui-btn layui-btn-primary btn-cancel" type="button" >取消</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <br><hr>
+            <div>
+                  <span>注：1.当收到款项时，知道是那个客户的，可以直接进行核销，且选择操作类型为核销同时生成收支记录时，核销后，会同时生成一条收入记录</span><br>
+                  <span>2.当收到款项时，还不知道时那个客户的，可以先登记银行收支，确认是那个客户的款项后，然后进行核销，此时选择操作类型是关联收支记录进行核销，核销后，不会再生成收入记录。</span><br>
+                  <span>3.操作类型是：关联收支记录进行核销时，请点击“选择收款记录”进行选择具体那条收款记录</span>
+            </div>
+    </form>
+
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  <!-- <script charset="utf-8" src="./chargeoff.js"></script> -->
+  
+  <script>
+    
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    laydate.render({
+      elem: '#receiveTime' //收款日期
+    });
+
+    var $collectionRecordId = sessionStorage.getItem("collectionRecordId");
+
+    function operationTypeClick(){
+        $('select[name="channel"]').prop('disabled',true);
+        $('input[name="receivePay"]').prop('disabled',true);
+        $('input[name="receiveTime"]').prop('disabled',true);
+        $('textarea[name="described"]').prop('disabled',true);
+        $('.collectionRecord').addClass('pointer');
+        $('.collectionRecord').removeClass('no-drop');
+        $('.collectionRecord').off('click');
+        collectionRecordClick();
+        form.render();
+    }
+
+    form.on('select(operationType)', function(data) {
+      if(data.value == 0){
+        $('select[name="channel"]').prop('disabled',false);
+        $('input[name="receivePay"]').prop('disabled',false);
+        $('input[name="receiveTime"]').prop('disabled',false);
+        $('textarea[name="described"]').prop('disabled',false);
+        $('.collectionRecord').removeClass('pointer');
+        $('.collectionRecord').addClass('no-drop');
+        $('.collectionRecord').off('click');
+        form.render();
+      }else{
+        operationTypeClick();
+      }
+    })
+
+    function collectionRecordClick(){
+        $('.collectionRecord').click(function(){
+            parent.layer.open({
+                type: 2,
+                title: '查找关联的收支记录',
+                shadeClose: true,
+                shade: 0.8,
+                area: ['90%', '90%'],
+                content: 'collectionRecord.html',
+                end: function () {
+                    location.reload();
+                }
+            });
+        })
+    }
+
+    if($collectionRecordId != ''){
+        $('select[name="operationType"]').val(1);
+        operationTypeClick();
+        $.ajax({
+        type:"GET", 
+            //   url:"/ucenter/general/finance/settlementChannel/"+ $collectionRecordId +".shtml",
+            url:"/ucenter/general/finance/bankFlow/"+ $collectionRecordId +".shtml",
+            dataType:"json",      
+            contentType:"application/json",
+            success:function(d){
+                var $code = d.code,
+                    $msg = d.msg,
+                    $objects = d.objects;
+                
+                if($code === 'SUCCESS'){
+                    var settlementChannelId = $objects.settlementChannelId;
+                      //加载收款账户下拉框数据
+                    $.get('/ucenter/general/finance/settlementChannel/searchBankNameAccountNo.shtml', function(d){
+                        var $code = d.code,
+                            $msg = d.msg,
+                            $objects = d.objects;
+
+                        if($code != 'SUCCESS') return false;
+                        
+                        if($objects.length > 0){
+                        for(var $i = 0; $i < $objects.length; $i++){
+                            if($objects[$i].accountName != null && $objects[$i].accountNo != null && $objects[$i].status == 1){
+                            $('select[name="channel"]').append('<option value="'+ $objects[$i].id +'">'+ $objects[$i].accountNo + '(' + $objects[$i].accountName +')</option>');
+                            }
+                        }
+                        $('select[name="channel"]').val(settlementChannelId);
+                        form.render('select');
+                        }
+                    }, 'json');
+                    
+                    // $('select[name="channel"]').val($objects.settlementChannelId);
+                    $('input[name="receivePay"]').val($objects.received);
+                    $('input[name="receiveTime"]').val($objects.tradeDate != null ? new Date($objects.tradeDate).format('yyyy-MM-dd') : '');
+                    $('textarea[name="described"]').val($objects.described);
+                    $('textarea[name="remark"]').val($objects.remark);
+                    operationTypeClick();
+                    form.render();
+                }
+            }
+        });
+    }else{
+         $('.collectionRecord').addClass('no-drop');
+         //加载收款账户下拉框数据
+        $.get('/ucenter/general/finance/settlementChannel/searchBankNameAccountNo.shtml', function(d){
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+
+            if($code != 'SUCCESS') return false;
+            
+            if($objects.length > 0){
+            for(var $i = 0; $i < $objects.length; $i++){
+                if($objects[$i].accountName != null && $objects[$i].accountNo != null && $objects[$i].status == 1){
+                $('select[name="channel"]').append('<option value="'+ $objects[$i].id +'">'+ $objects[$i].accountNo + '(' + $objects[$i].accountName +')</option>');
+                }
+            }
+            form.render('select');
+            }
+        }, 'json');
+    }
+    var $customerId = $.trim(getUrlParam('customerId'));
+    var $Id = $.trim(getUrlParam('id'));
+    var $layIdID = $.trim(getUrlParam('layIdID'));
+    var $lastModifyTime;
+     $.get('/ucenter/general/finance/receivedBills/getConfirmPage.shtml?customerId='+ $customerId +'&id='+ $Id , function(d){
+        // for(var $i = 0 ; $i < d.objects.channels.length ;$i++){
+    //      $('select[name="channel"]').append('<option value="' + d.objects.channels[$i].id + '">' + d.objects.channels[$i].bankName + d.objects.channels[$i].bankBranchName + ':' + d.objects.channels[$i].accountNo + '</option>');
+    //    }
+       $lastModifyTime = d.objects.bill.modifyDate;
+       $('span[name="billMonth"]').html(d.objects.bill.billMonth);
+       $('span[name="billNo"]').html(d.objects.bill.billNo);
+       $('span[name="paymentType"]').html(d.objects.bill.paymentType == 0 ? '现金' : d.objects.bill.paymentType + '天');
+       $('span[name="receiveCost"]').html(d.objects.bill.receiveCost);
+       $('span[name="receivedCost"]').html(d.objects.bill.receivedCost);
+       $('span[name="receivCost"]').html((d.objects.bill.receiveCost) - (d.objects.bill.receivedCost));
+       $('span[name="remarks"]').html(d.objects.bill.remarks);
+       form.render();
+     })
+
+         //监听提交
+    form.on('submit(submit)', function(data){
+       var $channel = $.trim(data.field.channel),
+      $receivePay = $.trim(data.field.receivePay),
+      $receiveTime = $.trim(data.field.receiveTime),
+      $described = $.trim(data.field.described);
+      $remark = $.trim(data.field.remark);
+      $lastModifyTime
+      roleStatus($channel, $receivePay, $receiveTime, $described,$remark);
+      return false;
+    });
+
+    function roleStatus($channel, $receivePay, $receiveTime, $described,$remark){
+      var $saveData = {
+        pkId: $Id,
+        channel: $channel,
+        receivePay: $receivePay,
+        receiveTime: $receiveTime,
+        described: $described,
+        remark: $remark,
+        lastModifyTime: $lastModifyTime,
+        bankFlowId: $collectionRecordId
+      }
+       $.ajax({
+        type:'POST',
+        url:'/ucenter/general/finance/confirm/billConfirm.shtml', 
+        dataType:"json",
+        contentType:"application/json",
+        data:JSON.stringify($saveData),
+        success:function(d){
+          var $code = d.code,
+              $msg = d.msg,
+              $objects = d.objects;
+              
+          if($code === 'SUCCESS'){
+            parent.layer.alert("操作成功", {
+                closeBtn: 0,
+                yes: function(index) {
+                    parent.layer.close(index);
+                    $(window.parent['f'+$layIdID].document).find('.btn-search').click();
+                    bizUtil.frame.closeCurrentIframeTab(window.parent);
+                }
+            })
+          }else{
+            parent.layer.alert($msg);
+          }
+        }
+      });
+    }
+
+    $(".btn-cancel").on("click",function(){
+        tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+    });
+    form.render();
+  });
+  </script>
+</html>

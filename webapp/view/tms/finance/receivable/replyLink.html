@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>回复账单 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      <!--start:表格列表-->
+      <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+      <!--end:表格列表-->
+    </form>
+  </body>
+  <script type="text/html" id="doarkDateTpl">
+      {{new Date(d.doarkDate).format("yyyy-MM")}}
+  </script>
+  <script type="text/html" id="createDateTpl">
+      {{new Date(d.createDate).format("yyyy-MM-dd hh:mm:ss")}}
+  </script>
+  <script type="text/html" id="idTpl">
+      {{d.LAY_TABLE_INDEX+1}}
+  </script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+        
+    var verifyId = $.trim(getUrlParam('receivedBillsNo'));
+    setTableData(verifyId);
+
+    //方法级渲染
+    function setTableData(verifyId){
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/receivedBills/queryBill.shtml',
+        where: {verifyId: verifyId} ,//如果无需传递额外参数，可不加该参数
+        method: 'get' ,//如果无需自定义HTTP类型，可不加该参数
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total', //数据总数的字段名称，默认：count
+          dataName: 'objects'
+        },
+        // 该接口不需要额外参数，也不需要分页
+        request: {},
+        cols: [[
+          {title: '序号', width:80, sort: true, align: 'center', templet:"#idTpl"},
+          {field:'jobNo', title: '运输作业号', width:200, align: 'center'},
+          {field:'doarkDate', title: '做柜日期', width:120, align: 'center', templet:'#doarkDateTpl'},
+          {field:'ordersType', title: '类型', width:100, align: 'center'},
+          {field:'soNo', title: 'S/O', width:150, align: 'center'},
+          {field:'arkNo', title: '柜号', width:150, align: 'center'},
+          {field:'arkType', title: '柜型', width:100, align: 'center'},
+          {field:'carNo', title: '车牌号', width:100, align: 'center'},
+          {field:'transportCost', title: '运费', width:100, align: 'center'},
+          {field:'extraCost', title: '异常费', width:100, align: 'center'},
+          {field:'sum', title: '合计', width:100, align: 'center'},
+          {field:'paidCost', title: '已收金额', width:100, align: 'center'},
+          {field:'createDate', title: '创建时间', width:300, align: 'center', templet:'#createDateTpl'}
+        ]],
+        id: 'dataReload',
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){}
+      });
+    }
+
+    $(".btn-cancel").on("click",function(){
+      parent.layer.closeAll();
+      return false;
+    });
+  });
+  </script>
+</html>

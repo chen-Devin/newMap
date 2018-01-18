@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>角色管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+        body {
+            margin: 20px;
+        }
+        
+        span.required {
+            color: #f00;
+            font-family: 'simsun', '宋体';
+            margin-right: 5px;
+            font-size: 15px;
+        }
+        
+        .form-txt {
+            margin: -10px 0 20px 110px;
+            color: #999;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+    <form class="layui-form" method="post" autocomplete="off">
+        <div class="layui-form-item">
+            <label class="layui-form-label"><span class="required">*</span>角色名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" lay-verify="name" placeholder="请输入角色名称" class="layui-input" maxlength="30">
+            </div>
+        </div>
+        <div class="layui-form-item" pane="" id="platformBox">
+            <label class="layui-form-label"><span class="required">*</span>所属系统</label>
+            <div class="layui-input-block" id="platformId"></div>
+        </div>
+        <div class="form-txt">注：当你选择多个系统时，将为每个系统生成一个同样角色名字的角色</div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-block">
+                <textarea name="remarks" placeholder="备注，0~300位之间" class="layui-textarea" maxlength="300"></textarea>
+            </div>
+        </div>
+        <input type="hidden" name="id">
+        <div class="layui-form-item" style="text-align:center;">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit">保存</button>
+            <button class="layui-btn layui-btn-primary" id="vcancel">关闭</button>
+        </div>
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'table'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery;
+
+        //自定义验证规则
+        form.verify({
+            name: function(value) {
+                if (value.length == 0) {
+                    return '请输入角色名称';
+                }
+            }
+        });
+
+        var $type = $.trim(getUrlParam('do'));
+
+        //子系统接口
+        $.get('/ucenter/code/common/system/search.shtml', function(d) {
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+
+            if ($code != 'SUCCESS') return false;
+
+            if ($objects.length > 0) {
+                for (var $i = 0; $i < $objects.length; $i++) {
+                    $('#platformId').append('<input type="checkbox" name="platformId[' + $i + ']" value="' + $objects[$i].id + '" lay-skin="primary" title="' + $objects[$i].name + '">');
+                }
+                $type == 'edit' ? $('#platformId input[type="checkbox"]').prop('disabled', true) : 0;
+                form.render('checkbox');
+            }
+        }, 'json');
+
+        if ($type == 'edit') {
+            var $id = $.trim(getUrlParam('id'));
+            if ($id != null) {
+                $('input[name="id"]').val($id);
+                $('.form-txt').html('注：修改角色时，不能更改所属系统');
+
+                //获取数据
+                $.get('/ucenter/centre/permi/role/' + $id + '.shtml', function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code === 'SUCCESS') {
+                        $('input[name="name"]').val($objects.name);
+                        $('textarea[name="remarks"]').val($objects.remarks);
+                        $('#platformId input[type="checkbox"]').each(function() {
+                            if (parseInt($objects.platformId) == parseInt($(this).val())) {
+                                $(this).attr('checked', 'checked');
+                                form.render('checkbox');
+                            }
+                        });
+                    } else {
+                        layer.alert('数据异常');
+                        return false;
+                    }
+                }, 'json');
+            }
+        }
+
+        //监听提交
+        form.on('submit(submit)', function(data) {
+            var $cbLen = $('#platformId input[type="checkbox"]:checked').length;
+            if ($cbLen == 0 && $type != 'edit') {
+                layer.msg('请选择所属系统');
+                return false;
+            }
+            var $platformIdVal = '';
+            $('#platformId input[type="checkbox"]:checked').each(function() {
+                var k = $.trim($(this).val());
+                $platformIdVal += k + ',';
+            });
+            $platformIdVal = $platformIdVal.substr(0, $platformIdVal.length - 1);
+
+            var $platformIdValArr = [];
+            $platformIdValArr = $platformIdVal.split(',');
+
+            //数据源
+            var $saveData = {};
+
+            if ($type == 'edit') {
+                $saveData = {
+                    name: $.trim(data.field.name),
+                    remarks: $.trim(data.field.remarks)
+                }
+                setData('/ucenter/centre/permi/role/' + $.trim(data.field.id) + '.shtml', $saveData, 'PUT');
+            } else {
+                $saveData = {
+                    name: $.trim(data.field.name),
+                    platformIds: $platformIdValArr,
+                    remarks: $.trim(data.field.remarks)
+                }
+                setData('/ucenter/centre/permi/role/add.shtml', $saveData, 'POST');
+            }
+
+            //获取当前框架ID
+            var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+
+            parent.layer.closeAll();
+            parent['f' + $layId].location.reload();
+        });
+
+        //保存数据
+        function setData($url, $data, $method) {
+            //调用接口
+            $.ajax({
+                type: $method,
+                url: $url,
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify($data),
+                success: function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code === 'SUCCESS') {
+                        //保存成功
+                    } else {
+                        layer.alert('保存信息失败！');
+                    }
+                }
+            });
+        }
+
+        $('#vcancel').on('click', function() {
+            parent.layer.closeAll();
+        })
+    });
+</script>
+
+</html>

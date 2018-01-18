@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>海关代码分类 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <body>
+    <!--start:表格列表-->
+    <table class="layui-hide" id="table_list"></table>
+    <!--end:表格列表-->
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/tms_common/utils.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['layer', 'table'], function(){
+    var layer = layui.layer,
+        table = layui.table,
+        $ = layui.jquery;
+
+    var options = {
+      "seachOptions":{
+        "rely": $form,
+        "condition": ["exact","type","name"],
+        "getParameter": ""
+      },
+
+      "tableOptions": {
+        cols: [[
+          {field:'id', title: '序号', width:80, sort: true}
+          ,{field:'code', title: '海关代码类型编号', width:150}
+          ,{field:'nameCn', title: '海关代码名称', width:150}
+          ,{field:'nameEn', title: '代码识别码', width:120}
+        ]],
+        url: '/ucenter/code/common/common/getCustomCodeType.shtml',
+        where: {"exact" : false, "code" : ""}
+      }   
+    }
+
+    tmsCommonTable.init(options, table);
+
+
+    //方法级渲染
+    // function setTableData(){
+    //   var $pageSize = 10;
+
+    //   $table.render({
+    //     elem: '#table_list',
+    //     url: '/ucenter/code/common/common/getCustomCodeType.shtml',
+    //     response: {
+    //       statusCode: 'SUCCESS',
+    //       countName: 'objects.total', //数据总数的字段名称，默认：count
+    //       dataName: 'objects.list'
+    //     },
+    //     request: {
+    //       pageName: 'pageNum', //页码的参数名称，默认：page
+    //       limitName: 'pageSize' //每页数据量的参数名，默认：limit
+    //     },
+    //     cols: [[
+    //            {field:'id', title: '序号', width:80, sort: true}
+    //            ,{field:'code', title: '海关代码类型编号', width:150}
+    //            ,{field:'nameCn', title: '海关代码名称', width:150}
+    //            ,{field:'nameEn', title: '代码识别码', width:120}
+    //          ]],
+    //     id: 'testReload',
+    //     page: true,
+    //     limits: [15, 30, 50, 100],
+    //     limit: $pageSize,
+    //     height: 'full-20',
+    //     even: true,
+    //     done: function(res, curr, count){}
+    //   });
+    // }
+    // setTableData();
+
+    // getData();
+
+    // //读取数据
+    // function getData(){
+    //   $.get('/ucenter/code/common/common/getCustomCodeType.shtml', function(d){
+    //     var $code = d.code;
+    //         $msg = d.msg;
+    //         $objects = d.objects;
+
+    //     if($code === 'SUCCESS'){
+    //       setTableData($objects);
+    //     }else if($code === 'ERROR_USER_LOGOFF'){
+    //       loginFailure();
+    //     }else{
+    //       parent.layer.alert('数据异常');
+    //       return;
+    //     }
+    //   }, 'json');
+    // }
+    
+    // //方法级渲染
+    // function setTableData(rows){
+    //   table.render({
+    //     elem: '#table_list',
+    //     data: rows.list,
+    //     response: {
+    //       countName: 'total', //数据总数的字段名称，默认：count
+    //     },
+    //     request: {
+    //       pageName: 'pageNum', //页码的参数名称，默认：page
+    //       limitName: 'pageSize' //每页数据量的参数名，默认：limit
+    //     },
+    //     cols: [[
+    //       {field:'id', title: '序号', width:80, sort: true}
+    //       ,{field:'code', title: '海关代码类型编号', width:150}
+    //       ,{field:'nameCn', title: '海关代码名称', width:150}
+    //       ,{field:'nameEn', title: '代码识别码', width:120}
+    //     ]],
+    //     id: 'testReload',
+    //     page: false,
+    //     limits: [15, 30, 50, 100],
+    //     limit: 10,
+    //     height: 'full-20',
+    //     even: true, //开启隔行背景
+    //     //size: 'sm' //小尺寸的表格
+    //   });
+    // }
+  });
+  </script>
+</html>

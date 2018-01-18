@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>应收款管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+      <form class="layui-form layui-form-pane">
+        <!-- <button class="layui-btn layui-btn-danger" onclick="window.location.href='list.html'">全部</button> -->
+        <div class="layui-input-inline">
+          <label class="layui-form-label">客户简称</label>
+          <div class="layui-input-inline">
+            <input type="text" name="clientName" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">状态</label>
+          <div class="layui-input-inline">
+            <select name="type">
+            <option value="" selected="selected">全部</option>
+            <option value="0" >未核销</option>
+            <option value="1" >部分核销</option>
+            <option value="2" >全部核销</option>
+            </select>
+          </div>
+        </div>
+        <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+      </form>
+    </div>
+    <!--end: 搜索-->
+    
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+      <div class="layui-btn-group fl">
+        <button class="layui-btn layui-btn-normal" data-type="checkData">查看明细</button>
+        <!-- <button class="layui-btn layui-btn-normal" data-type="chargeoff">核销</button>
+        <button class="layui-btn layui-btn-normal" data-type="reversechargeoff">反核销</button> -->
+        <button class="layui-btn layui-btn-normal" data-type="deriveDetail">明细导出</button>
+        <button class="layui-btn layui-btn-normal" data-type="deriveBrief">简要导出</button>
+      </div>
+      <!-- <div class="layui-btn-group fr">
+        <button class="layui-btn"><i class="layui-icon">&#xe614;</i>定义表头</button>
+        <button class="layui-btn"><i class="layui-icon">&#xe62d;</i>导出EXCEL</button>
+      </div> -->
+      <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+   <!--start:快捷搜索-->
+   <div id="shortBar" style="display:none;">
+      <dl>
+        <dt>应收合计 ： <span class="layui-badge layui-bg-cyan">123456789</span></dt>
+        <dd><a href="">未收合计<span class="layui-badge">123564</span></a></dd>
+      </dl>
+    </div>
+    <!--end:快捷搜索-->
+
+    <script type="text/html" id="statusTpl">
+      {{# if(d.status == 0){  }}
+      <p>未核销</p>
+      {{# }else if(d.status == 1){ }}
+      <P>部分核销</P>
+      {{# }else { }}
+      <p>全部核销</p>
+      {{# } }}
+    </script>
+     <script type="text/html" id="roleUsersTpl">
+      {{ (d.totalReceiveCost - d.totalReceivedCost) }}
+    </script>
+    <script type="text/html" id="paymentTypeTpl">
+      {{#  if(d.paymentType == '0'){ }}
+        现金
+      {{#  } else{ }}
+        {{d.paymentType + '天'}}      
+      {{#  } }}
+    </script>
+  </body>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'tms_tab'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    setTableData();
+    var $shortBarHtml = $('#shortBar').html();
+    $('.layui-table-tool').prepend('<div class="short-bar">' + $shortBarHtml + '</div>');
+
+    //子系统接口
+    $.get('/ucenter/code/common/system/search.shtml', function(d){
+      var $code = d.code,
+          $msg = d.msg,
+          $objects = d.objects;
+
+      if($code != 'SUCCESS') return false;
+      
+      if($objects.length > 0){
+        for(var $i = 0; $i < $objects.length; $i++){
+          $('select[name="platformId"]').append('<option value="'+ $objects[$i].id +'">'+ $objects[$i].name +'</option>');
+        }
+        form.render('select');
+      }
+    }, 'json');
+    
+    //监听提交
+    form.on('submit(search)', function(data){
+      var $customerName = $.trim(data.field.clientName),
+      $status = $.trim(data.field.type);
+      setTableData($customerName, $status);
+      return false;
+    });
+    
+    //方法级渲染
+    function setTableData($customerName, $status){
+      typeof $customerName != 'undefined' ? $customerName = $customerName : $customerName = '';
+      typeof $status != 'undefined' ? $status = $status : $status = '';
+      var $pageSize = 15;
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/receivedStatistics/page.shtml?customerName=' + $customerName + '&status=' + $status,
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects', //数据总数的字段名称，默认：count
+          dataName: 'objects.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'customerName', title: '客户简称', align: 'center', width:200, event: 'setSign', style:'cursor: pointer;color:#51a2f7;'},
+          {field:'paymentType', title: '结算方式', align: 'center', width:150, templet:"#paymentTypeTpl"},
+          {field:'totalReceiveCost', title: '实应收总金额', align: 'center', width:150},
+          {field:'totalReceivedCost', title: '已收总金额', align: 'center', width:150},
+          {field:'roleUsers', title: '未收总金额', align: 'center', width:150, templet:"#roleUsersTpl"},
+          {align:'status', title: '状态', align: 'center', width:200, templet:"#statusTpl" }
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){}
+      });
+    }
+    //监听工具条
+    table.on('tool(tbar)', function(obj){
+       if(obj.event === 'setSign'){
+          var data = obj.data;
+          tmsTab.add($(this), '查看明细' + data.customerName, 'check.html?customerId=' + data.customerId);
+        }
+    });
+    var active = {
+      //查看明细
+      checkData: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('请选择需要查看的数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else{
+           tmsTab.add($(this), '查看明细' + data[0].customerName, 'check.html?customerId=' + data[0].customerId);
+        }
+      },
+      //核销
+      chargeoff: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('请选择需核销的数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else{
+          parent.layer.open({
+            type: 2,
+            title: '核销费用',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['1000px', '500px'],
+            content: 'chargeoff.html?id=' + data[0].id +'&customerId=' + data[0].customerId
+          });
+        }
+      },
+      //反核销
+      reversechargeoff: function(){ //获取选中数据
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('请选择需反核销的数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else{
+          parent.layer.open({
+            type: 2,
+            title: '反核销费用',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['90%', '80%'],
+            content: 'reversechargeoff.html?id=' + data[0].id
+          });
+        }
+      },
+        //导出明细账单
+      deriveDetail: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+        $data = checkStatus.data;
+          var $customerIds = [];
+        for(var $i = 0; $i< $data.length; $i++){
+          $customerIds.push($data[$i].id);
+        }
+         if($data.length == 0){
+          parent.layer.alert('请选择需要导出的数据！');
+        }else{
+          $.ajax({
+            type:'GET', 
+            url:'/ucenter/general/finance/receivedBills/excel.shtml?customerIds=' + $customerIds, 
+            success:function(d){
+              if(d.code == 'ERROR_FINANACE_EXPORT_EXCEL'){
+                parent.layer.alert('没有查询到相关数据！');
+              }else{
+                document.location.href = '/ucenter/general/finance/receivedBills/excel.shtml?customerIds=' + $customerIds;
+              }
+            },
+            error:function(){
+              parent.layer.alert('操作失败！');
+            }
+          });
+        }
+      },
+      //导出简要账单
+      deriveBrief: function(){
+        typeof $customerName != 'undefined' ? $customerName = $customerName : $customerName = '';
+        typeof $status != 'undefined' ? $status = $status : $status = '';
+        $.ajax({
+          type:'GET', 
+          url:'/ucenter/general/finance/receivedStatistics/excel.shtml?customerName=' + $customerName + '&status=' + $status  , 
+          success:function(d){
+            if(d.code == 'ERROR_FINANACE_EXPORT_EXCEL'){
+                parent.layer.alert('没有查询到相关数据！');
+              }else{
+                  document.location.href = '/ucenter/general/finance/receivedStatistics/excel.shtml?customerName=' + $customerName + '&status=' + $status;
+              }
+            },
+          error:function(){
+             parent.layer.alert('操作失败！');
+          }
+        });
+      }
+    };
+    $('.btns-bar .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+  });
+  </script>
+</html>

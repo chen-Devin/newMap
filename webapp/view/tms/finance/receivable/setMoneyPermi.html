@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>账单催款 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+    <style>
+      body {margin:20px;}
+      .layui-table-page {float: right;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      <!--start:表格列表-->
+      <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+      <!--end:表格列表-->
+    </form>
+    <div class="layui-form-item btns-bar button-bar" style="float:right">
+      <button class="layui-btn layui-btn-normal" data-type="billReminders" >立刻催款</button>
+      <button class="layui-btn layui-btn-primary btn-cancel" type="button" >返回</button>
+    </div>
+  </body>
+  <script type="text/html" id="confirmStatusTpl">
+    {{# if(d.confirmStatus == 0){  }}
+    <p>未核销</p>
+    {{# }else if(d.confirmStatus == 1){ }}
+    <P>部分核销</P>
+    {{# }else { }}
+    <p>全部核销</p>
+    {{# } }}
+  </script>
+    <script type="text/html" id="isUrgeTpl">
+    {{# if(d.isUrge == 0){  }}
+    <p>未催账</p>
+    {{# }else { }}
+    <p>已催账</p>
+    {{# } }}
+  </script>
+  <script type="text/html" id="unReceivedCostTpl">
+    {{ (d.receiveCost - d.receivedCost) }}
+  </script>
+  <script type="text/html" id="billMonthTpl">
+      {{new Date(d.billMonth).format("yyyy-MM")}} 
+  </script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+    var $Ids = $.trim(getUrlParam('ids')).split(",");
+
+    setTableData($Ids);
+   
+
+    //方法级渲染
+    function setTableData(ids){
+      var $pageSize = 15;
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/receivedBills/showIsUrge.shtml',
+        where: {ids : ids },
+        method: 'post', //如果无需自定义HTTP类型，可不加该参数
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects', //数据总数的字段名称，默认：count
+          dataName: 'objects'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'billNo', title: '账单号', width:170},
+          {field:'billMonth', title: '账期', width:90,templet:"#billMonthTpl"},
+          {field:'paymentType', title: '结算方式', width:100},
+          {field:'receiveCost', title: '应收金额', width:100},
+          {field:'receivedCost', title: '已收金额', width:100},
+          {field:'unReceivedCost', title: '未收金额', width:100, templet:"#unReceivedCostTpl"},
+          {field:'revenueNos', title: '收款单号', width:190},
+          {field:'confirmStatus', title: '状态', width:100, templet:"#confirmStatusTpl"}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){}
+      });
+    }
+
+    var active = {
+      //账单催款
+      billReminders: function(){ //获取选中数据
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('请选择需催款的数据！');
+        }else{
+          parent.layer.confirm('确定要催款这些记录吗？',function(){
+            var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+             var $data = [];
+            for(var $i = 0; $i< data.length; $i++){
+              $data.push(data[$i].id);
+            }
+            console.log($data);
+            if($data.length == 0){
+              parent.layer.alert('请选择需要催款的数据！');
+            }else{
+                var $saveData = {
+                  ids : $data
+                }
+                $.ajax({
+                  type:'POST',
+                  url:'/ucenter/general/finance/receivedBills/isUrge.shtml', 
+                  dataType:"json",
+                  contentType:"application/json",
+                  data:JSON.stringify($saveData),
+                  success:function(d){
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+                        
+                    if($code === 'SUCCESS'){
+                      parent.layer.closeAll();
+                      // parent.layer.alert('操作成功！');
+                      parent.layer.msg('操作成功！');
+                      window.location.reload();
+                      // tableIns.reload(options)
+                    }else{
+                      parent.layer.alert('操作失败！');
+                    }
+                  }
+                
+                });
+            }
+
+          });
+        }
+      }
+    };
+
+    $('.btns-bar .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+
+    $(".btn-cancel").on("click",function(){
+      parent.layer.closeAll();
+      return false;
+    });
+  });
+  </script>
+</html>

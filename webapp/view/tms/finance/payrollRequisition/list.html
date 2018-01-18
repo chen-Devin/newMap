@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>请款单管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+      <form class="layui-form layui-form-pane">
+        <div class="layui-input-inline">
+          <label class="layui-form-label">结算单位</label>
+          <div class="layui-input-inline">
+            <input type="text" name="targetName"  autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">状态</label>
+          <div class="layui-input-inline">
+            <select name="confirmStatus">
+              <option value="" selected="selected">全部</option>
+              <option value="0">未核销</option>
+              <option value="1">部分核销</option>
+              <option value="2">全部核销</option>
+            </select>
+          </div>
+        </div>
+        <button class="layui-btn layui-btn-danger btn-search" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+      </form>
+    </div>
+    <!--end: 搜索-->
+    
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+      <div class="layui-btn-group fl">
+        <button class="layui-btn layui-btn-normal" data-type="examineData">查看明细</button>
+        <button class="layui-btn layui-btn-normal" data-type="applyData">申请</button>
+        <button class="layui-btn layui-btn-normal" data-type="auditData">审核</button>
+        <button class="layui-btn layui-btn-normal" data-type="chargeoffData">核销</button>
+        <button class="layui-btn layui-btn-normal" data-type="reversechargeoffData">反核销</button>
+        <button class="layui-btn layui-btn-normal" data-type="deriveBrief">导出</button>
+      </div>
+      <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+  </body>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'tms_tab'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+    var $targetName,
+      $confirmStatus;
+
+    setTableData();
+    
+    //监听提交
+    form.on('submit(search)', function(data){
+      $targetName = $.trim(data.field.targetName),
+      $confirmStatus = $.trim(data.field.confirmStatus);
+      setTableData($targetName, $confirmStatus);
+      return false;
+    });
+    
+    //方法级渲染
+    function setTableData($targetName, $confirmStatus){
+      typeof $targetName != 'undefined' ? $targetName = $targetName : $targetName = '';
+      typeof $confirmStatus != 'undefined' ? $confirmStatus = $confirmStatus : $confirmStatus = '';
+      var $pageSize = 15;
+
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/askPrice/askPriceList.shtml?targetName=' + $targetName + '&confirmStatus=' + $confirmStatus,
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'targetName', title: '结算单位', align: 'center', width:105},
+          {field:'targetType', title: '单位类型', align: 'center', width:100,templet:'#targetTypeTpl'},
+          {field:'askPriceType', title: '请款类型', align: 'center', width:100, templet:'#askPriceTypeTpl'},
+          {field:'askCost', title: '请款金额', align: 'center', width:120},
+          {field:'handledCost', title: '已付金额', align: 'center', width:120},
+          {field:'unpaidCost', title: '未付金额', align: 'center', width:120, templet:'#unpaidCostTpl'},
+          {field:'asker', title: '请款人', align: 'center', width:150},
+          {field:'askPriceDate', title: '请款日期', align: 'center', width:120, templet:"#askPriceDateTpl"},
+          {field:'auditor', title: '审核人', align: 'center', width:120},
+          {field:'auditDate', title: '审核日期', align: 'center', width:120, templet:"#auditDateTpl"},
+          {field:'auditStatus', title: '审核状态', align: 'center', width:120, templet:"#auditStatusTpl"},
+          {field:'confirmStatus', title: '核销状态', align: 'center', width:120, templet:"#confirmStatusTpl"}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){}
+      });
+    }
+
+    var active = {
+      //查看明细
+      examineData: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能查看一条数据！');
+        }else{
+          if(data[0].askPriceType == 1){
+            tmsTab.add($(this), '请款单明细-运单(' + data[0].id + ')', 'examineWaybill.html?id=' + data[0].id + '&auditStatus=' + data[0].auditStatus);
+          }else{
+            tmsTab.add($(this), '请款单明细-账单(' + data[0].id + ')', 'examineBill.html?id=' + data[0].id + '&auditStatus=' + data[0].auditStatus);
+          }
+        }
+      },
+      //申请
+      applyData: function(){
+        tmsTab.add($(this), '申请账单付款', 'apply.html');
+      },
+      //审核
+      auditData : function(){ //获取选中数据
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能审核一条数据！');
+        }else if(data[0].auditStatus != 0){
+          parent.layer.alert('你所选择的请款单，当前不需要审核！');
+        }else{
+          if(data[0].askPriceType == 1){
+            tmsTab.add($(this), '请款单审核-运单(' + data[0].id + ')', 'audit.html?id=' + data[0].id + '&askPriceType=1');
+          }else{
+            tmsTab.add($(this), '请款单审核-账单(' + data[0].id + ')', 'audit.html?id=' + data[0].id + '&askPriceType=2');
+          }
+        }
+      },
+      //核销
+      chargeoffData: function(){ //获取选中数据
+        sessionStorage.setItem("collectionRecordId", '');
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else if(data[0].auditStatus != 1){
+          parent.layer.alert('你所选择的请款单，没有审核通过，无法核销！');
+        }else{
+          if(data[0].askPriceType == 1){
+            tmsTab.add($(this), '核销费用-运单(' + data[0].id + ')', 'chargeoff.html?id=' + data[0].id + '&askPriceType=1');
+          }else{
+            tmsTab.add($(this), '核销费用-账单(' + data[0].id + ')', 'chargeoff.html?id=' + data[0].id + '&askPriceType=2');
+          }
+        }
+      },
+      //反核销
+      reversechargeoffData: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else if(data[0].confirmStatus == 0){
+          parent.layer.alert('你所选择的请款单，暂无核销记录，无法反核！');
+        }else{
+          tmsTab.add($(this), '反核销(' + data[0].id + ')', 'reversechargeoff.html?id=' + data[0].id);
+        }
+      },
+       //导出简要账单
+      deriveBrief: function(){
+        typeof $targetName != 'undefined' ? $targetName = $targetName : $targetName = '';
+        typeof $confirmStatus != 'undefined' ? $confirmStatus = $confirmStatus : $confirmStatus = '';
+        $.ajax({
+          type:'GET', 
+          url:'/ucenter/general/finance/askPrice/askPriceExprot.shtml?targetName='+$targetName+'&confirmStatus='+$confirmStatus+'&fileName="请款管理"',
+          success:function(d){
+              if(d.code == 'ERROR_FINANACE_EXPORT_EXCEL'){
+                parent.layer.alert('没有查询到相关数据！');
+              }else{
+                document.location.href = '/ucenter/general/finance/askPrice/askPriceExprot.shtml?targetName='+$targetName+'&confirmStatus='+$confirmStatus+'&fileName="请款管理"';
+              }
+            },
+          error:function(){
+             parent.layer.alert('操作失败！');
+          }
+        });
+      }
+    };
+  
+    $('.btns-bar .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+  });
+  </script>
+  <script type="text/html" id="askPriceTypeTpl">
+    {{#  if(d.askPriceType == '1'){ }}
+      运单
+    {{#  } else if(d.askPriceType == '2'){ }}
+      账单
+    {{#  } }}
+  </script>
+  <script type="text/html" id="askPriceDateTpl">
+    {{d.askPriceDate != null ? new Date(d.askPriceDate).format("yyyy-MM-dd") : ""}}
+  </script>
+  <script type="text/html" id="auditDateTpl">
+    {{d.auditDate != null ? new Date(d.auditDate).format("yyyy-MM-dd") : ""}}
+  </script>
+  <script type="text/html" id="auditStatusTpl">
+    {{#  if(d.auditStatus == '0'){ }}
+      待审核
+    {{#  } else if(d.auditStatus == '1'){ }}
+      审核通过
+    {{#  } else if(d.auditStatus == '2'){ }}
+      审核不通过
+    {{#  } }}
+  </script>
+  <script type="text/html" id="confirmStatusTpl">
+    {{#  if(d.confirmStatus == '0'){ }}
+      未核销
+    {{#  } else if(d.confirmStatus == '1'){ }}
+      部分核销
+    {{#  } else if(d.confirmStatus == '2'){ }}
+      全部核销
+    {{#  } }}
+  </script>
+  <script type="text/html" id="unpaidCostTpl">
+    {{ (d.askCost - d.handledCost).toFixed(2) }}
+  </script>
+  <script type="text/html" id="targetTypeTpl">
+    {{setUnitAttr(d.targetType)}}
+  </script>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>会计科目 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+      <form class="layui-form layui-form-pane">
+        <!-- <button class="layui-btn layui-btn-danger" onclick="window.location.href='list.html'">全部</button> -->
+        <div class="layui-input-inline">
+          <label class="layui-form-label">科目名称</label>
+          <div class="layui-input-inline">
+            <input type="text" name="courseTitle" placeholder="科目名称" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">一级科目</label>
+          <div class="layui-input-inline">
+            <select name="stairSubject" lay-search="">
+              <option value="" selected="selected">全部</option>
+              <option value="1" >激活</option>
+              <option value="3" >未激活</option>
+            </select>
+          </div>
+        </div>
+        <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+      </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+  </body>
+    <script type="text/html" id="typeTpl">
+      {{#  if(d.type == 1){ }}
+        <p>用户</p>
+      {{#  }else{ }}
+        <p>平台</p>
+      {{#  } }}
+    </script>
+     <script type="text/html" id="hasReceivedTpl">
+      {{#  if(d.hasReceived == true){ }}
+        <p>是</p>
+      {{#  }else{ }}
+        <p>否</p>
+      {{#  } }}
+    </script>
+     <script type="text/html" id="hasHandleTpl">
+      {{#  if(d.hasHandle == true){ }}
+        <p>是</p>
+      {{#  }else{ }}
+        <p>否</p>
+      {{#  } }}
+    </script>
+    <script type="text/html" id="statusTpl">
+      {{#  if(d.status == 1){ }}
+        <p>启用</p>
+      {{#  }else{ }}
+        <p>禁用</p>
+      {{#  } }}
+    </script>
+    <script type="text/html" id="createDateTpl">
+      {{new Date(d.createDate).format("yyyy-MM-dd hh:mm:ss")}}
+    </script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+  <script charset="utf-8" src="./list.js"></script>
+</html>

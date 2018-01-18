@@ -1,0 +1,233 @@
+@charset "utf-8";
+/* CSS Document */
+body {
+    background:url(/view/frame/static/images/login_bg_5.png) 50% 0 #fff no-repeat; 
+    background-size:cover; 
+    min-width:800px;
+}
+
+.panel-login {
+    width:380px; 
+    height:510px; 
+    margin:auto; 
+    position:relative;
+}
+
+.footer {
+    position:relative; 
+    width:100%; 
+    height:160px;
+}
+.footer .footer-body {
+    position:absolute; 
+    left:0; top:0; 
+    width:100%; 
+    height:100%; 
+    z-index:300; 
+    color:#999; 
+    font-size:13px;
+}
+.footer .footer-mask {
+    position:absolute; 
+    left:0; top:0; 
+    width:100%; 
+    height:100%; 
+    z-index:1; 
+    color:#999; 
+    background: #000;
+    opacity:0.6; 
+}
+.body-content {
+    width:770px; 
+    margin:0 auto; 
+    padding:30px 15px;
+}
+.body-content .lefter {
+    float:left; 
+    display:inline-block;
+}
+.body-content .lefter p.txt1 {
+    height:40px; 
+    font-size:18px; 
+    color:#f90; 
+    line-height:normal;
+}
+.body-content .lefter p.txt1 span {
+    display:block; 
+    font-size:12px; 
+    color:#666;
+}
+.body-content .lefter p.txt2 {
+    margin-top:15px; 
+    height:20px; 
+    line-height:20px;
+}
+.body-content .lefter p.txt2 a {
+    margin-right:15px; 
+    font-size:14px; 
+    color:#0382d4;
+}
+.body-content .lefter p.txt2 a:hover {
+    color:#f90;
+}
+.body-content .lefter p.txt3 {
+    margin-top:5px; 
+    height:20px; 
+    line-height:20px; 
+    font-size:12px; 
+    color:#666;
+}
+.body-content .lefter p a {
+    margin-top:5px; 
+    height:20px; 
+    line-height:20px; 
+    font-size:12px; 
+    color:#666;
+}
+.body-content .righter {
+    float: right;
+    display:inline-block;
+}
+.body-content .righter ul li {
+    margin-left:30px; 
+    text-align:center; 
+    float:left;
+}
+.body-content .righter ul li span {
+    display:block; 
+    height:20px; 
+    line-height:30px;
+}
+.login-title {
+    margin-bottom:30px; 
+    height:77px; 
+    text-align:center;
+}
+.login-body .body-title {
+    height: 95px;
+    line-height: 95px;
+    font-size: 18px;
+    font-weight: 300;
+    text-align: center;
+    letter-spacing: 2px;
+    color: #fff;
+}
+.login-body {
+    position: absolute;
+    left: 0;
+    top: 100px;
+    width: 100%;
+    height: 450px;
+    z-index: 300;
+    color: #bbb;
+    font-size: 13px;
+}
+.login-mask {
+    position: absolute;
+    left: 0;
+    top: 100px;
+    width: 100%;
+    height: 450px;
+    z-index: 100;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+    background: #000;
+    border-radius: 2px;
+}
+
+.layui-input-block{
+    margin: 0 20px;
+}
+
+.layui-input-block input{
+    color: #fff;
+    border: rgba(255,255,255,0.3) 1px solid;
+}
+
+.username {
+    background:url(/view/frame/static/images/login_ipt_bg.png) transparent 15px -3px no-repeat; 
+    margin-bottom:5px;
+    padding: 0 10px 0 50px;
+}
+.password {
+    background:url(/view/frame/static/images/login_ipt_bg.png) transparent 15px -49px 
+    no-repeat;
+    padding: 0 10px 0 50px;
+}
+#vcode{
+    background: transparent;
+}
+
+.login-body .active {
+    border:rgba(255,153,0,1) 1px solid !important;
+}
+
+.login-body .vcode-img img {
+    width: 86px;
+    height: 38px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.login-body .vcode-txt a {
+    color: #f90;
+}
+
+.login-body .vcode-txt a:hover {
+    color: #f60;
+}
+
+.login-body .vcode-txt {
+    width: 50px;
+    height: 38px;
+    overflow: hidden;
+    float: left;
+    margin-left: 10px;
+    line-height: 38px;
+}
+
+.layui-form-checkbox[lay-skin="primary"] span{
+    color: #bbb;;
+}
+
+.login-body .check-box {
+    margin-top: -10px;
+    height: 20px;
+    line-height: 20px;
+}
+
+.login-body .error-msg {
+    color: #f00;
+    margin-top: -10px;
+}
+
+.login-body .form-submit {
+    width: 100%;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+}
+
+.login-body .register a {
+    color: #f90;
+}
+
+.login-body .register {
+    height: 40px;
+    line-height: 40px;
+    text-align: right;
+}
+
+.login-body .register a:hover {
+    color:#0382d4;
+}
+
+#vcode-box {
+    display: none;
+}
+
+.layui-form-checkbox[lay-skin=primary] i {
+    background-color: transparent;
+}

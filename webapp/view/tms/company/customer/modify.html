@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>编辑客户 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+    <style>
+        .registeraddTax {
+            display: none;
+        }
+        
+        .continueAdd {
+            display: inline-block
+        }
+    </style>
+</head>
+
+<body>
+    <form class="layui-form" autocomplete="off">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>基本信息</legend>
+        </fieldset>
+
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require" style="position: relative;">
+                        <label class="layui-form-label" style="position: absolute; left: -28px; top: 0"><span id="uscId" style="white-space: nowrap">统一社会信用代码/身份证</span></label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm9">
+                                <div class="margin-right10">
+                                    <input id="idNumberId" type="text" name="usc" class="layui-input" maxlength="18" lay-verify="required" hc-verify="uscOrId">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <select name="bodyType" lay-filter="bodyType">
+                                    <option value="1">企业</option>
+                                    <option value="0">个体</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">客户名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" class="layui-input" maxlength="255" lay-verify="required" hc-verify="companyRegex|companySize" hc-verify_field="客户名称">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">客户简称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="nameShort" class="layui-input" maxlength="20" lay-verify="required" hc-verify="companyRegex|abbreviation" hc-verify_field="客户简称">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm8">
+                    <div class="layui-form-item layui-form-item--require" id="linkDistrict">
+                        <label class="layui-form-label">详细地址</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="linkProvince" lay-filter="linkProvince">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="linkCity" lay-filter="linkCity">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="linkCounty" lay-filter="linkCounty">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div>
+                                    <select name="linkStreet" lay-filter="linkStreet">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="margin-left10">
+                        <input type="hidden" name="linkmanAreaId">
+                        <input type="text" name="linkmanAddress" placeholder="请输入详细地址" class="layui-input" maxlength="255" lay-verify="required">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">客户类型</label>
+                        <div class="layui-input-block">
+                            <select name="roleDcode" lay-verify="required">
+                              <option value="" selected="selected">请选择</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">英文名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="nameEn" class="layui-input" maxlength="255" hc-verify="companyRegex|companySize" hc-verify_field="英文名称">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">网址</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="weburl" placeholder="" class="layui-input" maxlength="500" hc-verify="url">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 业务员信息 -->
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">客户业务员姓名</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="salesmanName" placeholder="" class="layui-input" maxlength="20" hc-verify="userName|nameSize" hc-verify_field="客户业务员姓名">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">业务员手机号码</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="salesmanMobile" placeholder="" class="layui-input" maxlength="20" hc-verify="mobile">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">业务员电话</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="salesmanTel" placeholder="" class="layui-input" maxlength="20" hc-verify="tele">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">业务员微信</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="salesmanWechat" placeholder="" class="layui-input" maxlength="100" hc-verify="wechat">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">业务员QQ</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="salesmanQq" placeholder="" class="layui-input" maxlength="20" hc-verify="qq">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">业务员邮箱</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="salesmanEmail" placeholder="" class="layui-input" maxlength="100" hc-verify="email">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 派单员信息 -->
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">客户派单员姓名</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="dispatchersName" placeholder="" class="layui-input" maxlength="20" hc-verify="userName|nameSize" hc-verify_field="客户派单员姓名">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">派单员手机号码</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="dispatchersMobile" placeholder="" class="layui-input" maxlength="20" hc-verify="mobile">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">派单员电话</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="dispatchersTel" placeholder="" class="layui-input" maxlength="20" hc-verify="tele">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">派单员微信</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="dispatchersWechat" placeholder="" class="layui-input" maxlength="100" hc-verify="wechat">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">派单员QQ</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="dispatchersQq" placeholder="" class="layui-input" maxlength="20" hc-verify="qq">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">派单员邮箱</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="dispatchersEmail" placeholder="" class="layui-input" maxlength="100" hc-verify="email">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 我司人员信息 -->
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">使用公司</label>
+                        <div class="layui-input-block">
+                            <select name="companyUsedId" lay-filter="companyUsedId" id="companyUsedId" lay-verify="companyUsedId" lay-search lay-filter="companyUsedId" lay-search hc-data_url="/ucenter/centre/core/organization/all.shtml">
+                                <option value="" selected>请选择</option>
+                                <option value="" disabled>数据加载中...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">我司业务员</label>
+                        <div class="layui-input-block">
+                            <select name="companySalesmanId" lay-filter="companySalesmanId" id="companySalesmanId" lay-verify="companySalesmanId" lay-search lay-filter="companySalesmanId" lay-search hc-data_url="/ucenter/centre/permi/employee/page.shtml?pageNum=-1">
+                                <option value="" selected>请选择</option>
+                                <option value="" disabled>数据加载中...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">我司操作员</label>
+                        <div class="layui-input-block">
+                            <select name="companyOperateId" lay-filter="companyOperateId" id="companyOperateId" lay-verify="companyOperateId" lay-search lay-filter="companyOperateId" lay-search hc-data_url="/ucenter/centre/permi/employee/page.shtml?pageNum=-1">
+                                <option value="" selected>请选择</option>
+                                <option value="" disabled>数据加载中...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm11">
+                                <select name="status" lay-filter="status" id="status">
+                                    <option value="0" selected>草稿</option>
+                                    <option value="1">启用</option>
+                                </select>
+                            </div>
+                            <div class="layui-col-sm1">
+                                <div class="btns-add" style="line-height: 20px;">
+                                    <a class="layui-icon icon-add show-info" style="font-size: 17px;">&#xe60b;</a>  
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm8">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">备注</label>
+                        <div class="layui-input-block">
+                            <textarea name="remarks" placeholder="0~1000字符之间" class="layui-textarea" style="min-height:50px;" maxlength="1000" hc-verify="remarkSize"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结算信息 -->
+        <fieldset class="layui-elem-field layui-field-title">
+            <legend>结算信息</legend>
+        </fieldset>
+
+        <div class="layui-fluid" style="margin-top:20px;">
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">结算方式</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm5">
+                                <div class="margin-right10">
+                                    <select name="paymentTypeDcode" lay-verify="paymentTypeDcode">
+                                        <option value="" selected="selected">请选择</option>
+                                        <option value="0">现金</option>
+                                        <option value="30">30天</option>
+                                        <option value="45">45天</option>
+                                        <option value="60">60天</option>
+                                        <option value="90">90天</option>
+                                        <option value="120">120天</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm7">
+                                <label class="layui-form-label" style="width:80px; padding-left:0;">回款期限(天)</label>
+                                <div class="layui-input-block" style="margin-left:95px;">
+                                    <input type="text" name="paybackPeriod" class="layui-input" maxlength="5" hc-verify="range|positiveIntegers" hc-verify_field="回款期限" hc-verify_min="0" hc-verify_max="366">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">税点(%)</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <input type="text" name="taxRate" class="layui-input" maxlength="5" hc-verify="range|decimals2" hc-verify_min="0" hc-verify_max="100" hc-verify_field="返公司折扣">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm9">
+                                <label class="layui-form-label" style="width:105px; padding-left:0;">欠款金额上限(元)</label>
+                                <div class="layui-input-block" style="margin-left:120px;">
+                                    <input type="text" name="debtLimit" class="layui-input" maxlength="12" hc-verify="expenst" hc-verify_field="欠款金额上限">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">欠款通知邮箱</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="debtEmail" class="layui-input" maxlength="100" hc-verify="email">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">是否开票</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="hasInvoice" lay-verify="hasInvoice">
+                                        <option value="1" selected="selected">是</option>
+                                        <option value="0">否</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm9">
+                                <label class="layui-form-label" style="width:65px; padding-left:0;">发票类型</label>
+                                <div class="layui-input-block" style="margin-left:80px;">
+                                    <select name="invoiceType" lay-verify="invoiceType" lay-filter="addTax">
+                                        <option value="1" selected="selected">增值税普票</option>
+                                        <option value="2">增值税专票</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">单位名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="invoiceTitle" class="layui-input" maxlength="50" hc-verify="companyRegex|companySize" hc-verify_field="单位名称">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">纳税人识别码</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="taxId" class="layui-input" maxlength="18" hc-verify="ein">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row registeraddTax">
+                <div class="layui-col-sm8">
+                    <div class="layui-form-item" id="regDistrict">
+                        <label class="layui-form-label">注册地址</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="invoiceProvince" lay-filter="invoiceProvince">
+                                            <option value="">请选择</option>
+                                        </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="invoiceCity" lay-filter="invoiceCity">
+                                            <option value="">请选择</option>
+                                        </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="invoiceCounty" lay-filter="invoiceCounty">
+                                            <option value="">请选择</option>
+                                        </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div>
+                                    <select name="invoiceStreet" lay-filter="invoiceStreet">
+                                            <option value="">请选择</option>
+                                        </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="margin-left10">
+                        <input type="hidden" name="regAreaId">
+                        <input type="text" name="regAddress" placeholder="详细地址" class="layui-input" maxlength="255">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row registeraddTax">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">注册电话</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="regTel" placeholder="" class="layui-input" maxlength="20" hc-verify="tele">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">开户银行</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="bankName" placeholder="" class="layui-input" maxlength="200" hc-verify="bankName">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">银行账户</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="bankNo" placeholder="" class="layui-input" maxlength="30" hc-verify="bankNo">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">收票人及手机</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <div class="margin-right10">
+                                    <input type="text" name="invoiceConsigneeUname" placeholder="收票人姓名" class="layui-input" maxlength="20" hc-verify="userName" hc-verify_field="收票人姓名">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="invoiceConsigneePhone" placeholder="收票人手机" class="layui-input" maxlength="20" hc-verify="mobile">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm8">
+                    <div class="layui-col-sm8">
+                        <div class="layui-form-item" id="juryDistrict">
+                            <label class="layui-form-label">收票人地址</label>
+                            <div class="layui-input-block">
+                                <div class="layui-col-sm3">
+                                    <div class="margin-right10">
+                                        <select name="juryProvince" lay-filter="juryProvince">
+                                            <option value="">请选择</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-col-sm3">
+                                    <div class="margin-right10">
+                                        <select name="juryCity" lay-filter="juryCity">
+                                            <option value="">请选择</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-col-sm3">
+                                    <div class="margin-right10">
+                                        <select name="juryCounty" lay-filter="juryCounty">
+                                            <option value="">请选择</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-col-sm3">
+                                    <div>
+                                        <select name="juryStreet" lay-filter="juryStreet">
+                                            <option value="">请选择</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm4">
+                        <div class="margin-left10">
+                            <input type="hidden" name="invoiceConsigneeAreaId">
+                            <input type="text" name="invoiceConsigneeAddress" placeholder="收票人详细地址" class="layui-input" maxlength="255">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 结算信息财务人信息 -->
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">财务姓名</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="financeName" placeholder="" class="layui-input" maxlength="20" hc-verify="userName|nameSize" hc-verify_field="财务姓名">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">财务手机号码</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="financeMobile" placeholder="" class="layui-input" maxlength="20" hc-verify="mobile">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">财务电话</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="financeTel" placeholder="" class="layui-input" maxlength="20" hc-verify="tele">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">财务微信</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="financeWechat" placeholder="" class="layui-input" maxlength="100" hc-verify="wechat">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">财务QQ</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="financeQq" placeholder="" class="layui-input" maxlength="20" hc-verify="qq">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">财务邮箱</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="financeEmail" placeholder="" class="layui-input" maxlength="100" hc-verify="email">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 装卸地址 -->
+        <fieldset class="layui-elem-field layui-field-title">
+            <legend>
+                装卸地址
+                <span class="legend-btns">
+                    <a class="layui-icon icon-add tableHS" data-type="handingSiteAdd" data-func="callback(obj)">&#xe61f;</a>
+                </span>
+            </legend>
+        </fieldset>
+        <table id="tableList" lay-filter="testHS"></table>
+
+        <!-- 报关行 -->
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top:20px;">
+            <legend>
+                报关行<span style="visibility: hidden">行</span>
+                <span class="legend-btns">
+                  <a class="layui-icon icon-add tableCB" data-type="customsBrokerAdd" data-func="callbackCB(obj)">&#xe61f;</a>
+                </span>
+            </legend>
+        </fieldset>
+        <table id="tableListCB" lay-filter="testCB"></table>
+
+        <!-- 第三方平台账号 -->
+        <!-- <fieldset class="layui-elem-field layui-field-title" style="margin-top:20px;">
+            <legend>
+                第三方平台账号
+                <span class="legend-btns">
+                  <a class="layui-icon icon-add tableTP" data-type="thirdPartyBoardAdd" data-func="callbackTP(obj)">&#xe61f;</a>
+                </span>
+            </legend>
+        </fieldset>
+        <table id="tableListTP" lay-filter="testTP"></table> -->
+
+        <!-- 保存按钮 -->
+        <div id="buttonBar" class="layui-form-item button-bar">
+            <div class="continueAdd"><input id="continue" name="continueAdd" type="checkbox" title="保存后继续新增" lay-skin="primary"></div>
+            <button type="button" class="layui-btn layui-btn-normal" id="vsubmit" lay-submit lay-filter="submit">保存</button>
+            <button type="button" class="layui-btn layui-btn-primary" id="vcancel">取消</button>
+        </div>
+
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/layui.district_1.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<!-- 工具库依赖 -->
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+<!-- 下拉select -->
+<!-- <script charset="utf-8" src="./js/transportOrder.js"></script> -->
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+</script>
+<script type="text/html" id="statusTpl">
+    {{# if(d.hasDefault == 1){ }}
+    <a lay-event="statusCancel" style="color:#1E9FFF;">是</a> {{# }else{ }}
+    <a lay-event="statusStart" style="color:#FF5722;">否</a> {{# } }}
+</script>
+<script>
+    layui.use(['form', 'layer', 'layedit', 'laydate', 'table'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            layedit = layui.layedit,
+            laydate = layui.laydate,
+            tmsTab = layui.tms_tab,
+            table = layui.table,
+            $ = layui.jquery;
+
+        var $type = $.trim(getUrlParam('do'));
+        var $idS = $.trim(getUrlParam('id'));
+        var uscIs = true;
+        // bizUtil.init.initSelectData();
+        bizUtil.layui.loadDataToSelect('#companyUsedId');
+        bizUtil.layui.loadDataToSelect('#companySalesmanId');
+        bizUtil.layui.loadDataToSelect('#companyOperateId');
+
+        laydate.render({
+            elem: '#birthday'
+        });
+        laydate.render({
+            elem: '#positionDate'
+        });
+
+        if ($type == 'add') {
+            $('#linkDistrict').district(form);
+            $('#regDistrict').district(form);
+            $('#juryDistrict').district(form);
+        }
+
+        //鼠标hover 显示状态提示信息
+        $('.show-info').hover(function (ev) {
+            var title = '注：草稿状态，客户任何信息都能编辑，包括统一社会代码或身份证；但不能给草稿状态的客户下单。' + 
+            '启用状态，统一社会代码／身份证不能编辑，其他信息可编辑，只有启用状态的客户，才能帮他们下单。'
+            var left = event.pageX , top = event.pageY;
+            var showEle = $('<div></div>', {text:title, class:'showTitleBox'}).css({
+                position: 'absolute',
+                top: top + 25,
+                left: left + 10,
+                border: '1px solid #CCC',
+                borderRadius: '2px',
+                background: "#F8F8F8",
+                padding: '5px'
+            })
+            showEle.appendTo($('form'));  
+
+        },function () {
+            $('.showTitleBox').remove();
+        });
+
+        //初始化客户类型
+        $('select[name="roleDcode"]').append(getSupplierCustomerList(2));
+        form.render('select');
+
+        //监听新增客户时  主体属性
+        form.on('select(bodyType)', function(data) {
+            if (data.value == 0) {
+                //为个人时默认选中车主
+                $('select[name="roleDcode"]').val('553');
+                
+            } else {
+                $('select[name="roleDcode"]').val('');
+
+            }
+            form.render('select');
+
+        });
+
+        form.on('select(addTax)', function(data) {
+            if (data.value == 2) {
+                $('.registeraddTax').show();
+                // $('.registeraddTax').('display','none')
+            } else if (data.value == 1) {
+                $('.registeraddTax').hide();
+            }
+        })
+        var addressDelIdArr = [],
+            brokerDelIdArr = [],
+            thirdDelIdArr = [];
+
+        if ($type == 'add') {
+            //添加装卸单位
+            var customersAddressArr = [],
+                customersBroker = [],
+                customersThird = [];
+        }
+        var tableActive = {
+            //添加装卸单位列表
+            setHandSiteTableData: function(data, $type) {
+                if ($type == 'detail') {
+                    table.render({
+                        data: data,
+                        elem: '#tableList',
+                        page: true,
+                        limit: 5,
+                        limits: [5, 10, 25, 50],
+                        id: 'dataReload',
+                        cols: [
+                            [{
+                                field: 'coNameShort',
+                                title: '装卸货地简称',
+                                width: 150
+                            }, {
+                                field: 'address',
+                                title: '装卸地址',
+                                width: 280
+                            }, {
+                                field: 'uname',
+                                title: '联系人',
+                                width: 110,
+                                align: 'center'
+                            }, {
+                                field: 'mobile',
+                                title: '联系方式',
+                                width: 133,
+                                align: 'center'
+                            }, {
+                                field: 'tel',
+                                title: '电话',
+                                width: 170,
+                                align: 'center'
+                            }, {
+                                field: 'notes',
+                                title: '注意事项',
+                                width: 350
+                            }]
+                        ],
+                    })
+                } else {
+                    table.render({
+                        data: data,
+                        elem: '#tableList',
+                        page: true,
+                        limit: 5,
+                        limits: [5, 10, 25, 50],
+                        id: 'dataReload',
+                        cols: [
+                            [{
+                                field: 'coNameShort',
+                                title: '装卸货地简称',
+                                width: 150
+                            }, {
+                                field: 'address',
+                                title: '装卸地址',
+                                width: 250
+                            }, {
+                                field: 'uname',
+                                title: '联系人',
+                                width: 100,
+                                align: 'center'
+                            }, {
+                                field: 'mobile',
+                                title: '联系方式',
+                                width: 122,
+                                align: 'center'
+                            }, {
+                                field: 'tel',
+                                title: '电话',
+                                width: 150,
+                                align: 'center'
+                            }, {
+                                field: 'notes',
+                                title: '注意事项',
+                                width: 300
+                            }, {
+                                title: '操作',
+                                toolbar: '#bar',
+                                width: 120,
+                                align: 'center'
+                            }]
+                        ],
+                    })
+                }
+            },
+            //添加报关行列表
+            setCustomsBrokerTableData: function(data, $type) {
+                if ($type == 'detail') {
+                    table.render({
+                        data: data,
+                        elem: '#tableListCB',
+                        page: true,
+                        limit: 5,
+                        limits: [5, 10, 25, 50],
+                        id: 'dataReloadCB',
+                        cols: [
+                            [{
+                                field: 'coName',
+                                title: '报关行名称',
+                                width: 204
+                            }, {
+                                field: 'uname',
+                                title: '报关员姓名',
+                                width: 120,
+                                align: 'center'
+                            }, {
+                                field: 'tel',
+                                title: '联系方式',
+                                width: 150,
+                                align: 'center'
+                            }, {
+                                field: 'address',
+                                title: '联系地址',
+                                width: 570
+                            }, {
+                                field: 'hasDefault',
+                                title: '是否默认',
+                                width: 150,
+                                templet: '#statusTpl',
+                                align: 'center'
+                            }, ]
+                        ],
+                    })
+                } else {
+                    table.render({
+                        data: data,
+                        elem: '#tableListCB',
+                        page: true,
+                        limit: 5,
+                        limits: [5, 10, 25, 50],
+                        id: 'dataReloadCB',
+                        cols: [
+                            [{
+                                field: 'coName',
+                                title: '报关行名称',
+                                width: 203
+                            }, {
+                                field: 'uname',
+                                title: '报关员姓名',
+                                width: 100,
+                                align: 'center'
+                            }, {
+                                field: 'tel',
+                                title: '联系方式',
+                                width: 150,
+                                align: 'center'
+                            }, {
+                                field: 'address',
+                                title: '联系地址',
+                                width: 470
+                            }, {
+                                field: 'hasDefault',
+                                title: '是否默认',
+                                width: 150,
+                                templet: '#statusTpl',
+                                align: 'center'
+                            }, {
+                                title: '操作',
+                                toolbar: '#bar',
+                                width: 120,
+                                align: 'center'
+                            }]
+                        ],
+                    })
+                }
+
+            },
+            //添加第三方列表
+            setThirdPartyTableData: function(data, $type) {
+                if ($type == 'detail') {
+                    table.render({
+                        data: data,
+                        elem: '#tableListTP',
+                        page: true,
+                        limit: 5,
+                        limits: [5, 10, 25, 50],
+                        id: 'dataReloadTP',
+                        cols: [
+                            [{
+                                field: 'businessType',
+                                title: '业务类型',
+                                width: 150,
+                                align: 'center'
+                            }, {
+                                field: 'platformDcode',
+                                title: '平台名称',
+                                width: 160,
+                                align: 'center'
+                            }, {
+                                field: 'weburl',
+                                title: '平台链接',
+                                width: 282
+                            }, {
+                                field: 'operateType',
+                                title: '操作类型',
+                                width: 150,
+                                align: 'center'
+                            }, {
+                                field: 'loginAccid',
+                                title: '登录账号',
+                                width: 150,
+                                align: 'center'
+                            }, {
+                                field: 'payDcode',
+                                title: '支付方式',
+                                width: 150,
+                                align: 'center'
+                            }, {
+                                field: 'payAccid',
+                                title: '支付账号',
+                                width: 150,
+                                align: 'center'
+                            }]
+                        ],
+                    })
+                } else {
+                    table.render({
+                        data: data,
+                        elem: '#tableListTP',
+                        page: true,
+                        limit: 5,
+                        limits: [5, 10, 25, 50],
+                        id: 'dataReloadTP',
+                        cols: [
+                            [{
+                                field: 'businessType',
+                                title: '业务类型',
+                                width: 120,
+                                align: 'center'
+                            }, {
+                                field: 'platformDcode',
+                                title: '平台名称',
+                                width: 150,
+                                align: 'center'
+                            }, {
+                                field: 'weburl',
+                                title: '平台链接',
+                                width: 251
+                            }, {
+                                field: 'operateType',
+                                title: '操作类型',
+                                width: 150,
+                                align: 'center'
+                            }, {
+                                field: 'loginAccid',
+                                title: '登录账号',
+                                width: 150,
+                                align: 'center'
+                            }, {
+                                field: 'payDcode',
+                                title: '支付方式',
+                                width: 100,
+                                align: 'center'
+                            }, {
+                                field: 'payAccid',
+                                title: '支付账号',
+                                width: 150,
+                                align: 'center'
+                            }, {
+                                align: 'center',
+                                title: '操作',
+                                toolbar: '#bar',
+                                width: 120
+                            }]
+                        ],
+                    })
+                }
+
+            },
+            //清除一个数组的根据根据Id一组子对象arr为数组,id为指定id的值,$id为对象指定id的key
+            $clearOneArrEle: function(arr, id) {
+                for (var i = arr.length - 1; i >= 0; i--) {
+                    if (arr[i].$id == id)
+                        arr.splice(i, 1);
+                }
+            },
+            //['60085','60084'] [] 60084
+            clearOneArrEle: function(arr, arr2, id) {
+                for (var i = arr.length - 1; i >= 0; i--) {
+                    if (arr[i].id == id) {
+                        arr2.push(arr[i].id)
+                        arr.splice(i, 1);
+                    }
+                }
+            }
+        }
+
+
+
+        if ($type == 'add') {
+            //初始化统一信用代码，焦点事件失去时，通过统一信用代码获取公司详情
+            $('input[name="usc"]').on('blur', function() {
+                var $usc = $.trim($(this).val());
+                var $uscType = $(this).attr('lay-verify');
+                var $uscName = $uscType == 'usc' ? '企业' : '个人';
+                uscIs = true;
+                if ($usc.length == 18 && HCValidator.verifyValue('uscOrId', $(this).val()).isValidated) {
+                    //获取企业/个人详情   
+
+                    var $companyDetail = getCompanyByUsc($usc);
+                    if ($companyDetail != null) {
+                        $('select[name="bodyType"]').val($companyDetail.type);
+                        $('input[name="name"]').val($companyDetail.coName);
+                        $('input[name="nameShort"]').val($companyDetail.coNameShort);
+                        form.render('select');
+                    }
+                    var $verifyCompany = verifyCompanyByUsc($usc);
+                    if (typeof $verifyCompany == 'string') {
+                        HCValidator.showTips($('input[name=usc]'), $verifyCompany);
+                        uscIs = false;
+                    }
+                }
+            });
+        } else if($type == 'detail'){
+            $('select[name=status]').append('<option value="3">停用</option>');
+            $('.icon-add').parent().siblings('span').remove();
+            form.render('select');          
+              
+        }else{
+
+        }
+
+        var $isAccid = false; //判断修改时是否添加登录账号
+        if ($type == 'edit' || $type == 'detail') {
+            var $id = $.trim(getUrlParam('id'));
+            if ($id != null && $id.length != 0) {
+                $('input[name="id"]').val($id);
+                $('.continueAdd').hide();
+                $('input[name=continueAdd]').attr('checked', false);
+                if ($type == 'detail') {
+                    $('form input, form textarea').prop('disabled', true).css({
+                        'background': '#eee'
+                    });
+                    $('form select').prop('disabled', true);
+                    $('a[data-func^="callback"]').hide();
+                    $('#buttonBar').hide();
+                    $('.legend-btns').hide();
+                }
+
+                //获取数据
+                $.get('/ucenter/crm/customers/customers/getDetail.shtml?customerId=' + $id, function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code === 'SUCCESS') {
+                        //如果状态为启用 则统一社会信用代码和状态都不可更改
+                        if($objects.status == 1){
+                            $('input[name="usc"]').prop('disabled', true).css({'background': '#eee'});
+
+                            $('select[name="status"]').prop('disabled', true).css({'background': '#eee'});
+
+                            $('select[name="bodyType"]').prop('disabled', true);
+                        }
+
+                        $('select[name=status]').val($objects.status);        
+                        $('input[name=usc]').val($objects.usc);
+                        $('select[name=bodyType]').val($objects.bodyType); 
+                        $('input[name=nameShort]').val($objects.nameShort);
+                        $('input[name=name]').val($objects.name);
+                        $('input[name=nameEn]').val($objects.nameEn);
+                        $('input[name=weburl]').val($objects.weburl);
+                        $('select[name=roleDcode]').val($objects.roleDcode);
+                        $objects.linkmanAreaId != null ? $('input[name="linkmanAreaId"]').val($objects.linkmanAreaId) : '';
+                        $objects.linkmanAreaId != null ? (
+                            $type == 'detail' ? $('#linkDistrict').district(form, $objects.linkmanAreaId, 0) : $('#linkDistrict').district(form, $objects.linkmanAreaId)
+                        ) : $('#linkDistrict').district(form);
+                        $('input[name=linkmanAddress]').val($objects.linkmanAddress);
+                        $('input[name=salesmanName]').val($objects.salesmanName);
+                        $('input[name=salesmanMobile]').val($objects.salesmanMobile);
+                        $('input[name=salesmanTel]').val($objects.salesmanTel);
+                        $('input[name=salesmanWechat]').val($objects.salesmanWechat);
+                        $('input[name=salesmanQq]').val($objects.salesmanQq);
+                        $('input[name=salesmanEmail]').val($objects.salesmanEmail);
+                        $('input[name=dispatchersName]').val($objects.dispatchersName);
+                        $('input[name=dispatchersMobile]').val($objects.dispatchersMobile);
+                        $('input[name=dispatchersTel]').val($objects.dispatchersTel);
+                        $('input[name=dispatchersWechat]').val($objects.dispatchersWechat);
+                        $('input[name=dispatchersQq]').val($objects.dispatchersQq);
+                        $('input[name=dispatchersEmail]').val($objects.dispatchersEmail);
+                        //我司人员
+
+                        // $objects.companySalesmanId != null ? $('select[name=companySalesmanId]').val($objects.companySalesmanId) : '';
+                        // $objects.companyOperateId != null ? $('select[name=companyOperateId]').val($objects.companyOperateId) : '';
+                        // $objects.companyUsedId != null ? $('select[name=companyUsedId]').val($objects.companyUsedId) : '';
+                        $.when($('#companyUsedId').data('ajaxDeferred')).done(function() {
+                            $('#companyUsedId').val($objects.companyUsedId)
+                            form.render('select', 'companyUsedId');
+                        })
+                        $.when($('#companyOperateId').data('ajaxDeferred')).done(function() {
+                            $('#companyOperateId').val($objects.companyOperateId)
+                            form.render('select', 'companyOperateId');
+                        })
+                        $.when($('#companySalesmanId').data('ajaxDeferred')).done(function() {
+                            $('#companySalesmanId').val($objects.companySalesmanId)
+                            form.render('select', 'companySalesmanId');
+                        })
+                        $('textarea[name=remarks]').val($objects.remarks);
+                        customersAddressArr = $objects.customersAddress;
+                        customersBroker = $objects.customersBroker;
+                        customersThird = $objects.customersThird;
+                        //结算信息
+                        $objects.customersSettlement != null ? $objects.customersSettlement = $objects.customersSettlement : $objects.customersSettlement = [];
+                        var $customersSettlement = $objects.customersSettlement;
+                        if ($customersSettlement.invoiceType == 2) {
+                            $('.registeraddTax').show();
+                        }
+                        $customersSettlement.debtLimit != null ? $('input[name=debtLimit]').val($customersSettlement.debtLimit) : '';
+                        $customersSettlement.paymentTypeDcode != null ? $('select[name=paymentTypeDcode]').val($customersSettlement.paymentTypeDcode) : '';
+                        $customersSettlement.hasInvoice != null ? $('select[name=hasInvoice]').val($customersSettlement.hasInvoice) : '';
+                        $customersSettlement.invoiceType != null ? $('select[name=invoiceType]').val($customersSettlement.invoiceType) : '';
+                        $customersSettlement.debtEmail != null ? $('input[name=debtEmail]').val($customersSettlement.debtEmail) : '';
+                        $customersSettlement.paybackPeriod != null ? $('input[name=paybackPeriod]').val($customersSettlement.paybackPeriod) : '';
+
+                        $customersSettlement.taxRate != null ? $('input[name=taxRate]').val($customersSettlement.taxRate) : '';
+                        $customersSettlement.invoiceTitle != null ? $('input[name=invoiceTitle]').val($customersSettlement.invoiceTitle) : '';
+                        $customersSettlement.invoiceConsigneeUname != null ? $('input[name=invoiceConsigneeUname]').val($customersSettlement.invoiceConsigneeUname) : '';
+                        $customersSettlement.invoiceConsigneePhone != null ? $('input[name=invoiceConsigneePhone]').val($customersSettlement.invoiceConsigneePhone) : '';
+                        $customersSettlement.taxId != null ? $('input[name=taxId]').val($customersSettlement.taxId) : '';
+                        $customersSettlement.invoiceConsigneeAreaId != null ? $('input[name="invoiceConsigneeAreaId"]').val($customersSettlement.invoiceConsigneeAreaId) : '';
+                        $customersSettlement.invoiceConsigneeAreaId != null ? (
+                            $type == 'detail' ? $('#juryDistrict').district(form, $customersSettlement.invoiceConsigneeAreaId, 0) : $('#juryDistrict').district(form, $customersSettlement.invoiceConsigneeAreaId)
+                        ) : $('#juryDistrict').district(form);
+                        $customersSettlement.regAreaId != null ? $('input[name="regAreaId"]').val($customersSettlement.regAreaId) : '';
+                        $customersSettlement.regAreaId != null ? (
+                            $type == 'detail' ? $('#regDistrict').district(form, $customersSettlement.regAreaId, 0) : $('#regDistrict').district(form, $customersSettlement.regAreaId)
+                        ) : $('#regDistrict').district(form);
+                        $customersSettlement.invoiceConsigneeAddress != null ? $('input[name=invoiceConsigneeAddress]').val($customersSettlement.invoiceConsigneeAddress) : '';
+                        $customersSettlement.regAddress != null ? $('input[name=regAddress]').val($customersSettlement.regAddress) : '';
+                        $customersSettlement.regTel != null ? $('input[name=regTel]').val($customersSettlement.regTel) : '';
+                        $customersSettlement.bankName != null ? $('input[name=bankName]').val($customersSettlement.bankName) : '';
+                        $customersSettlement.bankNo != null ? $('input[name=bankNo]').val($customersSettlement.bankNo) : '';
+                        $customersSettlement.financeName != null ? $('input[name=financeName]').val($customersSettlement.financeName) : '';
+                        $customersSettlement.financeMobile != null ? $('input[name=financeMobile]').val($customersSettlement.financeMobile) : '';
+                        $customersSettlement.financeTel != null ? $('input[name=financeTel]').val($customersSettlement.financeTel) : '';
+                        $customersSettlement.financeWechat != null ? $('input[name=financeWechat]').val($customersSettlement.financeWechat) : '';
+                        $customersSettlement.financeQq != null ? $('input[name=financeQq]').val($customersSettlement.financeQq) : '';
+                        $customersSettlement.financeEmail != null ? $('input[name=financeEmail]').val($customersSettlement.financeEmail) : '';
+
+                        // var addressDelIdArr = [],
+                        //     brokerDelIdArr = [],
+                        //     thirdDelIdArr = [];
+                        toolFunc('testHS', 'handingSiteTpl.html', '.tableHS', customersAddressArr, addressDelIdArr, 'addressAreaId');
+                        toolFunc('testCB', 'customsBrokerTpl.html', '.tableCB', customersBroker, brokerDelIdArr, 'areaId');
+                        toolFunc('testTP', 'thirdPartyTpl.html', '.tableTP', customersThird, thirdDelIdArr);
+                        tableActive.setHandSiteTableData(customersAddressArr, $type)
+                        tableActive.setThirdPartyTableData(customersThird, $type);
+                        tableActive.setCustomsBrokerTableData(customersBroker, $type);
+                        form.render('select');
+                        form.render('checkbox');
+                    } else {
+                        parent.layer.alert('数据异常');
+                        return false;
+                    }
+                }, 'json');
+            } else {
+                parent.layer.alert('请不要使用非法参数！', {
+                    yes: function() {
+                        parent.layer.closeAll();
+                    }
+                });
+            }
+        }
+        //监听工具条
+        // toolFunc('testHS', 'handingSiteTpl.html', '.tableHS', customersAddressArr, addressDelIdArr, 'addressAreaId');
+        // toolFunc('testCB', 'customsBrokerTpl.html', '.tableCB', customersBroker, brokerDelIdArr, 'areaId');
+        // toolFunc('testTP', 'thirdPartyTpl.html', '.tableTP', customersThird, thirdDelIdArr);
+
+        //封装监听工具条
+        //test是table原始容器的属性 lay-filter="对应的值",ele为数据返回的回调函数的唯一选择器,arr为存储数据的数组 addressId为地址ID
+        // .tableHS   customersAddressArr
+        function toolFunc(test, url, ele, arr, arr2, addressId) {
+            table.on('tool(' + test + ')', function(obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+                var data = obj.data; //获得当前行数据
+                var layEvent = obj.event; //获得 lay-event 对应的值
+                var tr = obj.tr; //获得当前行 tr 的DOM对象
+                data.$id != null ? data.$id = data.$id : data.$id = (new Date()).getTime();
+                var titleTxt = '',
+                    popArea = [];
+                if (test == 'testHS') {
+                    titleTxt = '装卸单位';
+                    popArea = ['900px', '620px'];
+                } else if (test == 'testCB') {
+                    titleTxt = '报关行';
+                    popArea = ['900px', '620px'];
+                } else if (test == 'testTP') {
+                    titleTxt = '第三方账号';
+                    popArea = ['900px', '450px'];
+                }
+
+                addressId != null ? data.$addressId = data[addressId] : data.$addressId = '';
+                if (layEvent === 'edit') { //编辑
+                    parent.layer.open({
+                        type: 2,
+                        title: '编辑' + titleTxt,
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: popArea,
+                        content: './addEdit/' + url + '?do=edit&id=' + data.$id + '&addressId=' + data.$addressId + '&whether=' + data.hasDefault + '&onlyId=aa',
+                        success: function(layero, index) {
+                            data['conAdd'] = '';
+                            for (var key in data) {
+                                data[key] != null ? data[key] : '';
+                            }
+                            var inputLists = $(layero.find('iframe')[0].contentWindow.document).find('input')
+                            var textareaS = $(layero.find('iframe')[0].contentWindow.document).find('textarea')
+                            for (var j = 0; j < inputLists.length; j++) {
+                                $(inputLists[j]).val(data[inputLists[j]['name']]);
+                            }
+                            for (var k = 0; k < textareaS.length; k++) {
+                                $(textareaS[k]).val(data[textareaS[k]['name']]);
+                            }
+                        },
+                        btn: ['确定', '关闭'],
+                        yes: function(index, layero) {
+                            $(layero.find('iframe')[0].contentWindow.document).find('#vsubmit').click();
+                            var cllBack = $(ele).attr('data-func')
+                            var Fun = eval(cllBack);
+                            var objs = Fun;
+                            objs.id = data.id;
+                            obj.update(objs);
+                        }
+                    });
+                } else if (layEvent === 'del') {
+                    parent.layer.confirm('真的删除这条信息吗？', function(index) {
+                        obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                        // debugger;
+                        if (data.id) {
+                            tableActive.clearOneArrEle(arr, arr2, data.id)
+                        } else {
+                            tableActive.$clearOneArrEle(arr, data.$id)
+                        }
+                        parent.layer.close(index);
+                    });
+                }
+            });
+        }
+
+        function callback(obj) {
+            if (obj == undefined || obj == null) return
+            if (obj.$id || obj.id) {
+                parent.layer.closeAll();
+                $('.tableHS').attr('data-func', 'callback()');
+                return obj
+            }
+            obj.$id = (new Date()).getTime();
+            customersAddressArr.unshift(obj);
+            tableActive.setHandSiteTableData(customersAddressArr);
+            $('.tableHS').attr('data-func', 'callback()');
+            if (obj.conAdd != 1) {
+                parent.layer.closeAll();
+            }
+        };
+
+        function callbackCB(obj) {
+            if (obj == undefined || obj == null) return
+            if (obj.$id || obj.id) {
+                parent.layer.closeAll();
+                $('.tableCB').attr('data-func', 'callbackCB()');
+                return obj
+            }
+            obj.$id = (new Date()).getTime();
+            customersBroker.unshift(obj);
+            tableActive.setCustomsBrokerTableData(customersBroker);
+            $('.tableCB').attr('data-func', 'callbackCB()');
+            if (obj.conAdd != 1) {
+                parent.layer.closeAll();
+            }
+        }
+
+        function callbackTP(obj) {
+            if (obj == undefined || obj == null) return
+            if (obj.$id || obj.id) {
+                parent.layer.closeAll();
+                $('.tableTP').attr('data-func', 'callbackTP()');
+                return obj
+            }
+            obj.$id = (new Date()).getTime();
+            customersThird.unshift(obj);
+            tableActive.setThirdPartyTableData(customersThird);
+            $('.tableTP').attr('data-func', 'callbackTP()');
+            if (obj.conAdd != 1) {
+                parent.layer.closeAll();
+            }
+        }
+        var active = {
+            //新增装卸单位
+            handingSiteAdd: function() {
+                parent.layer.open({
+                    type: 2,
+                    title: '添加装卸单位',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['900px', '620px'],
+                    content: './addEdit/handingSiteTpl.html?do=add',
+                    success: function(layero, index) {
+                        form.render();
+                    },
+                    btn: ['确定', '关闭'],
+                    yes: function(index, layero) {
+                        $(layero.find('iframe')[0].contentWindow.document).find('#vsubmit').click();
+                        var cllBack = $('.tableHS').attr('data-func')
+                        var Fun = eval(cllBack);
+                        Fun;
+                    }
+                });
+            },
+            //新增报关行
+            customsBrokerAdd: function() {
+                parent.layer.open({
+                    type: 2,
+                    title: '添加报关行',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['900px', '600px'],
+                    content: './addEdit/customsBrokerTpl.html?do=add',
+                    success: function(layero, index) {
+                        form.render();
+                    },
+                    btn: ['确定', '关闭'],
+                    yes: function(index, layero) {
+                        $(layero.find('iframe')[0].contentWindow.document).find('#vsubmit').click();
+                        var cllBack = $('.tableCB').attr('data-func');
+                        var Fun = eval(cllBack);
+                        Fun;
+                    }
+                });
+            },
+            //新增第三方平台
+            thirdPartyBoardAdd: function() {
+                parent.layer.open({
+                    type: 2,
+                    title: '添加第三方平台',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['900px', '450px'],
+                    content: './addEdit/thirdPartyTpl.html?do=add',
+                    success: function(layero, index) {
+                        form.render();
+                        form.render('select')
+                    },
+                    btn: ['确定', '关闭'],
+                    yes: function(index, layero) {
+                        $(layero.find('iframe')[0].contentWindow.document).find('#vsubmit').click();
+                        var cllBack = $('.tableTP').attr('data-func')
+                        var Fun = eval(cllBack);
+                        Fun;
+                    }
+                });
+            },
+
+        };
+
+        //给新增按钮添加事件
+        $('.legend-btns a').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //监听提交  
+        if ($type == 'edit' || $type == 'add') {
+            form.on('submit(submit)', function(data) {
+                $("#vsubmit").blur();
+                if (!bizUtil.validator.verifyContainer($('form'))) {
+                    return false;
+                }
+                if (!uscIs) {
+                    bizUtil.validator.showElementVerifyError($('input[name=usc]'), '客户已存在');
+                    return false;
+                }
+                var $index1 = $('#linkDistrict select').not(':disabled').length - 1,
+                    $indexVal1 = $('#linkDistrict select').eq($index1).val();
+                $indexVal1.length > 0 ? $('input[name="linkmanAreaId"]').val($indexVal1) : '';
+                if ($('input[name="linkmanAreaId"]').val().length == 0) {
+                    parent.layer.msg('请选择客户详细地址的城市');
+                    return false;
+                }
+
+                var $index2 = $('#juryDistrict select').not(':disabled').length - 1,
+                    $indexVal2 = $('#juryDistrict select').eq($index2).val();
+                $indexVal2.length > 0 ? $('input[name="invoiceConsigneeAreaId"]').val($indexVal2) : '';
+                if ($.trim(data.field.invoiceConsigneeAddress).length > 0) {
+                    if ($('input[name="invoiceConsigneeAreaId"]').val().length == 0) {
+                        parent.layer.msg('请选择收票人地址的城市');
+                        return false;
+                    }
+                }
+                // regAreaId regDistrict
+                var $index3 = $('#regDistrict select').not(':disabled').length - 1,
+                    $indexVal3 = $('#regDistrict select').eq($index3).val();
+                $indexVal3.length > 0 ? $('input[name="regAreaId"]').val($indexVal2) : '';
+                if ($.trim(data.field.regAddress).length > 0) {
+                    if ($('input[name="regAreaId"]').val().length == 0) {
+                        parent.layer.msg('请选择注册地址的城市');
+                        return false;
+                    }
+                }
+
+                var $linkmanAreaId = $('input[name="linkmanAreaId"]').val().length > 0 ? parseInt($.trim($indexVal1)) : '',
+                    $invoiceConsigneeAreaId = $('input[name="invoiceConsigneeAreaId"]').val().length > 0 ? parseInt($.trim($indexVal2)) : '';
+                $regAreaId = $('input[name="regAreaId"]').val().length > 0 ? parseInt($.trim($indexVal2)) : '';
+
+                //数据源       
+                var $saveData = {
+                    bodyType: parseInt($.trim(data.field.bodyType)),
+                    companyOperateId: parseInt($.trim(data.field.companyOperateId)),
+                    companySalesmanId: parseInt($.trim(data.field.companySalesmanId)),
+                    companyUsedId: parseInt($.trim(data.field.companyUsedId)),
+                    dispatchersEmail: $.trim(data.field.dispatchersEmail),
+                    dispatchersMobile: $.trim(data.field.dispatchersMobile),
+                    dispatchersName: $.trim(data.field.dispatchersName),
+                    dispatchersQq: $.trim(data.field.dispatchersQq),
+                    dispatchersTel: $.trim(data.field.dispatchersTel),
+                    dispatchersWechat: $.trim(data.field.dispatchersWechat),
+                    linkmanAddress: $.trim(data.field.linkmanAddress),
+                    linkmanAreaId: $linkmanAreaId,
+                    name: $.trim(data.field.name),
+                    nameEn: $.trim(data.field.nameEn),
+                    nameShort: $.trim(data.field.nameShort),
+                    status: parseInt($.trim(data.field.status)),
+                    remarks: $.trim(data.field.remarks),
+                    roleDcode: $.trim(data.field.roleDcode),
+                    salesmanEmail: $.trim(data.field.salesmanEmail),
+                    salesmanMobile: $.trim(data.field.salesmanMobile),
+                    salesmanName: $.trim(data.field.salesmanName),
+                    salesmanQq: $.trim(data.field.salesmanQq),
+                    salesmanTel: $.trim(data.field.salesmanTel),
+                    salesmanWechat: $.trim(data.field.salesmanWechat),
+                    usc: $.trim(data.field.usc),
+                    weburl: $.trim(data.field.weburl),
+                    customersAddress: customersAddressArr,
+                    customersSettlement: {
+                        debtLimit: parseFloat($.trim(data.field.debtLimit)),
+                        financeEmail: $.trim(data.field.financeEmail),
+                        financeMobile: $.trim(data.field.financeMobile),
+                        financeName: $.trim(data.field.financeName),
+                        financeQq: $.trim(data.field.financeQq),
+                        financeTel: $.trim(data.field.financeTel),
+                        financeWechat: $.trim(data.field.financeWechat),
+                        taxId: $.trim(data.field.taxId),
+                        invoiceConsigneeAreaId: $invoiceConsigneeAreaId,
+                        invoiceConsigneeAddress: $.trim(data.field.invoiceConsigneeAddress),
+                        regAreaId: $regAreaId,
+                        regAddress: $.trim(data.field.regAddress),
+                        regTel: $.trim(data.field.regTel),
+                        bankName: $.trim(data.field.bankName),
+                        debtEmail: $.trim(data.field.debtEmail),
+                        bankNo: $.trim(data.field.bankNo),
+                        invoiceTitle: $.trim(data.field.invoiceTitle),
+                        invoiceConsigneeUname: $.trim(data.field.invoiceConsigneeUname),
+                        invoiceConsigneePhone: $.trim(data.field.invoiceConsigneePhone),
+                        hasInvoice: parseInt($.trim(data.field.hasInvoice)),
+                        invoiceType: parseInt($.trim(data.field.invoiceType)),
+                        paybackPeriod: parseInt($.trim(data.field.paybackPeriod)),
+                        paymentTypeDcode: $.trim(data.field.paymentTypeDcode),
+                        taxRate: parseFloat($.trim(data.field.taxRate)),
+                    },
+                    customersBroker: customersBroker,
+                    customersThird: customersThird,
+                    addressDelId: addressDelIdArr,
+                    brokerDelId: brokerDelIdArr,
+                    thirdDelId: thirdDelIdArr
+                };
+                if (!$isAccid) {
+                    $saveData.accid = $.trim(data.field.accid);
+                    $saveData.accpwd = $.trim(data.field.accpwd);
+                }
+                if ($saveData.customersSettlement.invoiceType == 1) {
+                    $saveData.customersSettlement.regAreaId = '';
+                    $saveData.customersSettlement.regAddress = '';
+                    $saveData.customersSettlement.regTel = '';
+                    $saveData.customersSettlement.bankName = '';
+                    $saveData.customersSettlement.bankNo = '';
+                }
+                var $url, $method;
+                if ($type == 'edit') {
+                    $url = '/ucenter/crm/customers/customers/' + $idS + '.shtml';
+                    $method = 'PUT';
+                } else if ($type == 'add') {
+                    $url = '/ucenter/crm/customers/customers/add.shtml';
+                    $method = 'POST';
+                }
+                //保存数据，调用接口
+                HC.ajax[$method.toLowerCase()]({
+                    url: $url,
+                    data: JSON.stringify($saveData),
+                    success: function(d) {
+                        parent.layer.alert('保存成功！', {
+                            yes: function(index) {
+                                //关闭窗口
+                                parent.layer.close(index);
+                                if ($("#continue").is(":checked")) {
+                                    $(window.parent['f1'].document).find('.btn-search').click();
+                                    window.location.reload();
+                                } else {
+                                    parent.layer.closeAll();
+                                    //获取当前框架ID并刷新
+                                    bizUtil.frame.refreshCurrentFrame();
+                                    bizUtil.frame.refreshListFrame();
+                                    bizUtil.frame.closeCurrentIframeTab(window.parent);
+                                }
+
+                            }
+                        });
+                    }
+                });
+                return false;
+            });
+
+            //取消按钮事件
+            $('#vcancel').on('click', function() {
+                bizUtil.frame.closeCurrentIframeTab(window.parent);
+            });
+        }
+    });
+</script>
+
+</html>

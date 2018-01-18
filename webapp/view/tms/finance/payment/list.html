@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>应付账单 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <style>
+      .layui-form-item{
+          margin:0;
+      }
+  </style>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane" autocomplete="off">
+            <div class="layui-row layui-col-space5">
+                <div class="layui-col-sm1" style="width:17%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">结算单位</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="targetName" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:17%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">单位属性</label>
+                        <div class="layui-input-block">
+                            <select name="targetType">
+                                <option value="" selected="selected">全部</option>
+                                 <option value="1" >供应商</option>
+                                <option value="2" >员工</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:17%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">账期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="billMonth" class="layui-input" id="billMonth"  placeholder="全部">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:17%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">是否被催款</label>
+                        <div class="layui-input-block">
+                            <select name="hasUrge">
+                                <option value="" selected="selected">全部</option>
+                                <option value="true" >是</option>
+                                <option value="false" >否</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:17%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            <select name="verifyStatus">
+                                <option value="" selected="selected">全部</option>
+                                <option value="0" >未提交</option>
+                                <option value="1" >待对方核对</option>
+                                <option value="2" >待审核</option>
+                                <option value="3" >核对完成</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:10%;">
+                    <div class="layui-form-item">
+                        <button class="layui-btn layui-btn-danger btn-search" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--end: 搜索-->
+    
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+      <div class="layui-btn-group fl">
+        <button class="layui-btn layui-btn-normal" data-type="detailData">查看明细</button>
+        <button class="layui-btn layui-btn-normal" data-type="checkbill">核对</button>
+        <button class="layui-btn layui-btn-normal" data-type="checkdetail">核对详情</button>
+        <button class="layui-btn layui-btn-normal" data-type="deriveDetail">导出明细账单</button>
+        <button class="layui-btn layui-btn-normal" data-type="deriveBrief">导出简要账单</button>
+      </div>
+      <!-- <div class="layui-btn-group fr">
+        <button class="layui-btn"><i class="layui-icon">&#xe614;</i>定义表头</button>
+        <button class="layui-btn"><i class="layui-icon">&#xe62d;</i>导出EXCEL</button>
+      </div> -->
+      <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+   <!--start:快捷搜索-->
+   <div id="shortBar" style="display:none;">
+      <dl>
+        <dt>应付合计 ： <span class="layui-badge layui-bg-cyan  handleSum"></span></dt>
+        <dd><a href="">未付合计<span class="layui-badge noHandleSum"></span></a></dd>
+      </dl>
+    </div>
+    <!--end:快捷搜索-->
+  </body>
+   <script type="text/html" id="createDateTpl">
+      {{new Date(d.createDate).format("yyyy-MM-dd hh:mm:ss")}}
+  </script>
+  <script type="text/html" id="billMonthTpl">
+      {{new Date(d.billMonth).format("yyyy-MM")}}
+  </script>
+  <script type="text/html" id="hasUrgeTpl">
+      {{# if(d.hasUrge == true){ }}
+      <p>是</p>
+      {{# }else{ }}
+      <p>否</p>
+      {{# } }}
+  </script>
+  <script type="text/html" id="verifyStatusTpl">
+    {{# if(d.verifyStatus == 0){ }}
+      <p>未提交</p>
+    {{# }else if(d.verifyStatus == 1){ }}
+      <p>待对方核对</p>
+    {{# }else if(d.verifyStatus == 2){ }}
+      <p>待审核</p>
+    {{# }else{ }}
+      <p>核对完成</p>
+    {{# } }}
+  </script>
+  <script type="text/html" id="targetTypeTpl">
+    {{setUnitAttr(d.targetType)}}
+  </script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer','laydate', 'table', 'tms_tab'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+        laydate.render({
+          elem: '#billMonth'
+          ,type: 'month'
+        });
+      var $targetName,
+      $targetType,
+      $billMonth,
+      $hasUrge,
+      $verifyStatus;
+
+    setTableData();
+
+    var $shortBarHtml = $('#shortBar').html();
+    $('.layui-table-tool').prepend('<div class="short-bar">' + $shortBarHtml + '</div>');
+
+    
+    //监听提交
+    form.on('submit(search)', function(data){
+      $targetName = $.trim(data.field.targetName),
+      $targetType = $.trim(data.field.targetType),
+      $billMonth = $.trim(data.field.billMonth),
+      $hasUrge = $.trim(data.field.hasUrge),
+      $verifyStatus = $.trim(data.field.verifyStatus);
+      setTableData($targetName, $targetType, $billMonth, $hasUrge, $verifyStatus);
+      return false;
+    });
+    
+    //方法级渲染
+    function setTableData($targetName, $targetType, $billMonth, $hasUrge, $verifyStatus){
+      typeof $targetName != 'undefined' ? $targetName = $targetName : $targetName = '';
+      typeof $targetType != 'undefined' ? $targetType = $targetType : $targetType = '';
+      typeof $billMonth != 'undefined' ? $billMonth = $billMonth : $billMonth = '';
+      typeof $hasUrge != 'undefined' ? $hasUrge = $hasUrge : $hasUrge = '';
+      typeof $verifyStatus != 'undefined' ? $verifyStatus = $verifyStatus : $verifyStatus = '';
+      var $pageSize = 15;
+
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/handleBills/page.shtml?targetName='+ $targetName + '&targetType=' + $targetType + '&billMonth=' + $billMonth + '&hasUrge=' + $hasUrge + '&verifyStatus=' + $verifyStatus,
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.handlePageResult.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.handlePageResult.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'targetName', title: '结算单位', align: 'center', width:180, event: 'setSign', style:'cursor: pointer;color:#51a2f7;'},
+          {field:'targetType', title: '单位属性', align: 'center', width:150, templet:"#targetTypeTpl"},
+          {field:'billNo', title: '账单号', align: 'center', width:190},
+          {field:'billMonth', title: '月份', align: 'center', width:90, templet:"#billMonthTpl"},
+          {field:'paymentType', title: '结算方式', align: 'center', width:90},
+          {field:'orderCount', title: '运输单量', align: 'center', width:90},
+          {field:'arkCount', title: '运输柜量', align: 'center', width:90},
+          {field:'transportCost', title: '运费', align: 'center', width:100},
+          {field:'extraCost', title: '异常费', align: 'center', width:100},
+          {field:'totalCost', title: '合计', align: 'center', width:100},
+          {field:'handleCost', title: '实应付金额', align: 'center', width:100},
+          {field:'handledCost', title: '已付金额', align: 'center', width:100},
+          {field:'verifyStatus', title: '核对状态', align: 'center', width:90, templet:"#verifyStatusTpl"},
+          {field:'hasUrge', title: '是否被催账', align: 'center', width:120, templet:"#hasUrgeTpl"},
+          {align:'createDate', title: '创建时间', align: 'center', width:200, templet:"#createDateTpl"}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){
+           $('.handleSum').html(res.objects.smallPageResult.handleSum);
+          $('.noHandleSum').html(res.objects.smallPageResult.noHandleSum);
+        }
+      });
+    }
+
+    //监听工具条
+    table.on('tool(tbar)', function(obj){
+        if(obj.event === 'setSign'){
+          var data = obj.data;
+          tmsTab.add($(this), '查看明细（' + data.targetName + '）', 'detailData.html?targetId=' + data.targetId +'&billMonth=' + data.billMonth +'&targetName=' + data.targetName);
+        }
+    });
+    var active = {
+      //查看明细
+      detailData: function(){
+         var checkStatus = table.checkStatus('dataReload'),
+          data = checkStatus.data;
+          if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+          // tmsTab.add($(this), '核对账单', 'checkbill.html');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else{
+        tmsTab.add($(this), '查看明细（' + data[0].targetName + '）', 'detailData.html?targetId=' + data[0].targetId +'&billMonth=' + data[0].billMonth +'&targetName=' + data[0].targetName);
+      }
+      },
+      //核对账单
+      checkbill: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else{
+          //在平台
+          if(data[0].targetHasRegister == 1){
+            if(data[0].verifyStatus != 2){
+              parent.layer.alert('对方已加入平台，但对方尚未提交账单，只有待对方提交账单，即待审核的账单，才能审核！');
+              return false ;
+            }
+            tmsTab.add($(this), '核对账单（' + data[0].targetName + '）', 'checkbillTerrace.html?customerId=' + data[0].id + '&verifyStatus=' + data[0].verifyStatus);
+          }else{
+            if(data[0].verifyStatus != 0){
+              parent.layer.alert('对方尚未加入平台，所以只有未提交状态的账单，才能进行审核！');
+              return false ;
+            }
+              tmsTab.add($(this), '核对账单（' + data[0].targetName + '）', 'checkbill.html?customerId=' + data[0].id + '&verifyStatus=' + data[0].verifyStatus);
+          }
+        }
+      },
+      //核对详情
+      checkdetail: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+          // tmsTab.add($(this), '核对账单', 'checkdetail.html');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else{
+          tmsTab.add($(this), '核对详情（' + data[0].targetName + '）', 'checkdetail.html?customerId=' + data[0].id);
+        }
+      },
+      //导出明细账单
+      deriveDetail: function(){
+       var checkStatus = table.checkStatus('dataReload'),
+        $data = checkStatus.data;
+          var $ids = [];
+        for(var $i = 0; $i< $data.length; $i++){
+          $ids.push($data[$i].id);
+        }
+        if($data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else{
+          $.ajax({
+            type:'GET', 
+            url:'/ucenter/general/finance/handleBills/excelHandleDetail.shtml?ids=' + $ids , 
+            success:function(d){
+              if(d.code == 'ERROR_FINANACE_EXPORT_EXCEL'){
+                parent.layer.alert('没有查询到相关数据！');
+              }else{
+                document.location.href = '/ucenter/general/finance/handleBills/excelHandleDetail.shtml?ids=' + $ids ;
+              }
+            },
+            error:function(){
+              parent.layer.alert('操作失败！');
+            }
+          });
+        }
+      },
+      //导出简要账单
+      deriveBrief: function(){
+        typeof $targetName != 'undefined' ? $targetName = $targetName : $targetName = '';
+        typeof $targetType != 'undefined' ? $targetType = $targetType : $targetType = '';
+        typeof $billMonth != 'undefined' ? $billMonth = $billMonth : $billMonth = '';
+        typeof $hasUrge != 'undefined' ? $hasUrge = $hasUrge : $hasUrge = '';
+        typeof $verifyStatus != 'undefined' ? $verifyStatus = $verifyStatus : $verifyStatus = '';
+        $.ajax({
+          type:'GET', 
+          url:'/ucenter/general/finance/handleBills/excelHandle.shtml?targetName=' + $targetName + '&targetType=' + $targetType + '&billMonth=' + $billMonth + '&hasUrge=' + $hasUrge + '&verifyStatus=' + $verifyStatus , 
+          success:function(d){
+            if(d.code == 'ERROR_FINANACE_EXPORT_EXCEL'){
+                parent.layer.alert('没有查询到相关数据！');
+              }else{
+                document.location.href = '/ucenter/general/finance/handleBills/excelHandle.shtml?targetName=' + $targetName + '&targetType=' + $targetType + '&billMonth=' + $billMonth + '&hasUrge=' + $hasUrge + '&verifyStatus=' + $verifyStatus;
+              }
+            },
+          error:function(){
+             parent.layer.alert('操作失败！');
+          }
+        });
+      }
+    };
+  
+    $('.btns-bar .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+  });
+  </script>
+</html>

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>改派 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+        body {
+            margin: 20px;
+        }
+        
+        span.required {
+            color: #f00;
+            font-family: 'simsun', '宋体';
+            margin-right: 5px;
+            font-size: 15px;
+        }
+        
+        .blue-txt {
+            color: #06f;
+            font-weight: bold;
+        }
+        
+        .layui-table th,
+        .layui-table td {
+            text-align: center;
+            padding: 0;
+            height: 38px;
+        }
+        
+        .layui-table td input,
+        .layui-table td textarea {
+            border: 0;
+        }
+        
+        .item {
+            display: none;
+        }
+        
+        .hide-box {
+            /* display: block; */
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <form class="layui-form" autocomplete="off">
+        <table class="layui-table">
+            <colgroup>
+                <col width="150">
+                <col width="200">
+                <col width="200">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>派车信息</th>
+                    <th>改派前</th>
+                    <th>改派后</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="required">&nbsp;</span>司机姓名</td>
+                    <td id="frontDriverName"></td>
+                    <td class="editDriver">
+                        <span class="blue-txt item" id="postDriverName"></span>
+                        <div class="hide-box">
+                            <select name="driverName" lay-verify="driverName" lay-filter="driverName">
+                              <option value="">请选择司机</option>
+                            </select>
+                            <input type="hidden" name="driverId">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="required">&nbsp;</span>司机手机</td>
+                    <td id="frontDriverMobile"></td>
+                    <td class="editDriver">
+                        <span class="blue-txt item" id="postDriverMobile"></span>
+                        <div class="hide-box">
+                            <input type="text" name="driverMobile" lay-verify="driverMobile" placeholder="司机手机" class="layui-input" maxlength="11">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="required">*</span>拖车车牌</td>
+                    <td id="frontDriverCar"></td>
+                    <td class="editDriver">
+                        <span class="item" id="postDriverCar"></span>
+                        <div class="hide-box">
+                            <select name="carNo" lay-verify="carNo" lay-filter="carNo">
+                                <option value="">请选择拖车</option>
+                            </select>
+                            <input type="hidden" name="carId">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="required">&nbsp;</span>车架车牌</td>
+                    <td id="frontDriverCarFrame"></td>
+                    <td class="editDriver">
+                        <span class="item" id="postDriverCarFrame"></span>
+                        <div class="hide-box">
+                            <select name="carframeNo" lay-verify="carframeNo" lay-filter="carframeNo">
+                                <option value="">请选择车架</option>
+                            </select>
+                            <input type="hidden" name="carframeId">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="required">*</span>改派原因</td>
+                    <td colspan="2" style="text-align:left;">
+                        <textarea name="toSendReason" lay-verify="toSendReason" placeholder="请输入改派原因，2~300之间" class="layui-textarea" maxlength="300"></textarea>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="layui-form-item" style="text-align:center; margin:20px 0 40px;">
+            <button class="layui-btn layui-btn-normal" id="vsubmit" lay-submit lay-filter="submit" style="min-width:120px;">确认改派</button>
+            <button class="layui-btn layui-btn-primary" id="vclose" type="button" style="min-width:120px;">取消</button>
+        </div>
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'layedit'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            layedit = layui.layedit,
+            $ = layui.jquery;
+
+        var $id = getUrlId($.trim(getUrlParam('id')));
+
+        //初始化司机列表
+        var $driverName = $('select[name="driverName"]');
+        var $drivers = getDriverList();
+        if ($drivers.length > 0) {
+            var $driverIds = [],
+                $driverMobiles = [];
+            for (var $j = 0; $j < $drivers.length; $j++) {
+                $driverName.append('<option value="' + $drivers[$j].name + '">' + $drivers[$j].name + '</option>');
+                $driverIds.push($drivers[$j].id);
+                $driverMobiles.push($drivers[$j].mobile);
+            }
+            $driverName.data('driverIds', $driverIds);
+            $driverName.data('driverMobiles', $driverMobiles);
+            form.render('select', 'driverName');
+        }
+        form.on('select(driverName)', function(data) {
+            var $driverIdsData = $driverName.data('driverIds'),
+                $driverMobilesData = $driverName.data('driverMobiles');
+            if ($driverIdsData.length > 0) {
+                var $index = $(this).index() - 1,
+                    $driverId = $driverIdsData[$index] || '',
+                    $driverMobile = $driverMobilesData[$index] || '';
+                $('input[name="driverId"]').val($driverId);
+                $('input[name="driverMobile"]').val($driverMobile);
+            }
+        });
+
+        //初始化拖车列表
+        var $carNo = $('select[name="carNo"]');
+        var $cars = getTrailerList();
+        if ($cars.length > 0) {
+            var $carIds = [];
+            for (var $j = 0; $j < $cars.length; $j++) {
+                $carNo.append('<option value="' + $cars[$j].carNo + '/' + $cars[$j].carColor + '">' + $cars[$j].carNo + '/' + $cars[$j].carColor + '</option>');
+                $carIds.push($cars[$j].id);
+            }
+            $carNo.data('carIds', $carIds);
+            form.render('select', 'carNo');
+        }
+        form.on('select(carNo)', function(data) {
+            var $carIdsData = $carNo.data('carIds');
+            if ($carIdsData.length > 0) {
+                var $index = $(this).index() - 1,
+                    $carId = $carIdsData[$index] || '';
+                $('input[name="carId"]').val($carId);
+            }
+        });
+
+        //初始化车架列表
+        var $carframeNo = $('select[name="carframeNo"]');
+        var $carframes = getCarFrameList();
+        if ($carframes.length > 0) {
+            var $carframeIds = [];
+            for (var $j = 0; $j < $carframes.length; $j++) {
+                $carframeNo.append('<option value="' + $carframes[$j].carNo + '/' + $carframes[$j].carColor + '">' + $carframes[$j].carNo + '/' + $carframes[$j].carColor + '</option>');
+                $carframeIds.push($carframes[$j].id);
+            }
+            $carframeNo.data('carframeIds', $carframeIds);
+            form.render('select', 'carframeNo');
+        }
+        form.on('select(carframeNo)', function(data) {
+            var $carframeIdsData = $carframeNo.data('carframeIds');
+            if ($carframeIdsData.length > 0) {
+                var $index = $(this).index() - 1,
+                    $carframeId = $carframeIdsData[$index] || '';
+                $('input[name="carframeId"]').val($carframeId);
+            }
+        });
+
+        //获取派车信息
+        $.get('/ucenter/tms/city/cityWaybill/searchChangeSend.shtml', {
+            id: $id
+        }, function(d) {
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+
+            //console.log(d);
+            //return false;
+
+            if ($code === 'SUCCESS') {
+                $('#frontDriverName').text($objects.frontDriverName || '--');
+                $('#frontDriverMobile').text($objects.frontDriverMobile || '--');
+                $('#frontDriverCar').text($objects.frontDriverCar || '--');
+                $('#frontDriverCarFrame').text($objects.frontDriverCarFrame || '--');
+                $('#postDriverName').text($objects.postDriverName || '--');
+                $('#postDriverMobile').text($objects.postDriverMobile || '--');
+                $('#postDriverCar').text($objects.postDriverCar || '--');
+                $('#postDriverCarFrame').text($objects.postDriverCarFrame || '--');
+                $('textarea[name="toSendReason"]').val($objects.postSendReason || '');
+                $('input[name="driverId"]').val($objects.frontDriverId || '');
+                $('select[name="driverName"]').val($objects.frontDriverName || '');
+                $('input[name="driverMobile"]').val($objects.frontDriverMobile || '');
+                $('input[name="carId"]').val($objects.frontDriverCarId || '');
+                $('select[name="carNo"]').val($objects.frontDriverCar || '');
+                $('input[name="carframeId"]').val($objects.frontDriverCarFrameId || '');
+                $('select[name="carframeNo"]').val($objects.frontDriverCarFrame || '');
+                form.render('select');
+            }
+        }, 'JSON');
+
+        //通过司机关联拖车和车架
+        // var getCarAndFrameAndDriverByDriverId = function(driverId) {
+        //     var allRelation = getCarAndCarframeAndDriver();
+        //     var getObjs = {};
+        //     if (allRelation.length > 0) {
+        //         $.each(allRelation, function(k, v) {
+        //             if (allRelation[k].driverId == driverId) {
+        //                 //司机
+        //                 if (allRelation[k].driverId) {
+        //                     getObjs.driverDetail = getDriverById(allRelation[k].driverId);
+        //                 } else {
+        //                     getObjs.driverDetail = null;
+        //                 }
+        //                 //拖车
+        //                 if (allRelation[k].trailerId) {
+        //                     getObjs.trailerDetail = getTrailerById(allRelation[k].trailerId);
+        //                 } else {
+        //                     getObjs.trailerDetail = null;
+        //                 }
+        //                 //车架
+        //                 if (allRelation[k].frameId) {
+        //                     getObjs.frameDetail = getCarFrameById(allRelation[k].frameId);
+        //                 } else {
+        //                     getObjs.frameDetail = null;
+        //                 }
+        //             }
+        //         });
+        //     }
+        //     return getObjs;
+        // }
+        // form.on('select(driverName)', function(data) {
+        //     var $driverIdsData = $driverName.data('drivesIds');
+        //     if ($driverIdsData.length > 0) {
+        //         var $index = $(this).index(),
+        //             $driverId = $driverIdsData[$index],
+        //             $getDetail = getCarAndFrameAndDriverByDriverId($driverId);
+
+        //         if ($getDetail) {
+        //             if ($getDetail.driverDetail) {
+        //                 var $dId = $driverId || '',
+        //                     $dMobile = $getDetail.driverDetail.mobile || '';
+
+        //                 $('input[name="driverId"]').val($dId);
+        //                 $('input[name="driverMobile"]').val($dMobile);
+        //             }
+
+        //             if ($getDetail.trailerDetail) {
+        //                 var $tId = $getDetail.trailerDetail.id || '',
+        //                     $tNo = $getDetail.trailerDetail.carNo || '',
+        //                     $tColor = $getDetail.trailerDetail.carColor || '',
+        //                     $carNo;
+
+        //                 if ($tNo) {
+        //                     $carNo = $tNo;
+        //                     if ($tColor) {
+        //                         $carNo += '/' + $tColor;
+        //                     }
+        //                 }
+
+        //                 $('input[name="carId"]').val($tId);
+        //                 $('input[name="carNo"]').val($carNo);
+        //             }
+
+        //             if ($getDetail.frameDetail) {
+        //                 var $fId = $getDetail.frameDetail.id || '',
+        //                     $fNo = $getDetail.frameDetail.carNo || '',
+        //                     $fColor = $getDetail.frameDetail.carColor || '',
+        //                     $frameNo;
+
+        //                 if ($fNo) {
+        //                     $frameNo = $fNo;
+        //                     if ($fColor) {
+        //                         $frameNo += '/' + $fColor;
+        //                     }
+        //                 }
+
+        //                 $('input[name="carframeId"]').val($fId);
+        //                 $('input[name="carframeNo"]').val($frameNo);
+        //             }
+        //         }
+        //     }
+        // });
+
+        //自定义验证规则
+        form.verify({
+            // driverName: function(val) {
+            //     if (val.length == 0) {
+            //         return '请选择司机';
+            //     }
+            // },
+            driverMobile: function(val) {
+                if (val.length > 0) {
+                    if (val.length > 11) {
+                        return '手机号码为11位纯数字';
+                    } else if (!$jsReg.mobile.test(val)) {
+                        return '手机格式不正确';
+                    }
+                }
+            },
+            carNo: function(val) {
+                if (val.length == 0) {
+                    return '请输入拖车车牌';
+                }
+            },
+            // carframeNo: function(val) {
+            //     if (val.length == 0) {
+            //         return '请输入拖架车牌';
+            //     }
+            // },
+            toSendReason: function(val) {
+                if (val.length == 0) {
+                    return '请输入改派原因';
+                } else if (val.length > 300 || val.length < 2) {
+                    return '改派原因在2~300字符之间';
+                }
+            }
+        });
+
+        //点击可编辑
+        $('.editDriver').on('click', function() {
+            $('.item').hide();
+            $('.hide-box').show();
+        });
+
+        //监听提交
+        form.on('submit(submit)', function(data) {
+            //console.log(JSON.stringify(data.field));
+            //return false;
+            //数据源
+            var $saveData = {
+                id: $id,
+                driverId: parseInt(data.field.driverId),
+                driverName: data.field.driverName,
+                driverMobile: data.field.driverMobile,
+                carId: parseInt(data.field.carId),
+                carNo: data.field.carNo,
+                carframeId: parseInt(data.field.carframeId),
+                carframeNo: data.field.carframeNo,
+                toSendReason: data.field.toSendReason
+            };
+
+            // console.log(JSON.stringify($saveData));
+            // return false;
+
+            //保存数据，调用接口
+            $.ajax({
+                type: 'POST',
+                url: '/ucenter/tms/city/cityWaybill/toSend.shtml',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify($saveData),
+                success: function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code === 'SUCCESS') {
+                        setLayerAlert(parent.layer, '改派成功！', {
+                            yes: function() {
+                                //关闭窗口
+                                parent.layer.closeAll();
+                                //获取当前框架ID并刷新
+                                var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+                                // parent['f' + $layId].location.reload();
+                                parent['f' + $layId].refreshTableList();
+                            }
+                        });
+                    } else {
+                        setLayerAlert(parent.layer, '改派失败！');
+                    }
+                }
+            });
+            return false;
+        });
+
+        //取消按钮
+        $('#vclose').on('click', function() {
+            parent.layer.closeAll();
+        });
+    });
+</script>
+
+</html>

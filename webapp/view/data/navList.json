@@ -1,0 +1,145 @@
+{
+    "data": [{
+            "navName": "运力信息",
+            "status": 1,
+            "isPermission": 1,
+            "children": [
+                { "navName": "司机管理", "status": 1, "isPermission": 1, "url": "/view/tms/capacity/driver/index.html", "children": [] },
+                { "navName": "车架管理", "status": 1, "isPermission": 1, "url": "/view/tms/capacity/carframe/index.html", "children": [] },
+                { "navName": "拖车管理", "status": 1, "isPermission": 1, "url": "/view/tms/capacity/trailer/index.html", "children": [] },
+                { "navName": "车辆保险", "status": 1, "isPermission": 1, "url": "/view/tms/capacity/car-insurance/index.html", "children": [] },
+                { "navName": "提成方案", "status": 1, "isPermission": 1, "url": "/view/tms/capacity/commission/index.html", "children": [] }
+            ]
+        },
+        {
+            "navName": "订单信息",
+            "status": 1,
+            "isPermission": 1,
+            "children": [
+                { "navName": "订单管理（拖车）", "status": 1, "isPermission": 1, "url": "/view/tms/forwarder/trailer/index.html", "children": [] },
+                { "navName": "调度派车（拖车）", "status": 1, "isPermission": 1, "url": "/view/tms/forwarder/trailer/dispatch.html", "children": [] },
+                { "navName": "运单费用（拖车）", "status": 1, "isPermission": 1, "url": "/view/tms/forwarder/trailer/waybill.html", "children": [] },
+                { "navName": "订单管理（货主货代）", "status": 1, "isPermission": 1, "url": "/view/tms/forwarder/shipper/index.html", "children": [] },
+                { "navName": "运单费用（货主货代）", "status": 1, "isPermission": 1, "url": "/view/tms/forwarder/shipper/waybill.html", "children": [] },
+                { "navName": "城配运单", "status": 1, "isPermission": 1, "url": "/view/tms/forwarder/cityWaybill/index.html", "children": [] }
+            ]
+        },
+        {
+            "navName": "运输行业代码",
+            "status": 1,
+            "isPermission": 1,
+            "children": [
+                { "navName": "准驾车型", "status": 1, "isPermission": 1, "url": "/view/tms/common/allow-vehicle/index.html", "children": [] },
+                { "navName": "车辆证件业务代码", "status": 1, "isPermission": 1, "url": "/view/tms/common/vehicle-business/index.html", "children": [] },
+                { "navName": "车辆（架）资产关系", "status": 1, "isPermission": 1, "url": "/view/tms/common/vehicle-assetrela/index.html", "children": [] },
+                { "navName": "司机从业资格", "status": 1, "isPermission": 1, "url": "/view/tms/common/driver-qualification/index.html", "children": [] },
+                { "navName": "汽车燃油种类", "status": 1, "isPermission": 1, "url": "/view/tms/common/fuel-type/index.html", "children": [] },
+                { "navName": "高速收费标准", "status": 1, "isPermission": 1, "url": "/view/tms/common/charge-standard/index.html", "children": [] },
+                { "navName": "车轴", "status": 1, "isPermission": 1, "url": "/view/tms/common/axle/index.html", "children": [] },
+                { "navName": "车牌种类", "status": 1, "isPermission": 1, "url": "/view/tms/common/platenumber-type/index.html", "children": [] }
+            ]
+        },
+        {
+            "navName": "报关申报代码",
+            "status": 1,
+            "isPermission": 1,
+            "children": [
+                { "navName": "地区性质", "status": 1, "isPermission": 1, "url": "/view/tms/common/districtnature/index.html", "children": [] },
+                { "navName": "结汇方式", "status": 1, "isPermission": 1, "url": "/view/tms/common/lctype/index.html", "children": [] },
+                { "navName": "包装种类", "status": 1, "isPermission": 1, "url": "/view/tms/common/packagetype/index.html", "children": [] },
+                { "navName": "地区代码", "status": 1, "isPermission": 1, "url": "/view/tms/common/areacode/index.html", "children": [] },
+                { "navName": "征免性质", "status": 1, "isPermission": 1, "url": "/view/tms/common/levytype/index.html", "children": [] },
+                { "navName": "币种代码", "status": 1, "isPermission": 1, "url": "/view/tms/common/currencycode/index.html", "children": [] },
+                { "navName": "用途代码", "status": 1, "isPermission": 1, "url": "/view/tms/common/usecode/index.html", "children": [] },
+                { "navName": "运输方式", "status": 1, "isPermission": 1, "url": "/view/tms/common/transportway/index.html", "children": [] },
+                { "navName": "成交方式", "status": 1, "isPermission": 1, "url": "/view/tms/common/soldfor/index.html", "children": [] },
+                { "navName": "贸易方式", "status": 1, "isPermission": 1, "url": "/view/tms/common/tradeway/index.html", "children": [] },
+                { "navName": "计量单位", "status": 1, "isPermission": 1, "url": "/view/tms/common/measureunit/index.html", "children": [] },
+                { "navName": "关区代码", "status": 1, "isPermission": 1, "url": "/view/tms/common/customscode/index.html", "children": [] },
+                { "navName": "征免方式", "status": 1, "isPermission": 1, "url": "/view/tms/common/newway/index.html", "children": [] },
+                { "navName": "国别代码", "status": 1, "isPermission": 1, "url": "/view/tms/common/countrycode/index.html", "children": [] },
+                { "navName": "监管证件", "status": 1, "isPermission": 1, "url": "/view/tms/common/licensed/index.html", "children": [] },
+                { "navName": "报关港口", "status": 1, "isPermission": 1, "url": "/view/tms/common/customsport/index.html", "children": [] },
+                { "navName": "企业性质", "status": 1, "isPermission": 1, "url": "/view/tms/common/enterprisenature/index.html", "children": [] },
+                { "navName": "商品编码", "status": 1, "isPermission": 1, "url": "/view/tms/common/productcode/index.html", "children": [] },
+                { "navName": "海运港口", "status": 1, "isPermission": 1, "url": "/view/tms/common/port/index.html", "children": [] }
+            ]
+        },
+        {
+            "navName": "公共信息",
+            "status": 1,
+            "isPermission": 1,
+            "children": [
+                { "navName": "箱型代码", "status": 1, "isPermission": 1, "url": "/view/tms/common/contatypes/index.html", "children": [] },
+                { "navName": "子系统代码", "status": 1, "isPermission": 1, "url": "/view/tms/common/system/index.html", "children": [] },
+                { "navName": "数据来源", "status": 1, "isPermission": 1, "url": "/view/tms/common/datasource/index.html", "children": [] },
+                { "navName": "数据状态", "status": 1, "isPermission": 1, "url": "/view/tms/common/datastatus/index.html", "children": [] },
+                { "navName": "营业执照企业类型", "status": 1, "isPermission": 1, "url": "/view/tms/common/businesslicense/index.html", "children": [] },
+                { "navName": "行政区划代码", "status": 1, "isPermission": 1, "url": "/view/tms/common/district/index.html", "children": [] },
+                { "navName": "费用类型", "status": 1, "isPermission": 1, "url": "/view/tms/common/costtype/index.html", "children": [] },
+                { "navName": "费用定义", "status": 1, "isPermission": 1, "url": "/view/tms/common/costitem/index.html", "children": [] },
+                { "navName": "业务单证类型", "status": 1, "isPermission": 1, "url": "/view/tms/common/businessdoctype/index.html", "children": [] },
+                { "navName": "船公司信息", "status": 1, "isPermission": 1, "url": "/view/tms/common/shipping/index.html", "children": [] },
+                { "navName": "码头代码", "status": 1, "isPermission": 1, "url": "/view/tms/common/wharf/index.html", "children": [] },
+                { "navName": "堆场信息", "status": 1, "isPermission": 1, "url": "/view/tms/common/stack/index.html", "children": [] }
+            ]
+        },
+        {
+            "navName": "企业管理",
+            "status": 1,
+            "isPermission": 1,
+            "children": [
+                { "navName": "组织架构", "status": 1, "isPermission": 1, "url": "/view/tms/company/organization/index.html", "children": [] },
+                { "navName": "员工管理", "status": 1, "isPermission": 1, "url": "/view/tms/company/employee/index.html", "children": [] },
+                { "navName": "客户管理", "status": 1, "isPermission": 1, "url": "/view/tms/company/customer/index.html", "children": [] },
+                { "navName": "供应商管理", "status": 1, "isPermission": 1, "url": "/view/tms/company/supplier/index.html", "children": [] },
+                { "navName": "价格协议", "status": 1, "isPermission": 1, "url": "/view/tms/company/freightAgreement/index.html", "children": [] },
+                { "navName": "装卸地址", "status": 1, "isPermission": 1, "url": "/view/tms/company/handingSite/index.html", "children": [] },
+                { "navName": "第三方平台账号", "status": 1, "isPermission": 1, "url": "/view/tms/company/thirdPartyBoard/index.html", "children": [] }
+            ]
+        },
+        {
+            "navName": "财务管理",
+            "status": 1,
+            "isPermission": 1,
+            "children": [
+                { "navName": "会计科目（平台）", "status": 1, "isPermission": 1, "url": "/view/tms/finance/accountantAerrace/index.html", "children": [] },
+                { "navName": "会计科目（客户）", "status": 1, "isPermission": 1, "url": "/view/tms/finance/accountantClient/index.html", "children": [] },
+                { "navName": "费用设置（平台）", "status": 1, "isPermission": 1, "url": "/view/tms/finance/costAerrace/index.html", "children": [] },
+                { "navName": "费用设置（客户）", "status": 1, "isPermission": 1, "url": "/view/tms/finance/costClient/index.html", "children": [] },
+                { "navName": "银行账号", "status": 1, "isPermission": 1, "url": "/view/tms/finance/bankAccount/index.html", "children": [] },
+                { "navName": "银行收支", "status": 1, "isPermission": 1, "url": "/view/tms/finance/bankIncome/index.html", "children": [] },
+                { "navName": "未出账单（应收）", "status": 1, "isPermission": 1, "url": "/view/tms/finance/receivableUnborn/index.html", "children": [] },
+                { "navName": "应收账单", "status": 1, "isPermission": 1, "url": "/view/tms/finance/receivable/index.html", "children": [] },
+                { "navName": "应收款管理", "status": 1, "isPermission": 1, "url": "/view/tms/finance/receivableManagement/index.html", "children": [] },
+                { "navName": "收款记录", "status": 1, "isPermission": 1, "url": "/view/tms/finance/receivableRecord/index.html", "children": [] },
+                { "navName": "未出账单（应付）", "status": 1, "isPermission": 1, "url": "/view/tms/finance/paymentUnborn/index.html", "children": [] },
+                { "navName": "应付账单", "status": 1, "isPermission": 1, "url": "/view/tms/finance/payment/index.html", "children": [] },
+                { "navName": "应付款管理", "status": 1, "isPermission": 1, "url": "/view/tms/finance/paymentManagement/index.html", "children": [] },
+                { "navName": "请款单管理", "status": 1, "isPermission": 1, "url": "/view/tms/finance/payrollRequisition/index.html", "children": [] },
+                { "navName": "付款记录", "status": 1, "isPermission": 1, "url": "/view/tms/finance/paymentRecord/index.html", "children": [] }
+            ]
+        },
+        {
+            "navName": "系统管理",
+            "status": 1,
+            "isPermission": 1,
+            "children": [
+                { "navName": "角色管理", "status": 1, "isPermission": 1, "url": "/view/tms/system/role/index.html", "children": [] },
+                { "navName": "修改密码", "status": 1, "isPermission": 1, "url": "/view/tms/system/user/index.html", "children": [] }
+            ]
+		},
+	    {   
+			"navName": "统计报表",
+            "status": 1,
+            "isPermission": 1,
+            "children": [
+                {"navName":"每日做柜记录 ", "status":1, "isPermission":1, "url":"/view/tms/statistics/doark/index.html?category=doarkRecord","children":[]},
+                {"navName":"每日做柜统计 ", "status":1, "isPermission":1, "url":"/view/tms/statistics/doark/index.html?category=doarkCount","children":[]},
+                {"navName":"做柜流水 ", "status":1, "isPermission":1, "url":"/view/tms/statistics/doark/index.html?category=doarkStream","children":[]},
+                {"navName":"银行收支报表 ", "status":1, "isPermission":1, "url":"/view/tms/statistics/doark/index.html?category=bankBalance","children":[]}
+			]
+		}
+
+    ]
+}

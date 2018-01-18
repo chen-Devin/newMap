@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>应收款管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <style>
+      .layui-form-item{
+            margin:0;
+        }
+  </style>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane" autocomplete="off">
+            <div class="layui-row layui-col-space5">
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">账单号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="billNo" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">账期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="billMonth" class="layui-input" id="billMonth"  placeholder="全部">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            <select name="confirmStatus">
+                                <option value="" selected="selected">全部</option>
+                                <option value="0" >未核销</option>
+                                <option value="1" >部分核销</option>
+                                <option value="2" >全部核销</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">是否已催款</label>
+                        <div class="layui-input-block">
+                            <select name="urge">
+                                <option value="" >全部</option>
+                                 <option value="true" >是</option>
+                                <option value="false" >否</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <button class="layui-btn layui-btn-danger btn-search" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--end: 搜索-->
+    
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+      <div class="layui-btn-group fl">
+        <button class="layui-btn layui-btn-normal" data-type="chargeoff">核销</button>
+        <button class="layui-btn layui-btn-normal" data-type="reversechargeoff">反核销</button>
+        <button class="layui-btn layui-btn-normal" data-type="billReminders">催款</button>
+        <button class="layui-btn layui-btn-normal" data-type="deriveDetail">导出</button>
+      </div>
+      <!-- <div class="layui-btn-group fr">
+        <button class="layui-btn"><i class="layui-icon">&#xe614;</i>定义表头</button>
+        <button class="layui-btn"><i class="layui-icon">&#xe62d;</i>导出EXCEL</button>
+      </div> -->
+      <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+  </body>
+  <script type="text/html" id="confirmStatusTpl">
+    {{# if(d.confirmStatus == 0){  }}
+    <p>未核销</p>
+    {{# }else if(d.confirmStatus == 1){ }}
+    <P>部分核销</P>
+    {{# }else { }}
+    <p>全部核销</p>
+    {{# } }}
+  </script>
+    <script type="text/html" id="isUrgeTpl">
+    {{# if(d.hasUrge == 0){  }}
+    <p>未催账</p>
+    {{# }else { }}
+    <p>已催账</p>
+    {{# } }}
+  </script>
+  <script type="text/html" id="paymentTypeTpl">
+    {{#  if(d.paymentType == '0'){ }}
+      现金
+    {{#  } else{ }}
+      {{d.paymentType + '天'}}      
+    {{#  } }}
+  </script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'laydate', 'table', 'tms_tab'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+        laydate.render({
+          elem: '#billMonth'
+          ,type: 'month'
+        });
+
+    setTableData();
+    var layIdID =  $('.layui-this', window.parent.document).attr('lay-id');
+
+
+    //监听提交
+    form.on('submit(search)', function(data){
+      var $billNo = $.trim(data.field.billNo),
+      $billMonth = $.trim(data.field.billMonth),
+      $confirmStatus = $.trim(data.field.confirmStatus),
+      $urge = $.trim(data.field.urge);
+      setTableData($billNo, $billMonth, $confirmStatus, $urge);
+      return false;
+    });
+    
+    //方法级渲染
+    function setTableData($billNo, $billMonth, $confirmStatus, $urge){
+      typeof $billNo != 'undefined' ? $billNo = $billNo : $billNo = '';
+      typeof $billMonth != 'undefined' ? $billMonth = $billMonth : $billMonth = '';
+      typeof $confirmStatus != 'undefined' ? $confirmStatus = $confirmStatus : $confirmStatus = '';
+      typeof $urge != 'undefined' ? $urge = $urge : $urge = '';
+      var $id = $.trim(getUrlParam('customerId')); 
+      var $pageSize = 15;
+
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/receivedBills/searchWillDetail.shtml',
+        where: {customerId:$id, billMonth:$billMonth, confirmStatus:$confirmStatus, urge:$urge, billNo:$billNo},
+        method: 'post', //如果无需自定义HTTP类型，可不加该参数
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'billNo', title: '账单号', width:100},
+          {field:'billMonth', title: '账期', width:100},
+          {field:'paymentType', title: '结算方式', width:120, templet:"#paymentTypeTpl"},
+          {field:'receiveCost', title: '实应收金额', width:100},
+          {field:'receivedCost', title: '已收金额', width:100},
+          {field:'unReceivedCost', title: '未收金额', width:100},
+          {field:'revenueNos', title: '收款单号', width:200, event: 'setSign', style:'cursor: pointer;color:#51a2f7;'},
+          {field:'hasUrge', title: '是否已催款', width:120, templet: "#isUrgeTpl"},
+          {field:'confirmStatus', title: '状态', width:100, templet:"#confirmStatusTpl"}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){}
+      });
+    }
+
+    //监听工具条
+    table.on('tool(tbar)', function(obj){
+         if(obj.event === 'setSign'){
+          var data = obj.data;
+          parent.layer.open({
+            type: 2,
+            title: '关联收款单号',
+            shadeClose: true,
+            shade: 0.8,
+             area: ['80%', '80%'],
+            content: 'vouchernumber.html?billId='+ data.id + '&receivedCost=' + data.receivedCost
+          });
+        }
+    });
+
+    var active = {
+      //核销
+      chargeoff: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('请选择需核销的数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else{
+          sessionStorage.setItem("collectionRecordId", '');
+          tmsTab.add($(this), '核销费用('+ data[0].billNo +')', 'chargeoff.html?id=' + data[0].id + '&layIdID=' + layIdID);
+          // parent.layer.open({
+          //   type: 2,
+          //   title: '核销费用',
+          //   shadeClose: true,
+          //   shade: 0.8,
+          //   area: ['1000px', '500px'],
+          //   content: 'chargeoff.html?id=' + data[0].id 
+          // });
+        }
+      },
+      //反核销
+      reversechargeoff: function(){ //获取选中数据
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('请选择需反核销的数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else{
+          parent.layer.open({
+            type: 2,
+            title: '反核销费用',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['90%', '80%'],
+            content: 'reversechargeoff.html?id=' + data[0].id + '&modifyDate=' + data[0].modifyDate
+          });
+        }
+      },
+      //催款
+      billReminders: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+            var $data = [];
+            for(var $i = 0; $i< data.length; $i++){
+              $data.push(data[$i].id);
+            }
+        if(data.length == 0){
+          parent.layer.alert('请选择需催款的数据！');
+        }else{
+          parent.layer.open({
+            type: 2,
+            title: '账单催款',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['80%', '70%'],
+            content: 'billReminders.html?ids=' + $data
+          });
+        }
+      },
+      //导出明细账单
+      deriveDetail: function(){
+        typeof $billNo != 'undefined' ? $billNo = $billNo : $billNo = '';
+        typeof $billMonth != 'undefined' ? $billMonth = $billMonth : $billMonth = '';
+        typeof $confirmStatus != 'undefined' ? $confirmStatus = $confirmStatus : $confirmStatus = '';
+        typeof $urge != 'undefined' ? $urge = $urge : $urge = '';
+        var $customerId = $.trim(getUrlParam('customerId')); 
+          $.ajax({
+            type:'GET', 
+            url:'/ucenter/general/finance/receivedBills/excel.shtml?billNo=' + $billNo + '&billMonth=' + $billMonth + '&confirmStatus=' + $confirmStatus + '&urge=' + $urge + '&customerId=' + $customerId, 
+            success:function(d){
+              if(d.code == 'ERROR_FINANACE_EXPORT_EXCEL'){
+                parent.layer.alert('没有查询到相关数据！');
+              }else{
+                document.location.href = '/ucenter/general/finance/receivedBills/excel.shtml?billNo=' + $billNo + '&billMonth=' + $billMonth + '&confirmStatus=' + $confirmStatus + '&urge=' + $urge + '&customerId=' + $customerId;
+              }
+            },
+            error:function(){
+              parent.layer.alert('操作失败！');
+            }
+          });
+        }
+    
+    };
+  
+    $('.btns-bar .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+  });
+  </script>
+</html>

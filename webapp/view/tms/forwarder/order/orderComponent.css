@@ -1,0 +1,204 @@
+.compoment-district .district-select-container {
+    display: flex;
+}
+.compoment-district .district-address-detail {
+    flex: 1;
+    min-width: 190px;
+    /* 因为要填充全部剩余空间，所以要去掉右边距 */
+    margin-right: 0;
+}
+
+
+/* 进度条文案 */
+.loading-content-text {
+    float: left;
+    position: relative;
+    top: -1px;
+    left: 10px;
+    z-index: 100;
+    color: white;
+}
+
+
+/* 图标设置 */
+.icon-save-tmpl,
+.icon-delete,
+.icon-add,
+.icon-copy {
+    font-size: 30px;
+    cursor: pointer;
+}
+.icon-delete {
+    color: #FF5722;
+}
+.icon-add {
+    color: #009688;
+}
+.icon-save-tmpl,
+.icon-copy {
+    color: #01AAED;
+}
+.icon-loading {
+    color: #1E9FFF;
+    cursor: wait;
+}
+.icon-warn {
+    line-height: 14px;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: bold;
+    color: #FFB800;
+}
+.icon-retry {
+    color: #1E9FFF;
+    cursor: pointer;
+}
+.icon-save-tmpl {
+    /* 稍微往下挪一点，与文字水平对齐 */
+    position: relative;
+    top: 4px;
+    margin-left: 20px;
+    line-height: 1;
+}
+
+
+/* 因为没有合适的icon，所以手工制作一个“复制”图标 */
+.icon-copy-container {
+    position: relative;
+    top: -5px;
+    zoom: 0.85;
+}
+/* 需要一个icon作为背景（两个icon重复才能组成“复制”图标） */
+.icon-copy--bg {
+    position: relative;
+}
+/* 用一个跟背景色一样的伪元素 来“盖住” 背景icon的右下方边框 */
+.icon-copy--bg::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+    background: #f2f2f2;
+}
+/* 前景icon，设置宽度为0，不占用多余空间。再利用相对定位“盖”在 背景icon 上 */
+.icon-copy + .icon-copy {
+    display: inline-block;
+    position: relative;
+    left: -28px;
+    top: 5px;
+    z-index: 10;
+    width: 0;
+}
+/* 船务信息的复制按钮 背景为白色 */
+.shipping-icon-container .icon-copy--bg::before {
+    background: white;
+}
+
+
+/* 船务信息中 S/O No 附件布局 */
+.so-item-container input {
+    padding-right: 100px;
+}
+.so-attachment-container {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    margin-top: -9px;
+    zoom: 1.5;
+}
+.so-attachment-container i {
+    line-height: 16px;
+    font-size: 16px;
+}
+/* 链接、查看、删除 的图标样式 */
+.so-attachment-container .icon-link,
+.so-attachment-container .icon-link-delete,
+.so-attachment-container .icon-link-view {
+    cursor: pointer;
+}
+.so-attachment-container .icon-link {
+    font-size: 14px;
+    /* color: #70a9e2; */
+    color: #94c7fa;
+}
+.so-attachment-container .icon-link-delete {
+    color: #FF5722;
+}
+.so-attachment-container .icon-link-view {
+    color: #01AAED;
+}
+.so-attachment-container .icon-warn {
+    font-size: 14px;
+    cursor: default;
+}
+/* 船务信息附件上传状态图标 */
+.so-attachment-item .icon-loading,
+.so-attachment-item .icon-warn,
+.attachment-item--loading .icon-link-delete,
+.attachment-item--loading .attachment-name,
+.attachment-item--fail .icon-link-delete,
+.attachment-item--fail .attachment-name {
+    display: none;
+}
+.attachment-item--loading .icon-loading,
+.attachment-item--fail .icon-warn {
+    /* 如果设置为 inline 的话，则无法应用CSS3动画效果 */
+    display: inline-block;
+}
+/* 上传失败 */
+.so-attachment-item .icon-warn {
+    padding: 0 2px;
+}
+
+
+
+/* 船务信息：使用 css计数器 添加序号 */
+.shipping-counter-container {
+    counter-reset: shipping;
+}
+.shipping-counter::after {
+    /* 隐藏 不在.shipping-counter-container 下的 .shipping-counter */
+    display: none;
+    counter-increment: shipping;
+    /* 计数器序号 使用 小写罗马数字 */
+    content: counter(shipping, lower-roman);
+    /* content: counter(shipping, upper-roman); */
+}
+.shipping-counter-container .shipping-counter::after {
+    display: inline;
+}
+/* 装卸地点：使用 css计数器 添加序号 */
+.customer-address-container {
+    counter-reset: address;
+}
+.customer-address-counter::after {
+    counter-increment: address;
+    content: counter(address);
+}
+
+
+/* 上传、下载 按钮 */
+.file-control-group {
+    /* 父容器 .layui-input-block 已经默认 position: relative; 了 */
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    z-index: 100;
+    min-width: 80px;
+    margin-top: -10px;
+    margin-left: 15px;
+}
+.file-control-group a {
+    margin-right: 5px;
+    color: #01aaed;
+}
+.file-control-group a:hover {
+    color: #428bca;
+}
+.file-control-group-small {
+    min-width: 60px;
+    text-align: center;
+}

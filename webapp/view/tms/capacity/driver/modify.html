@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>司机管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+</head>
+
+<body>
+    <form class="layui-form" method="post" autocomplete="off">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>基本信息</legend>
+        </fieldset>
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">司机姓名</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" id="name" maxlength="20" placeholder="" class="layui-input" lay-verify="required" hc-verify="userName|nameSize" hc-verify_field="司机姓名">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">身份证号</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm10 ">
+                                <div class="margin-right10">
+                                    <input type="text" name="IDNumber" id="IDNumber" maxlength="18" placeholder="" class="layui-input" lay-verify="required" hc-verify="idNumber">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm2">
+                                <input type="text" name="sex" id="sex" lay-verify="sex" maxlength="18" placeholder="性别" class="layui-input" style="cursor:not-allowed;" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">手机号码</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="phone" id="phone" placeholder="" maxlength="20" class="layui-input" lay-verify="required" required hc-verify="mobile">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">驾驶证号</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm9">
+                                <div class=" margin-right10">
+                                    <input type="text" name="driveLicense" id="driveLicense" maxlength="18" placeholder="" class="layui-input" lay-verify="required" hc-verify="diNumber" hc-verify_field="驾驶证号">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <select name="vehicleModel" lay-verify="required">
+                                <option value="">准驾车型</option>
+                                <option value="A1">A1</option>
+                                <option value="A2" selected>A2</option>
+                                <option value="A3">A3</option>
+                                <option value="B1">B1</option>
+                                <option value="B2">B2</option>
+                                <option value="C1">C1</option>
+                                <option value="C2">C2</option>
+                                <option value="C3">C3</option>
+                                <option value="C4">C4</option>
+                              </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">驾照初领日期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="driversLicenseDateB" id="driversLicenseDateB" lay-verify="driversLicenseDateB" placeholder="" class="layui-input" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">驾照有效期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="driversLicenseDateE" id="driversLicenseDateE" lay-verify="driversLicenseDateE" placeholder="" class="layui-input" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">从业资格类别</label>
+                        <div class="layui-input-block">
+                            <select name="jobQualCateDcode" lay-verify="required">
+                            <option value=""></option>
+                            <option value="道路危险货物运输从业人员">道路危险货物运输从业人员</option>
+                            <option value="经营性道路货物运输驾驶员" selected>经营性道路货物运输驾驶员</option>
+                        </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">从业资格证号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="jobQualNo" id="jobQualNo" maxlength="18" placeholder="" class="layui-input" lay-verify="required" hc-verify="idNumber" hc-verify_field="从业资格证号">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">拖车车牌</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm4">
+                                <div class="margin-right10">
+                                    <select name="carShort">
+                                      <option value="粤">粤</option>
+                                      <option value="京">京</option>
+                                      <option value="津">津</option>
+                                      <option value="沪">沪</option>
+                                      <option value="渝">渝</option>
+                                      <option value="冀">冀</option>
+                                      <option value="豫">豫</option>
+                                      <option value="云">云</option>
+                                      <option value="辽">辽</option>
+                                      <option value="黑">黑</option>
+                                      <option value="湘">湘</option>
+                                      <option value="皖">皖</option>
+                                      <option value="鲁">鲁</option>
+                                      <option value="新">新</option>
+                                      <option value="苏">苏</option>
+                                      <option value="浙">浙</option>
+                                      <option value="赣">赣</option>
+                                      <option value="鄂">鄂</option>
+                                      <option value="桂">桂</option>
+                                      <option value="甘">甘</option>
+                                      <option value="晋">晋</option>
+                                      <option value="蒙">蒙</option>
+                                      <option value="陕">陕</option>
+                                      <option value="吉">吉</option>
+                                      <option value="闽">闽</option>
+                                      <option value="贵">贵</option>
+                                      <option value="青">青</option>
+                                      <option value="藏">藏</option>
+                                      <option value="川">川</option>
+                                      <option value="宁">宁</option>
+                                      <option value="琼">琼</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm4">
+                                <div>
+                                    <input type="text" name="carNo" id="carNo" placeholder="" maxlength="10" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm1 line-space">/</div>
+                            <div class="layui-col-sm3">
+                                <div>
+                                    <select name="carColor">
+                                      <option value="黄">黄</option>
+                                      <option value="黑">黑</option>
+                                      <option value="白">白</option>
+                                      <option value="蓝">蓝</option>
+                                      <option value="绿">绿</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">合同类型</label>
+                        <div class="layui-input-block">
+                            <select name="contractType" lay-verify="required" lay-filter="contractType">
+                              <option value=""></option>
+                              <option value="EMPLOY">聘用</option>
+                              <option value="JOIN_OPERATED">挂靠</option>
+                              <option value="OUTSOURCE">外协</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">所属公司</label>
+                        <div class="layui-input-block">
+                            <div>
+                                <select name="ownerSupplierId" lay-verify="required" id="company">
+                                    <option value=""></option>
+                                </select>
+                            </div>
+
+                            <input type="text" name="ownerCompanyName" id="ownerCompanyName" maxlength="255" placeholder="请输入" class="layui-input layui-hide" hc-verify="companyRegex|companySize">
+                           
+
+                            <!-- <div class="layui-col-sm6">
+                            <div class="margin-right10">
+                                <select name="contractType" lay-verify="required" lay-filter="contractType">
+                                    <option value=""></option>
+                                    <option value="EMPLOY">聘用</option>
+                                    <option value="JOIN_OPERATED">挂靠</option>
+                                    <option value="OUTSOURCE">外协</option>
+                                  </select>
+                             </div>
+                          </div>
+                          <div class="layui-col-sm6">
+                              <input type="text" name="salaryBasic" id="salaryBasic" lay-verify="salaryBasic" maxlength="6" placeholder="底薪" class="layui-input">
+                          </div> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">提成方案/底薪</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <div class="margin-right10">
+                                    <select name="pushMoneyPlan" lay-verify="required">
+                                        <option value=""></option>
+                                        <option value="0" selected>方案一</option>
+                                        <option value="1">方案二</option>
+                                        <option value="2">方案三</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="salaryBasic" id="salaryBasic" maxlength="6" placeholder="底薪" class="layui-input" hc-verify="positiveIntegers|max" hc-verify_field="底薪" hc-verify_max="990000">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">保底产值/提成比例(%)</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <div class="margin-right10">
+                                    <input type="text" name="yieldBasic" id="yieldBasic" lay-verify="yieldBasic" maxlength="8" placeholder="" class="layui-input" hc-verify="positiveIntegers|max" hc-verify_field="保底产值" hc-verify_max="10000000">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="yieldGetRate" id="yieldGetRate" placeholder="输入正数且保留小数点后两位" class="layui-input" maxlength="5" hc-verify="range|decimals2" hc-verify_min="0" hc-verify_max="100" hc-verify_field="提成比例">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">利润分成比率(%)</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="profitGetRate" id="profitGetRate" placeholder="输入正数且保留小数点后两位" class="layui-input" maxlength="5" hc-verify="range|decimals2" hc-verify_min="0" hc-verify_max="100" hc-verify_field="利润分成比率">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">司机编码及账号</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <div class="margin-right10">
+                                    <input type="text" name="driverNo" id="driverNo" maxlength="10" placeholder="司机编码" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="accountNo" id="accountNo" style="cursor:not-allowed;" placeholder="系统登录账号" disabled class="layui-input">
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>其他信息</legend>
+        </fieldset>
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-sm8">
+                    <div class="layui-form-item layui-form-item--require" id="userDistrict">
+                        <label class="layui-form-label">居住地址</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="userProvince" id="userProvince" lay-filter="userProvince">
+                                    <option value="">请选择</option>
+                                  </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="userCity" id="userCity" lay-filter="userCity">
+                                    <option value="">请选择</option>
+                                  </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="userCounty" id="userCounty" lay-filter="userCounty">
+                                    <option value="">请选择</option>
+                                  </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div>
+                                    <select name="userStreet" id="userStreet" lay-filter="userStreet">
+                                    <option value="">请选择</option>
+                                  </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="margin-left10">
+                        <input type="text" name="address" id="address" placeholder="请输入详细地址" class="layui-input" maxlength="255" lay-verify="required">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm8">
+                    <div class="layui-form-item layui-form-item--require" id="juryDistrict">
+                        <label class="layui-form-label">联系地址</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="juryProvince" id="juryProvince" lay-filter="juryProvince">
+                                    <option value="">请选择</option>
+                                  </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="juryCity" id="juryCity" lay-filter="juryCity">
+                                    <option value="">请选择</option>
+                                  </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div class="margin-right10">
+                                    <select name="juryCounty" id="juryCounty" lay-filter="juryCounty">
+                                    <option value="">请选择</option>
+                                  </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div>
+                                    <select name="juryStreet" id="juryStreet" lay-filter="juryStreet">
+                                    <option value="">请选择</option>
+                                  </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="margin-left10">
+                        <input type="text" name="linkAddress" placeholder="请输入详细地址" class="layui-input" maxlength="255" lay-verify="required">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">入职日期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="positionDate" id="positionDate" placeholder="" class="layui-input" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">合作终止日期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="positionDateE" id="positionDateE" placeholder="" class="layui-input" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">紧急联系人及关系</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <div class="margin-right10">
+                                    <input type="text" name="juryUname" id="juryUname" maxlength="20" placeholder="紧急联系人" class="layui-input" hc-verify="userName|nameSize" hc-verify_field="紧急联系人">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="juryRelation" id="juryRelation" maxlength="20" placeholder="与联系人关系" class="layui-input" hc-verify="userName|nameSize" hc-verify_field="与联系人关系">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-sm4">
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">联系人电话</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="juryMobile" id="juryMobile" placeholder="" class="layui-input" maxlength="20" hc-verify="fixCellphone">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm8">
+                    <div class="layui-form-item ">
+                        <div class="layui-col-sm8">
+                            <div class="layui-form-item" id="linkDistrict">
+                                <label class="layui-form-label">联系人地址</label>
+                                <div class="layui-input-block">
+                                    <div class="layui-col-sm3">
+                                        <div class="margin-right10">
+                                            <select name="linkProvince" id="linkProvince" lay-filter="linkProvince">
+                                                    <option value="">请选择</option>
+                                                  </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-col-sm3">
+                                        <div class="margin-right10">
+                                            <select name="linkCity" id="linkCity" lay-filter="linkCity">
+                                                    <option value="">请选择</option>
+                                                  </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-col-sm3">
+                                        <div class="margin-right10">
+                                            <select name="linkCounty" id="linkCounty" lay-filter="linkCounty">
+                                                    <option value="">请选择</option>
+                                                  </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-col-sm3">
+                                        <div>
+                                            <select name="linkStreet" id="linkStreet" lay-filter="linkStreet">
+                                                    <option value="">请选择</option>
+                                                  </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-sm4">
+                            <div class="margin-left10">
+                                <input type="text" name="linksAddress" placeholder="请输入详细地址" class="layui-input" maxlength="255">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item ">
+                            <label class="layui-form-label">备注</label>
+                            <div class="layui-input-block">
+                                <textarea id="remarks" name="remarks" placeholder="0~1000字符之间" class="layui-textarea" style="min-height:50px;" maxlength="1000" hc-verify="remarkSize"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 装卸地址 -->
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>
+                    结算信息
+                    <span class="legend-btns">
+                  <a class="layui-icon icon-add tableHS" id="btn-add" data-type="" >&#xe61f;</a>
+                </span>
+                </legend>
+            </fieldset>
+
+            <!--start:表格列表-->
+            <!-- <table class="layui-hide" id="table_list" lay-filter="demo"></table> -->
+
+            <table class="layui-table" id="table_list" lay-filter="test">
+            </table>
+            <!--end:表格列表-->
+
+            <input type="hidden" name="id">
+            <div class="layui-form-item div-add button-bar" style="text-align:center;">
+                <div class="layui-inline continue"><input type="checkbox" lay-skin="primary" id="continue" title="保存并继续新增" checked></div>
+                <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="submit">保存</button>
+                <button class="layui-btn layui-btn-primary btn-cancel">取消</button>
+            </div>
+            <div class="layui-form-item div-info button-bar" style="text-align:center; display:none;">
+                <button class="layui-btn layui-btn-normal btn-modify" type="button">编辑</button>
+                <button class="layui-btn layui-btn-primary btn-back" type="button">返回</button>
+            </div>
+    </form>
+    <!-- 新增所属公司 -->
+    <div id="select_prod" class="layui-form" hidden="hidden">
+        <div class="layui-input-inline">
+            <input type="text" name="text" placeholder="" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/layui.district_1.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<!-- 工具库依赖 -->
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+<script>
+    $(function() {
+        layui.use(['form', 'layer', 'table', 'laydate'], function() {
+            var form = layui.form,
+                layer = layui.layer,
+                table = layui.table,
+                laydate = layui.laydate,
+                tmsTab = layui.tms_tab,
+                $ = layui.jquery;
+            var $bankArrayLength = 0;
+            var layIdID;
+            form.render();
+            //日期
+            laydate.render({
+                elem: '#driversLicenseDateB' //驾照初领日期
+                ,max: 0
+            });
+            laydate.render({
+                elem: '#driversLicenseDateE' //驾照有效期
+                    ,
+                min: 0
+            });
+            laydate.render({
+                elem: '#positionDate' //入职日期
+            });
+            laydate.render({
+                elem: '#positionDateE' //合作终止日期
+                ,
+                min: 0
+            });
+            var compareTime = function(bTime, eTime){
+                var b = typeof bTime === 'number' ? bTime : Date.parse(new Date(bTime));
+                var e = typeof eTime === 'number' ? eTime : Date.parse(new Date(eTime));
+                return b - e ;
+            }
+            $('#IDNumber').blur(function() {
+                if ($(this).val().length == 0) {
+                    layer.tips('请输入身份证号', '#IDNumber', {
+                        tips: [3, '#d84747']
+                    });
+                } else if ($(this).val().length > 0) {
+                    if (!$jsReg.idNo.test($(this).val())) {
+                        layer.tips('身份证号码格式错误', '#IDNumber', {
+                            tips: [3, '#d84747']
+                        });
+                    } else {
+                        $('#driveLicense').val($('#IDNumber').val());
+                        $('#jobQualNo').val($('#IDNumber').val());
+                        $('#sex').val(
+                            parseInt($('#IDNumber').val().substr(16, 1)) % 2 == 1 ? "男" : "女"
+                        );
+                    }
+                }
+            });
+            var positionVal = $('#positionDate').val();
+            var positionEndVal = $('#positionDate').val();
+            if(positionVal.length && positionEndVal.length){
+                if(compareTime(positionVal, positionEndVal) > 0){
+                    layer.open({
+                        type: 1, 
+                        content: '入职日期不能大于合作终止日期'
+                    });
+                }
+            }
+            $('#userDistrict').district(form);
+            $('#juryDistrict').district(form);
+            $('#linkDistrict').district(form);
+
+            $('#address').blur(function() {
+                copyText();
+            });
+
+            //复制文本功能
+            function copyText() {
+                var $index4 = $('#userDistrict select').not(':disabled').length - 1,
+                    $areaId = $('#userDistrict select').eq($index4).val();
+                var $index5 = $('#juryDistrict select').not(':disabled').length - 1,
+                    $areaIds = $('#juryDistrict select').eq($index5).val();
+                if ($areaId == "") {
+                    parent.layer.alert("居住地址请选择完整！");
+                    return false;
+                }
+                if ($areaIds == "") {
+                    $('#juryDistrict').district(form, $areaId);
+                }
+                if ($('input[name="linkAddress"]').val() == "") {
+                    $('input[name="linkAddress"]').val($('input[name="address"]').val());
+                }
+                // $('#juryDistrict').district(form,$areaId);
+                // $('input[name="linkAddress"]').val($('input[name="address"]').val());
+            }
+
+            //加载所属公司下拉框数据
+            $.ajax({
+                type: "GET",
+                url: "/ucenter/crm/supplier/supplier/page.shtml",
+                async: false,
+                success: function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code === 'SUCCESS' && $objects.list.length > 0) {
+                        for (var $i = 0; $i < $objects.list.length; $i++) {
+                            $('select[name="ownerSupplierId"]').append('<option value="' + $objects.list[$i].id + '">' + $objects.list[$i].name + '</option>');
+                        }
+                        form.render('select');
+                    }
+                }
+            });
+
+            //合同类型为外协时  所属公司的下拉框变成输入框
+            var requireJudge = (function () {
+                return {
+                    notReq: function() {                      
+                        $('#ownerCompanyName').removeClass('layui-hide').attr('lay-verify', 'required');
+                        $('select[name="ownerSupplierId"]').parent().addClass('layui-hide');
+                        $('select[name="ownerSupplierId"]').removeAttr('lay-verify');
+                    },
+                    yesReq: function() {                                         
+                        $('#ownerCompanyName').addClass('layui-hide').removeAttr('lay-verify');
+                        $('select[name="ownerSupplierId"]').parent().removeClass('layui-hide');
+                        $('select[name="ownerSupplierId"]').attr('lay-verify');
+                    },
+                    getOwnerCompanyName: function() {
+                       if($('#ownerCompanyName').hasClass('layui-hide')){
+                           return $('select[name="ownerSupplierId"]').find('option:selected').text();
+                       }  
+                       return $('#ownerCompanyName').val();                      
+                    },
+                    getOwnerCompanyId: function() {                      
+                        if($('#ownerCompanyName').hasClass('layui-hide')){
+                            return $('select[name="ownerSupplierId"]').val();
+                        }  
+
+                        var osId = '';
+                        $('select[name="ownerSupplierId"] option').each(function(i, d) {
+                            if($('#ownerCompanyName').val() == $(this).text()){
+                                osId = $(this).val();
+                            }                       
+                        });
+
+                        return osId;
+                    }    
+                }
+            })();
+
+            form.on('select(contractType)', function(data) {
+                if (data.value == "EMPLOY" || data.value == "JOIN_OPERATED") {
+                    requireJudge.yesReq();
+
+                    $("select[name='ownerSupplierId']").empty();
+                    $.get('/ucenter/userinfo.shtml', function(d) {
+                        var $code = d.code,
+                            $msg = d.msg,
+                            $objects = d.objects;
+
+                        if ($code == 'SUCCESS') {
+                            $("select[name='ownerSupplierId']").append("<option value='" + $objects.regBodyId + "'>" + $objects.regBodyName + "</option>");
+                        } else {
+                            $('select[name="ownerSupplierId"]').append('<option></option>');
+                        }
+                        form.render('select');
+                    }, 'json');
+                } else {
+                    requireJudge.notReq();
+
+                    $("select[name='ownerSupplierId']").empty();
+                    $.get('/ucenter/crm/supplier/supplier/showCarOwnAndTowing.shtml', function(d) {
+                        var $code = d.code,
+                            $msg = d.msg,
+                            $objects = d.objects;
+                        if ($code == 'SUCCESS') {
+                            if ($objects.length > 0) {
+                                for (var $i = 0; $i < $objects.length; $i++) {
+                                    $('select[name="ownerSupplierId"]').append('<option value="' + $objects[$i].id + '">' + $objects[$i].nameShort + '</option>');
+                                }
+                            } else {
+                                $('select[name="ownerSupplierId"]').append('<option></option>');
+                            }
+                        } else {
+                            $('select[name="ownerSupplierId"]').append('<option></option>');
+                        }
+                        form.render('select');
+                    }, 'json');
+                }
+            });
+           
+            //编辑
+            var $type = $.trim(getUrlParam('type'));
+            var bankTableCols =  [
+                { field: 'id', title: '序号', width: 100},
+                {field: 'channelType',title: '渠道',width: 120,sort: true, templet: "#channelTypeTpl"}, 
+                {field: 'bankName',title: '开户银行',width: 250}, 
+                {field: 'bankBranchName', title: '支行',width: 280}, 
+                { field: 'accountName',title: '账户名称/姓名',width: 150}, 
+                {field: 'accountNo', title: '账户', width: 250}, 
+                {field: 'remarks',title: '备注', width: 300}];
+
+            if ($type == 'edit' || $type == 'info') {
+                $(".continue").hide();
+                var $id = $.trim(getUrlParam('id'));
+                if ($id != null) {
+                    $('input[name="id"]').val($id);
+
+                    //获取数据
+                    $.get('/ucenter/tms/capacity/driver/' + $id + '.shtml', function(d) {
+                        var $code = d.code,
+                            $msg = d.msg,
+                            $objects = d.objects;
+
+                        if ($code === 'SUCCESS') {
+                            // var trArr = $(".layui-table tr");
+                            $('input[name="name"]').val($objects.name);
+                            $('input[name="IDNumber"]').val($objects.idNo);
+                            if ($objects.carNo != "" && $objects.carNo != null) {
+                                $('select[name="carShort"]').val($objects.carNo.substring(0, 1));
+                                $('input[name="carNo"]').val($objects.carNo.substring(1));
+                            }
+                            if (d.objects.settlementChannels !== null) {
+                                $bankArrayLength = d.objects.settlementChannels.length;
+                            }
+                            var $sex = 2;
+                            if ($objects.sex == 'MEN') {
+                                $sex = '男';
+                            } else if ($objects.sex == 'WOMEN') {
+                                $sex = '女';
+                            }
+                            $('input[name="sex"]').val($sex);
+                            $('input[name="driveLicense"]').val($objects.driversLicenseNo);
+                            $('select[name="vehicleModel"]').val($objects.driversLicenseLevelDcode);
+                            $('input[name="phone"]').val($objects.mobile);
+                            $('input[name="driversLicenseDateB"]').val($objects.driversLicenseDateB != null ? new Date($objects.driversLicenseDateB).format('yyyy-MM-dd') : '');
+                            $('input[name="driversLicenseDateE"]').val($objects.driversLicenseDateE != null ? new Date($objects.driversLicenseDateE).format('yyyy-MM-dd') : '');
+                            $('select[name="jobQualCateDcode"]').val($objects.jobQualCateDcode);
+                            $('input[name="jobQualNo"]').val($objects.jobQualNo);
+                            $('select[name="contractType"]').val($objects.contractType);
+                            $('select[name="pushMoneyPlan"]').val($objects.pushMoneyPlanId);
+                            $('input[name="salaryBasic"]').val($objects.salaryBasic);
+                            $('input[name="yieldBasic"]').val($objects.yieldBasic);
+                            $('input[name="yieldGetRate"]').val($objects.yieldGetRate);
+                            $('input[name="profitGetRate"]').val($objects.profitGetRate);
+                            var ownerSupplierId = $objects.ownerSupplierId;
+                            if ($objects.contractType == "EMPLOY" || $objects.contractType == "JOIN_OPERATED") {
+                                $("select[name='ownerSupplierId']").empty();
+                                $.get('/ucenter/userinfo.shtml', function(d) {
+                                    var $code = d.code,
+                                        $msg = d.msg,
+                                        $objects = d.objects;
+
+                                    if ($code == 'SUCCESS') {
+                                        $("select[name='ownerSupplierId']").append("<option value='" + $objects.regBodyId + "'>" + $objects.regBodyName + "</option>");
+                                    } else {
+                                        $('select[name="ownerSupplierId"]').append('<option></option>');
+                                    }
+                                    $('select[name="ownerSupplierId"]').val(ownerSupplierId);
+                                    form.render('select');
+                                    form.render();
+                                }, 'json');
+                            } else {
+                                requireJudge.notReq();
+
+                                $("select[name='ownerSupplierId']").empty();
+                                $.get('/ucenter/crm/supplier/supplier/showCarOwnAndTowing.shtml', function(d) {
+                                    var $code = d.code,
+                                        $msg = d.msg,
+                                        $objects = d.objects;
+                                    if ($code == 'SUCCESS') {
+                                        if ($objects.length > 0) {
+                                            for (var $i = 0; $i < $objects.length; $i++) {
+                                                $('select[name="ownerSupplierId"]').append('<option value="' + $objects[$i].id + '">' + $objects[$i].nameShort + '</option>');
+                                            }
+                                        } else {
+                                            $('select[name="ownerSupplierId"]').append('<option></option>');
+                                        }
+                                    } else {
+                                        $('select[name="ownerSupplierId"]').append('<option></option>');
+                                    }
+                                    $('select[name="ownerSupplierId"]').val(ownerSupplierId);
+                                    form.render('select');
+                                    form.render();
+                                }, 'json');
+                            }
+                            // $('input[name="carNo"]').val($objects.carNo);
+                            $('select[name="carColor"]').val($objects.carColor);
+                            $('input[name="driverNo"]').val($objects.driverNo);
+                            $('input[name="accountNo"]').val($objects.accountNo);
+                            $('input[name="positionDate"]').val($objects.positionDate != null ? new Date($objects.positionDate).format('yyyy-MM-dd') : '');
+                            $('input[name="positionDateE"]').val($objects.positionDateE != null ? new Date($objects.positionDateE).format('yyyy-MM-dd') : '');
+                            $('#userDistrict').district(form, $objects.areaId);
+                            $('input[name="address"]').val($objects.address);
+                            $('#juryDistrict').district(form, $objects.contacts.linkAreaId);
+                            $('#linkDistrict').district(form, $objects.contacts.juryAreaId);
+                            $('input[name="linkAddress"]').val($objects.contacts.linkAddress);
+                            $('input[name="juryUname"]').val($objects.contacts.juryUname);
+                            $('input[name="juryMobile"]').val($objects.contacts.juryMobile);
+                            $('input[name="juryRelation"]').val($objects.contacts.juryRelation);
+                            //联系人地址
+                            $('input[name="linksAddress"]').val($objects.contacts.juryAddress);
+                            $('textarea[name="remarks"]').val($objects.remarks);
+
+                            //公司名称
+                            $('input[name="ownerCompanyName"]').val($objects.ownerCompanyName);
+
+                            form.render();
+
+                            if ($type == 'info') {
+                                $('form select').prop('disabled', true);
+                                 table.render({
+                                    elem: '#table_list',
+                                    data: d.objects.settlementChannels,
+                                    height: 272,
+                                    cols: [bankTableCols],
+                                    response: {
+                                        statusCode: 'SUCCESS',
+                                        dataName: 'settlementChannels' //数据列表的字段名称，默认：data
+                                    },
+                                    even: true
+                                        // ,page: true //是否显示分页
+                                        ,
+                                    limits: [10],
+                                    limit: 10, //每页默认显示的数量
+                                    page:true, 
+                                    id:'test'
+                                });
+                                layIdID = $('.layui-this', window.parent.document).attr('lay-id');
+                            } else {
+                                bankTableCols.push({
+                                    width: 200,
+                                    title: "操作",
+                                    toolbar: '#bar'
+                                });
+                                table.render({
+                                    elem: '#table_list',
+                                    data: d.objects.settlementChannels,
+                                    height: 272,
+                                    cols:[bankTableCols],
+                                    response: {
+                                        statusCode: 'SUCCESS',
+                                        dataName: 'settlementChannels' //数据列表的字段名称，默认：data
+                                    },
+                                    even: true
+                                        // ,page: true //是否显示分页
+                                        ,
+                                    limits: [10],
+                                    limit: 10 //每页默认显示的数量
+                                        ,
+                                    done: function(res, curr, count) {
+                                    },
+                                    page:true, 
+                                    id:'test'
+                                });
+                            }
+                        } else {
+                            layer.alert($msg);
+                            return false;
+                        }
+                    }, 'json');
+                }
+            }
+
+
+            if($.trim(getUrlParam('do')) == 'add'){     
+                bankTableCols.push({
+                    width: 200,
+                    title: "操作",
+                    toolbar: '#bar'
+                });     
+                table.render({
+                    elem: '#table_list',
+                    height: 272,
+                    cols: [bankTableCols],
+                    even: true,
+                    limits: [10],
+                    limit: 10,
+                    page:true, 
+                    id:'test'
+                });
+            }
+            else{
+                //其他情况
+            }
+
+            if ($type == 'info') {
+                // $("input,textarea,select").prop("disabled",true);
+                $('form input, form textarea').prop('disabled', true).css({
+                    'background': '#eee'
+                });
+                $('form select').prop('disabled', true);
+                $(".div-add").hide();
+                $(".div-info").show();
+                $("#btn-add").parent().hide();
+                $('#bar').hide();
+                form.render();
+            }
+
+            var carNoObj = {
+                target: $('#carNo'),
+                notice: 1,
+                callBack: function(){
+                    return {
+                        'firstWord': $('select[name="carShort"]').val(),
+                        'signVal': $('#carNo').val()
+                    }
+                }
+            }
+            verifyCarNuber(carNoObj);
+            //监听提交
+            form.on('submit(submit)', function(data) {
+                carNoObj.notice = 2;
+                if(!verifyCarNuber(carNoObj)){
+                    return false;
+                }
+
+                if (!bizUtil.validator.verifyContainer($('form'))) {
+                    return false;
+                }
+                var $index1 = $('#userDistrict select').not(':disabled').length - 1,
+                    $areaId = $('#userDistrict select').eq($index1).val();
+                if ($areaId == "") {
+                    parent.layer.alert("居住地址请选择完整！");
+                    return false;
+                }
+                var $index2 = $('#juryDistrict select').not(':disabled').length - 1,
+                    $linkAreaId = $('#juryDistrict select').eq($index2).val();
+                if ($linkAreaId == "") {
+                    parent.layer.alert("联系地址请选择完整！");
+                    return false;
+                }
+                var $index3 = $('#linkDistrict select').not(':disabled').length - 1,
+                    $juryAreaId = $('#linkDistrict select').eq($index3).val();
+                var wayArr = [];
+                var trArr = $(".layui-table-body tr");
+                if (trArr.length > 0) {
+                    for (var i = 0; i < trArr.length; i++) {
+                        var tdArr = $(trArr[i]).find("td");
+                        var id = $(tdArr[0]).find("div").html();
+                        var way = $.trim($(tdArr[1]).find("div").html());
+                        var bank = $(tdArr[2]).find("div").html();
+                        var branch = $(tdArr[3]).find("div").html();
+                        var name = $(tdArr[4]).find("div").html();
+                        var account = $(tdArr[5]).find("div").html();
+                        var remarks = $(tdArr[6]).find("div").html();
+                        if (way == '银行') {
+                            way = 0;
+                        } else if (way == '支付宝') {
+                            way = 1;
+                        } else if (way == '微信') {
+                            way = 2;
+                        };
+                        if ($type == "edit") {
+                            // bankSubBranch
+                            wayArr.push({
+                                "id": id,
+                                "channelType": way,
+                                "bankName": bank,
+                                "bankBranchName": branch,
+                                "accountName": name,
+                                "accountNo": account,
+                                "remarks": remarks
+                            });
+                        } else {
+                            wayArr.push({
+                                "id": id,
+                                "channelType": way,
+                                "bankName": bank,
+                                "bankBranchName": branch,
+                                "accountName": name,
+                                "accountNo": account,
+                                "remarks": remarks
+                            });
+                        }
+                    };
+                }
+
+                //底薪为空值为0
+                var $salaryBasic = $.trim(data.field.salaryBasic).length == 0 ? 0 : $.trim(data.field.salaryBasic);
+
+                //数据源
+                var $saveData = {
+                    name: $.trim(data.field.name),
+                    idNo: $.trim(data.field.IDNumber),
+                    sex: $.trim(data.field.sex) === '男' ? 'MEN' : 'WOMEN',
+                    mobile: $.trim(data.field.phone),
+                    driversLicenseNo: $.trim(data.field.driveLicense),
+                    driversLicenseLevelDcode: $.trim(data.field.vehicleModel),
+                    driversLicenseDateB: $.trim(data.field.driversLicenseDateB),
+                    driversLicenseDateE: $.trim(data.field.driversLicenseDateE),
+                    jobQualCateDcode: $.trim(data.field.jobQualCateDcode),
+                    jobQualNo: $.trim(data.field.jobQualNo),
+                    contractType: $.trim(data.field.contractType),
+                    pushMoneyPlanId: $.trim(data.field.pushMoneyPlan),
+                    salaryBasic: $salaryBasic,
+                    yieldBasic: $.trim(data.field.yieldBasic),
+                    yieldGetRate: $.trim(data.field.yieldGetRate),
+                    profitGetRate: $.trim(data.field.profitGetRate),
+                    ownerSupplierId: $.trim(requireJudge.getOwnerCompanyId()),
+                    ownerCompanyName: $.trim(requireJudge.getOwnerCompanyName()),
+                    carNo: $.trim(data.field.carNo) != "" ? data.field.carShort + $.trim(data.field.carNo) : "",
+                    carColor: $.trim(data.field.carColor),
+                    driverNo: $.trim(data.field.driverNo),
+                    positionDate: $.trim(data.field.positionDate),
+                    positionDateE: $.trim(data.field.positionDateE),
+                    areaId: $areaId,
+                    delSettlementChannelIds: delSettlementChannelIds,
+                    address: $.trim(data.field.address),
+                    status: 1,
+                    remarks: $.trim(data.field.remarks),
+                    contacts: {
+                        linkAreaId: $linkAreaId,
+                        linkAddress: $.trim(data.field.linkAddress),
+                        juryUname: $.trim(data.field.juryUname),
+                        juryMobile: $.trim(data.field.juryMobile),
+                        juryRelation: $.trim(data.field.juryRelation),
+                        // 联系人地址
+                        juryAddress: $.trim(data.field.linksAddress),
+                        juryAreaId: $juryAreaId
+                    },
+                    settlementChannels: wayArr
+                }
+
+                if ($type != 'edit') { //新增
+                    //调用接口
+                    HC.ajax.post({
+                        url: "/ucenter/tms/capacity/driver/add.shtml",
+                        data: JSON.stringify($saveData),
+                        success: function(d) {
+                            parent.layer.alert("保存成功", {
+                                closeBtn: 0,
+                                yes: function(index) {
+                                    parent.layer.close(index);
+                                    if ($("#continue").is(":checked")) { //保存后继续新增                                        
+                                        $(window.parent['f1'].document).find('.btn-search').click();
+                                        window.location.reload();
+                                    } else {
+                                        $(window.parent['f1'].document).find('.btn-search').click();
+                                        bizUtil.frame.closeCurrentIframeTab(window.parent);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    return false;
+                } else { //修改
+                    $saveData.id = $('input[name="id"]').val();
+                    //调用接口
+                    HC.ajax.put({
+                        url: "/ucenter/tms/capacity/driver/" + $("input[name='id']").val() + ".shtml",
+                        data: JSON.stringify($saveData),
+                        success: function(d) {
+                            parent.layer.alert("保存成功", {
+                                closeBtn: 0,
+                                yes: function(index) {
+                                    parent.layer.close(index);
+                                    $(window.parent['f1'].document).find('.btn-search').click();
+                                    bizUtil.frame.closeCurrentIframeTab(window.parent);
+                                }
+                            });
+                        }
+                    });
+                    return false;
+                }
+            });
+
+            //取消
+            $(".btn-cancel").click(function() {
+                bizUtil.frame.closeCurrentIframeTab(window.parent);
+            });
+
+            //修改司机
+            $(".btn-modify").click(function() {
+                // bizUtil.frame.closeCurrentIframeTab($(this));
+                tmsTab.add($(this), "编辑司机", "modify.html?type=edit&id=" + $('input[name="id"]').val());
+                layui.tms_tab.del(layIdID);
+            });
+
+            //返回
+            $(".btn-back").click(function() {
+                bizUtil.frame.closeCurrentIframeTab(window.parent);
+            });
+        });
+
+        $("#btn-add").click(function() {
+            parent.layer.open({
+                type: 2,
+                title: '新增银行账号',
+                shadeClose: true,
+                shade: 0.8,
+                area: ['1000px', '500px'],
+                content: 'bankaccountmodify.html' //iframe的url
+            });
+        });
+
+        $(document).on("click", ".btn-edit", function() {
+
+            $(this).parent().parent().parent().siblings().attr("status", "");
+            $(this).parent().parent().parent().attr("status", "edit");
+            var tdArr = $(this).parent().parent().parent().find("td");
+            var way = $(tdArr[1]).find("div").html();
+            var bank = $(tdArr[2]).find("div").html();
+            var branch = $(tdArr[3]).find("div").html();
+            var name = $(tdArr[4]).find("div").html();
+            var account = $(tdArr[5]).find("div").html();
+            var remarks = $(tdArr[6]).find("div").html();
+
+            way = encodeURI(encodeURI(way));
+            bank = encodeURI(encodeURI(bank));
+            branch = encodeURI(encodeURI(branch));
+            name = encodeURI(encodeURI(name));
+            account = encodeURI(encodeURI(account));
+            remarks = encodeURI(encodeURI(remarks));
+
+            parent.layer.open({
+                type: 2,
+                title: '编辑银行账号',
+                shadeClose: true,
+                shade: 0.8,
+                area: ['1000px', '500px'],
+                content: 'bankaccountmodify.html?do=edit&way=' + way + '&bank=' + bank + '&branch=' + branch + '&name=' + name + '&account=' + account + '&remarks=' + remarks //iframe的url
+            });
+        });
+
+        var delSettlementChannelIds = [];
+
+        $(document).on("click", ".btn-delete", function() {
+            var $this = $(this);
+            setLayerConfirm(parent.layer, '真的删除行么', function(index) {
+                delSettlementChannelIds.push($($this.parent().parent().parent()[0]).find('td:first-child div').text());
+                $this.parent().parent().parent().remove();
+                parent.layer.close(index);
+            });
+        });
+
+        $("#addCompany").on("click", function() {
+            addProductClassify()
+            // form.render();
+        })
+
+        function renderForm() {
+            layui.use('form', function() {
+                var form = layui.form;
+                form.render();
+            });
+        }
+
+        function addProductClassify() {
+            layer.open({
+                type: 1,
+                btn: ['确定', '取消'],
+                title: "添加新增所属公司",
+                content: $("#select_prod"),
+                area: ['270px', '160px'],
+                //当前层索引参数（index）、当前层的DOM对象（layero）
+                yes: function(index, layero) {
+                    //获取input输入的值
+                    var ivalue = $(layero).find("input").val();
+                    //获取要添加的option的索引
+                    var sIndex = $("#company")[0].options.length - 1;
+                    if (ivalue == null || ivalue == '') {
+                        layer.msg("请输入新增所属公司")
+                    } else {
+                        layer.msg("输入的所属公司是：" + ivalue);
+                        //为select添加option
+                        $("#company").append("<option value=" + sIndex + ">" + ivalue + "</option>");
+                        renderForm(); //表单重新渲染，要不然添加完显示不出来新的option
+                        layer.close(index);
+                    }
+                    $(layero).find("input").val('');
+                }
+            })
+        }
+    });
+
+    // function renderForm(){
+    //   layui.use('form', function(){
+    //   var form = layui.form();
+    //   form.render();
+    //   });
+    // }
+    //     $('#juryProvince').on("change",function(){
+    //     });
+</script>
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-mini btn-edit">编辑</a><a class="layui-btn layui-btn-danger layui-btn-mini btn-delete">删除</a>
+</script>
+<script type="text/html" id="channelTypeTpl">
+    {{# if(d.channelType == '0'){ }} 银行 {{# }else if(d.channelType == '1'){ }} 支付宝 {{# }else if(d.channelType == '2'){ }} 微信 {{# } }}
+</script>
+
+</html>

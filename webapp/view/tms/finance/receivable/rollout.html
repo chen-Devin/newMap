@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>运单转出 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      <h4 style="font-size:20px">确定把以下运单转出到下个账期吗？</h4>
+      <!--start:表格列表-->
+      <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+      <!--end:表格列表-->
+      <div class="layui-form-item" style="text-align:center;">
+        <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit" style="width:150px;">确定，立刻转出</button>
+        <button class="layui-btn layui-btn-primary btn-cancel" type="button" style="width:150px;">取消，返回想想</button>
+      </div>
+    </form>
+  </body>
+  <script type="text/html" id="doarkDateTpl">
+      {{new Date(d.doarkDate).format("MM-dd")}}
+  </script>
+  <script type="text/html" id="createDateTpl">
+      {{new Date(d.createDate).format("yyyy-MM-dd hh:mm:ss")}}
+  </script>
+  <script type="text/html" id="sumTpl">
+      {{ (d.transportCost + d.extraCost)  }}
+  </script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    var $data = $.trim(getUrlParam('data')).split(",");
+
+    setTableData($data);
+
+    //方法级渲染
+    function setTableData($data){
+      var $pageSize = 15;
+
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/receivedBills/showOrdersOut.shtml',
+        where: {ids:$data},
+        method: 'post', 
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'id', title: '序号', width:90, },
+          {field:'jobNo', title: '运输作业号', width:190},
+          {field:'doarkDate', title: '做柜日期', width:90, templet:'#doarkDateTpl'},
+          {field:'ordersType', title: '类型', width:90},
+          {field:'soNo', title: 'S/O', width:200},
+          {field:'arkNo', title: '柜号', width:130, },
+          {field:'arkType', title: '柜型', width:80},
+          {field:'carNo', title: '车牌号', width:100},
+          {field:'transportCost', title: '运费', width:100},
+          {field:'extraCost', title: '异常费', width:100},
+          {field:'sum', title: '合计', width:100, templet:"#sumTpl"},
+          {field:'paidCost', title: '已收金额', width:100},
+          {field:'createDate', title: '创建时间', width:200, templet:'#createDateTpl'}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){}
+      });
+    }
+
+    //监听提交
+    form.on('submit(submit)', function(data){
+      var checkStatus = table.checkStatus('dataReload'),
+      data = checkStatus.data;
+      if(data.length == 0){
+        parent.layer.alert('你还未选中数据！');
+      }else{
+        var $data = [];
+        for(var $i = 0; $i< data.length; $i++){
+          $data.push(data[$i].id);
+        }
+        roleStatus($data);
+      }
+      return false;
+    });
+
+    function roleStatus($ids){
+      var $saveData = {
+        ids: $ids,
+      }
+       $.ajax({
+        type:'PUT', 
+        url:'/ucenter/general/finance/receivedBills/ordersOut.shtml', 
+        dataType:"json",
+        contentType: "application/json",
+        data:JSON.stringify($saveData),
+        success:function(d){
+          var $code = d.code,
+              $msg = d.msg,
+              $objects = d.objects;
+          if($code === 'SUCCESS'){
+            parent.layer.alert("操作成功", {
+                closeBtn: 0,
+                yes: function(index) {
+                  parent.layer.closeAll();
+                    bizUtil.frame.refreshCurrentFrame();
+                }
+            })
+          }else{
+            parent.layer.alert($msg, {
+                closeBtn: 0,
+                yes: function(index) {
+                    parent.layer.closeAll();
+                }
+            });
+          }
+        }
+      });
+    }
+
+    $(".btn-cancel").on("click",function(){
+      parent.layer.closeAll();
+      return false;
+    });
+  });
+  </script>
+</html>

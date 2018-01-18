@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>编辑客户 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+</head>
+
+<body>
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+        <legend>
+            银行账号
+            <span class="legend-btns">
+                <a class="layui-icon icon-add tableSSC" data-type="supplierSettlementChannelsAdd" data-func="callbackSSC(obj)" href="javascript:;">&#xe61f;</a>
+            </span>
+        </legend>
+    </fieldset>
+    <!-- <div><a class="layui-btn layui-btn-small layui-btn-radius layui-btn-primary tableSSC" data-type="supplierSettlementChannelsAdd" data-func="callbackSSC(obj)"; href="javascript:;">增加银行</a></div> -->
+
+    <table id="tableListTP" lay-filter="tableSSC" style="margin-top:40px"></table>
+    <input type="hidden" name="dataSSC">
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<!-- <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script> -->
+<!-- <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script> -->
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script type="text/html" id="bar">
+    <!-- <a class="layui-btn layui-btn-mini btn-edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-mini btn-delete">删除</a> -->
+    <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a> {{# if(d.status == 1){ }}
+    <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">冻结</a> {{# }else{ }}
+    <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">激活</a> {{# } }}
+</script>
+<script type="text/html" id="channelTypeTpl">
+    {{# if(d.channelType == 0){ }}
+    <div>银行</div>
+    {{# }else if(d.channelType == 1){ }}
+    <div>支付宝</div>
+    {{# }else if(d.channelType == 2){ }}
+    <div>微信</div>
+    {{# } }}
+</script>
+<script type="text/html" id="statusTpl">
+    {{# if(d.status == 1){ }}
+    <a lay-event="statusCancel" style="color:#1E9FFF;">激活</a> {{# }else{ }}
+    <a lay-event="statusStart" style="color:#FF5722;">冻结</a> {{# } }}
+</script>
+<script>
+    layui.use(['table', 'layer', 'layedit', 'laydate'], function() {
+        var table = layui.table,
+            layer = layui.layer,
+            $ = layui.jquery;
+        var $id = $.trim(getUrlParam('id'));
+        console.log($id);
+        setTableData($id);
+
+        function setTableData($organizeId) {
+            typeof $organizeId != 'undefined' ? $organizeId = $organizeId : $organizeId = '';
+            console.log($organizeId);
+            table.render({
+                elem: '#tableListTP',
+                url: '/ucenter/general/finance/settlementChannel/getBankByTargetId.shtml?id=' +
+                    $organizeId,
+                response: {
+                    statusCode: 'SUCCESS',
+                    dataName: 'objects'
+                },
+                cols: [
+                    [{
+                        field: 'channelType',
+                        title: '渠道',
+                        width: 100,
+                        templet: '#channelTypeTpl',
+                        align: 'center'
+                    }, {
+                        field: 'bankName',
+                        title: '开户银行',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'bankBranchName',
+                        title: '支行',
+                        width: 180,
+                        align: 'center'
+                    }, {
+                        field: 'accountName',
+                        title: '账号名称',
+                        width: 120,
+                        align: 'center'
+                    }, {
+                        field: 'accountNo',
+                        title: '账号',
+                        width: 120,
+                        align: 'center'
+                    }, {
+                        field: 'status',
+                        title: '状态',
+                        width: 120,
+                        templet: '#statusTpl',
+                        align: 'center'
+                    }, {
+                        field: 'remarks',
+                        title: '备注',
+                        width: 110,
+                        align: 'center'
+                    }, {
+                        align: 'center',
+                        title: '操作',
+                        toolbar: '#bar',
+                        width: 120
+                    }, ]
+                ],
+                id: 'dataReload',
+                // page: false,
+                height: 'full-130',
+                even: true
+            });
+        }
+
+        // function toolFunc(test,url,ele,arr,arr2,addressId){
+        table.on('tool(tableSSC)', function(obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值
+            var tr = obj.tr; //获得当前行 tr 的DOM对象 
+            var $data = JSON.stringify(data)
+            console.log($data);
+            $('input[name=dataSSC]').attr('data-func', 'callB(' + $data + ')')
+            console.log($('input[name=dataSSC]'));
+            var $url = './supplierSettlementChannels.html?do=edit';
+            if (layEvent === 'edit') { //编辑
+                //do something
+                console.log($data);
+                // console.log(data); 
+                parent.layer.open({
+                    type: 2,
+                    title: '编辑装卸单位',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['950px', '550px'],
+                    content: $url,
+                    success: function(layero, index) {
+
+                    },
+                    btn: ['确定', '关闭'],
+                    yes: function(index, layero) {
+                        $(layero.find('iframe')[0].contentWindow.document).find('#vsubmit')
+                            .click();
+                        var cllBack = $('.tableSSC').attr('data-func')
+                        var Fun = eval(cllBack);
+                        var objs = Fun;
+
+                        var reb = false;
+                        if (objs.conAdd == 1) {
+                            reb = true;
+                        }
+                        objs.id = data.id;
+                        objs.targetId = data.targetId;
+                        objs.status = data.status;
+                        console.log(objs);
+                        delete(objs.$id);
+                        delete(objs.conAdd);
+                        $.ajax({
+                            type: 'post',
+                            // url:'/ucenter/crm/supplier/supplierSettlementChannel/'+data.id+'.shtml', 
+                            url: '/ucenter/general/finance/settlementChannel/updateBankById.shtml',
+                            dataType: "json",
+                            contentType: "application/json",
+                            data: JSON.stringify(objs),
+                            success: function(d) {
+                                console.log(d);
+                                var $code = d.code,
+                                    $msg = d.msg,
+                                    $objects = d.objects;
+
+                                if ($code === 'SUCCESS') {
+                                    obj.update(objs);
+                                    parent.layer.closeAll();
+                                    parent.layer.alert('保存成功！', {
+                                        yes: function() {
+                                            //关闭窗口
+                                            parent.layer.closeAll();
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            } else if (layEvent === 'del') {
+                // parent.layer.confirm('真的删除这条信息吗？', function(index){
+                var $this = $(this);
+                var $obj = obj;
+                var $data = data;
+                if (data.status == 1) {
+                    parent.layer.confirm('您确定要冻结这个账号吗？', function(index) {
+                        var $ids = [];
+                        $ids.push(data.id);
+                        roleStatus($ids, 3, $this, $obj, $data);
+
+                        // console.log(roleStatus($ids, 3,$this,$obj));
+                        parent.layer.close(index);
+                    });
+                } else {
+                    parent.layer.confirm('您确定要激活这个账号吗？', function(index) {
+                        var $ids = [];
+                        $ids.push(data.id);
+                        roleStatus($ids, 1, $this, $obj, $data);
+                        // console.log(roleStatus($ids, 1,$this,$obj));
+                        parent.layer.close(index);
+                    });
+                }
+            }
+        });
+
+        function callbackSSC(obj) {
+            if (obj == null || obj == '') {
+                return false
+            }
+            return obj
+        }
+        var active = {
+            //新增银行
+            supplierSettlementChannelsAdd: function() {
+                // data-type="handingSiteAdd"
+                // tmsTab.add($(this), '新增客户', 'modify.html?do=add');
+                parent.layer.open({
+                    type: 2,
+                    title: '新增支付',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['950px', '550px'],
+                    content: './supplierSettlementChannels.html?do=add&ppp=2',
+                    success: function(layero, index) {
+                        // form.render();           
+                    },
+                    btn: ['确定', '关闭'],
+                    yes: function(index, layero) {
+                        // $(window.parent['f' + $layId].document).find('.bbqq').contentWindow.document           
+                        // console.log($(layero.find('iframe')[0].contentWindow.document).find('#vsubmit'));
+                        $(layero.find('iframe')[0].contentWindow.document).find('#vsubmit')
+                            .click();
+                        var cllBack = $('.tableSSC').attr('data-func')
+                        $('.tableSSC').attr('data-func', 'callbackSSC()')
+                        var Fun = eval(cllBack);
+                        var objs = Fun;
+                        console.log(objs);
+                        if (!objs) {
+                            return;
+                        }
+                        var reb = false;
+                        if (objs.conAdd == 1) {
+                            reb = true;
+                        }
+                        objs.targetId = $id;
+                        objs.status = 1;
+                        delete objs.conAdd;
+                        delete objs.$id;
+                        console.log(objs);
+                        $.ajax({
+                            type: 'post',
+                            // url:'/ucenter/crm/supplier/supplierSettlementChannel/add.shtml', 
+                            url: '/ucenter/general/finance/settlementChannel/insert.shtml',
+                            dataType: "json",
+                            contentType: "application/json",
+                            data: JSON.stringify(objs),
+                            success: function(d) {
+                                parent.layer.alert('保存成功！')
+                                var $code = d.code,
+                                    $msg = d.msg,
+                                    $objects = d.objects;
+
+                                if ($code === 'SUCCESS') {
+                                    if (!reb) {
+                                        parent.layer.closeAll();
+                                    }
+                                }
+                            }
+                        });
+
+                        // layer.close(index);
+                    },
+                    end: function(index, layero) {
+                        var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+                        parent['f' + $layId].location.reload();
+                    }
+                });
+            },
+
+        };
+        //给按钮按钮添加事件
+
+        $('.tableSSC').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //改变状态，1正常，2删除
+        function roleStatus($ids, $status, $this, $obj, $data) {
+            var $saveData = {
+                ids: $ids,
+                status: $status
+            }
+
+            $.ajax({
+                type: 'PUT',
+                url: '/ucenter/general/finance/settlementChannel/status.shtml',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify($saveData),
+                success: function(d) {
+                    console.log(d);
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code === 'SUCCESS') {
+                        if ($status == 3) {
+                            $this.html('激活');
+                            $data.status = 3;
+                            $obj.update($data);
+                        } else if ($status == 1) {
+                            $this.html('冻结');
+                            $data.status = 1;
+                            $obj.update($data)
+                        }
+                    } else {
+                        parent.layer.alert('操作失败！');
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+</html>

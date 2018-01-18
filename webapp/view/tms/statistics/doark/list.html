@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>运输统计</title>
+  <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+  <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  <style>
+    .layui-form-item {
+      margin: 0;
+    }
+
+    .layui-form-item .layui-inline {
+      margin-bottom: 0;
+      margin-right: 6px;
+    }
+
+    .layui-form-item .layui-inline .layui-input-inline {
+      margin-right: 4px;
+      width: 160px;
+    }
+
+    .layui-form-item .layui-inline .layui-form-mid {
+      margin-right: 4px;
+    }
+
+    .search-bar {
+      display: none;
+    }
+
+    #table_list1 tr td,
+    #table_list1 tr th {
+      text-align: center;
+    }
+
+    .time-btn-sel {
+      background: #cecece;
+      color: #000;
+    }
+
+    #doarkStream-search .layui-form-item .layui-inline .layui-input-inline{
+      width: 128px;
+    }
+
+    #doarkRecord-search .layui-form-item .layui-inline{
+      margin-right: 5px;
+    }
+
+    #doarkRecord-search .layui-form-item .layui-inline .layui-input-inline{
+      width: 108px;
+    }
+  </style>
+</head>
+
+<body>
+  <!--start: 每日做柜记录 搜索-->
+  <div class="panel-handle search-bar" id="doarkRecord-search">
+    <form class="layui-form layui-form-pane" autocomplete="off">
+      <div class="layui-form-item">
+        <div class="layui-inline" style="margin-right: -1px;">
+          <label class="layui-form-label">做柜时间</label>
+          <div class="layui-input-inline">
+            <select name="doarkTime">
+            </select>
+          </div>
+          <!-- <div class="layui-input-inline">
+            <input type="text" name="beginDate" id="beginDate" placeholder="起始时间" class="layui-input">
+          </div>
+          <div class="layui-form-mid">-</div>
+          <div class="layui-input-inline" style="margin-right: 0">
+            <input type="text" name="endDate" id="endDate" placeholder="截止时间" class="layui-input">
+          </div> -->
+        </div>
+        <div class="layui-inline">
+          <div class="layui-input-inline" style="width:auto;">
+            <div class="layui-btn-group">
+              <button class="layui-btn layui-btn-primary time-btn-sel" data-btn="doTime" data-id="this-month" type="button">本月</button>
+              <button class="layui-btn layui-btn-primary" data-btn="doTime" data-id="last-month" type="button">上月</button>
+            </div>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">车牌号码</label>
+          <div class="layui-input-inline">
+            <input type="text" name="carNo" autocomplete="off" class="layui-input" />
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">客户名称</label>
+          <div class="layui-input-inline">
+            <select name="customerId" id="customerId" lay-filter="customerId" hc-data_text_field="nameShort" lay-search hc-data_url="/ucenter/crm/customers/customers/page.shtml?pageNum=-1&status=1">
+              <option value="" selected>请选择</option>
+              <option value="" disabled>数据加载中...</option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">供应商</label>
+          <div class="layui-input-inline">
+            <select name="carCompanyId" id="carCompanyId" lay-filter="carCompanyId" hc-data_text_field="nameShort" lay-search hc-data_url="/ucenter/crm/supplier/supplier/page.shtml?pageNum=-1&status=1&typeCode=550,553">
+              <option value="" selected>请选择</option>
+              <option value="" disabled>数据加载中...</option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <button type="button" class="layui-btn layui-btn-danger" lay-submit lay-filter="search">
+            <i class="layui-icon">&#xe615;</i>查询</button>
+          <button class="layui-btn layui-btn-primary doArkReset" type="button" style="margin:0;">重置</button>
+        </div>
+      </div>
+    </form>
+    <div class="clr"></div>
+  </div>
+  <!--end: 搜索-->
+
+  <!--start: 每日做柜统计 搜索-->
+  <div class="panel-handle search-bar" id="doarkCount-search">
+    <form class="layui-form layui-form-pane" autocomplete="off">
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <div class="layui-input-inline">
+            <select name="searchType">
+              <option value="1" selected>做柜时间</option>
+              <option value="2">完成时间</option>
+            </select>
+          </div>
+          <div class="layui-input-inline">
+            <input type="text" name="beginDate" id="beginDate" placeholder="起始时间" class="layui-input" />
+          </div>
+          <div class="layui-form-mid">-</div>
+          <div class="layui-input-inline" style="margin-right: 0">
+            <input type="text" name="endDate" id="endDate" placeholder="截止时间" class="layui-input" />
+          </div>
+        </div>
+        <div class="layui-inline">
+          <div class="layui-input-inline" style="width:auto;">
+            <div class="layui-btn-group">
+              <button class="layui-btn layui-btn-primary time-btn-sel" data-btn="doTime" data-id="this-month" type="button">本月</button>
+              <button class="layui-btn layui-btn-primary" data-btn="doTime" data-id="last-month" type="button">上月</button>
+            </div>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <button type="button" class="layui-btn layui-btn-danger" lay-submit lay-filter="search">
+            <i class="layui-icon">&#xe615;</i>查询</button>
+          <button class="layui-btn layui-btn-primary doArkReset" type="button" style="margin:0;">重置</button>
+        </div>
+      </div>
+    </form>
+    <div class="clr"></div>
+  </div>
+  <!--end: 搜索-->
+
+  <!--start: 做柜流水  搜索-->
+  <div class="panel-handle search-bar" id="doarkStream-search">
+    <form class="layui-form layui-form-pane" autocomplete="off">
+      <div class="layui-form-item">
+        <div class="layui-inline" style="margin-right: -1px;">
+          <label class="layui-form-label">作业日期</label>
+          <div class="layui-input-inline">
+            <input type="text" name="beginDate" id="beginDate" placeholder="起始时间" class="layui-input">
+          </div>
+          <div class="layui-form-mid">-</div>
+          <div class="layui-input-inline" style="margin-right: 0">
+            <input type="text" name="endDate" id="endDate" placeholder="截止时间" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <div class="layui-input-inline" style="width:auto;">
+            <div class="layui-btn-group">
+              <button class="layui-btn layui-btn-primary time-btn-sel" data-btn="doTime" data-id="this-month" type="button">本月</button>
+              <button class="layui-btn layui-btn-primary" data-btn="doTime" data-id="last-month" type="button">上月</button>
+            </div>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">客户名称</label>
+          <div class="layui-input-inline">
+            <select name="customerId" id="customerId" lay-filter="customerId" hc-data_text_field="nameShort" lay-search hc-data_url="/ucenter/crm/customers/customers/page.shtml?pageNum=-1&status=1">
+              <option value="" selected>请选择</option>
+              <option value="" disabled>数据加载中...</option>
+            </select>
+          </div>
+        </div>
+      
+        <div class="layui-inline">
+          <label class="layui-form-label">状态</label>
+          <div class="layui-input-inline">
+            <select name="status" id="status" lay-filter="status" lay-search hc-data_url="/ucenter/waybillstatus/options.shtml" hc-data_id_field="key" hc-data_text_field="value">
+              <option value="">请选择</option>
+              <option value="" disabled>数据加载中...</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="layui-inline">
+          <button type="button" class="layui-btn layui-btn-danger" lay-submit lay-filter="search">
+            <i class="layui-icon">&#xe615;</i>查询</button>
+          <button class="layui-btn layui-btn-primary doArkReset" type="button" style="margin:0;">重置</button>
+        </div>
+
+        <div class="layui-form-item" style="margin-top: 10px">
+          <div class="layui-inline">
+            <label class="layui-form-label">业务类型</label>
+            <div class="layui-input-inline">
+              <select name="bussinessType">
+                <option value="">请选择</option>
+                <option value="2">城配</option>
+                <option value="1">集港</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="layui-inline">
+            <label class="layui-form-label">司机</label>
+            <div class="layui-input-inline" style="width: 181px;">
+              <input type="text" name="driverName" autocomplete="off" class="layui-input" />
+            </div>
+          </div>
+          <div class="layui-inline">
+            <label class="layui-form-label">拖车车牌</label>
+            <div class="layui-input-inline">
+              <input type="text" name="carNo" autocomplete="off" class="layui-input" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="clr"></div>
+  </div>
+  <!--end: 搜索-->
+
+  <!--start: 银行收支报表  搜索-->
+  <div class="layui-tab layui-tab-card search-bar" id="bankBalance-search">
+    <ul class="layui-tab-title">
+      <li class="layui-this">银行收支每日报表</li>
+      <li>银行收支每月报表</li>
+    </ul>
+    <div class="layui-tab-content">
+      <div class="layui-tab-item layui-show">
+        <div class="panel-handle">
+          <form class="layui-form layui-form-pane" autocomplete="off">
+            <div class="layui-form-item">
+              <div class="layui-inline">
+                <div class="layui-input-inline">
+                  <select name="doarkTime" lay-filter="daily">
+                  </select>
+                </div>
+              </div>
+            </div>
+          </form>
+          <div class="clr"></div>
+        </div>
+        <!--start:表格列表-->
+        <table class="layui-table" id="table_list1" lay-filter="table1"></table>
+        <!--end:表格列表-->
+      </div>
+      <div class="layui-tab-item">
+        <div class="panel-handle">
+          <form class="layui-form layui-form-pane" autocomplete="off">
+            <div class="layui-form-item">
+              <div class="layui-inline">
+                <div class="layui-input-inline">
+                  <div class="layui-btn-group">
+                    <button class="layui-btn layui-btn-primary time-btn-sel" data-btn="doTime" data-id="this-year" type="button">今年</button>
+                    <button class="layui-btn layui-btn-primary" data-btn="doTime" data-id="last-year" type="button">去年</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+          <div class="clr"></div>
+        </div>
+        <!--start:表格列表-->
+        <div class="table-container"></div>
+        <table class="layui-table" id="table_list2" lay-filter="table2"></table>
+      </div>
+      <!--end:表格列表-->
+    </div>
+  </div>
+  <!--end: 搜索-->
+
+   <!--start: 客户做单月度统计  搜索-->
+  <div class="panel-handle search-bar" id="dolistCustomer-search">
+      <form class="layui-form layui-form-pane" autocomplete="off">
+        <div class="layui-form-item">
+          <div class="layui-inline">
+            <label class="layui-form-label">统计方式</label>
+            <div class="layui-input-inline">
+              <select name="dateType" lay-filter="dateType">
+                <option value="2">按月度统计</option>
+                <option value="1">按年度统计</option>
+              </select>
+            </div>
+          </div>
+  
+          <div class="layui-inline">
+            <label class="layui-form-label">时间范围</label>
+            <div class="layui-input-inline">
+              <select name="statDate" lay-filter="statDate">
+              </select>
+            </div>
+          </div>
+
+          <div class="layui-inline">
+            <label class="layui-form-label">客户</label>
+            <div class="layui-input-inline">
+              <select name="customerId" id="customerId" lay-filter="customerId" hc-data_text_field="nameShort" lay-search hc-data_url="/ucenter/crm/customers/customers/page.shtml?pageNum=-1&status=1">
+                <option value="" selected>请选择</option>
+                <option value="" disabled>数据加载中...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="layui-inline">
+            <input type="checkbox" lay-filter="hasPlace" name="hasPlace" title="统计装卸地点分布" lay-skin="primary"/>
+          </div>
+
+          <div class="layui-inline">
+            <button type="button" class="layui-btn layui-btn-danger" lay-submit lay-filter="search">
+              <i class="layui-icon">&#xe615;</i>查询</button>
+            <button class="layui-btn layui-btn-primary doArkReset" type="button" style="margin:0;">重置</button>
+          </div>
+          
+        </div>
+      </form>
+      <div class="clr"></div>
+  </div>
+  <!--end: 搜索-->
+
+
+
+  <!--start:表格列表-->
+  <table class="layui-hide" id="table_list"></table>
+  <!--end:表格列表-->
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/tms_common/utils.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<!-- 工具库依赖 -->
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script charset="utf-8" src="./doark.js"></script>
+<script type="text/html" id="idTpl">
+  {{d.LAY_TABLE_INDEX+1}}
+</script>
+
+<script type="text/html" id="statusTpl">
+  {{# return setWaybillStatus(Number(d.status)); }}
+</script>
+
+</html>

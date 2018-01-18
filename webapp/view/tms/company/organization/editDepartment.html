@@ -1,0 +1,199 @@
+<link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+<style>
+    .layui-form-item .layui-form-label {
+        width: 60px;
+    }
+    
+    .layui-form-item .layui-input-block {
+        margin-left: 90px;
+    }
+    
+    .check-form {
+        margin: 0 0 50px;
+    }
+</style>
+<form class="layui-form check-form" autocomplete="off" style="min-width:700px;">
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top:29px;">
+        <legend>新增部门</legend>
+    </fieldset>
+
+    <div class="layui-fluid" style="margin:0; padding:0;">
+        <div class="layui-row">
+            <div class="layui-col-sm3">&nbsp;</div>
+            <div class="layui-col-sm5">
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">所属公司</label>
+                            <div class="layui-input-block">
+                                <select name="companyId" lay-filter="companyId" lay-verify="required">
+                                  <option value="">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">上级部门</label>
+                            <div class="layui-input-block">
+                                <select name="parentId">
+                                  <option value="">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">部门名称</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="name" placeholder="请输入部门名称" class="layui-input" maxlength="50" lay-verify="required" hc-verify="departmentRegex|departmentSize">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">负责人</label>
+                            <div class="layui-input-block">
+                                <div class="layui-col-sm11">
+                                    <select name="mgrId" lay-filter="mgrId">
+                                      <option value="">请选择</option>
+                                    </select>
+                                    <input type="hidden" name="mgrName">
+                                </div>
+                                <div class="layui-col-sm1">
+                                    <div class="btns-add">
+                                        <a id="addChargePerson" class="layui-icon icon-add">&#xe61f;</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="layui-col-sm4">&nbsp;</div>
+        </div>
+    </div>
+
+    <input type="hidden" name="id">
+    <div id="buttonBar" class="layui-form-item button-bar" style="margin:10px 0 40px;">
+        <button class="layui-btn layui-btn-normal" id="vsubmit" lay-submit lay-filter="submit">保存</button>
+        <!-- <button class="layui-btn layui-btn-primary" type="reset">重置</button> -->
+    </div>
+
+    <div style="border-top:#eee 1px solid;">
+        <div class="form-txt" style="text-align:center;">
+            注：负责人是指部门负责人，可以选择一位已有员工作为部门负责人，也可通过点击“+”按钮来新增部门负责人
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(['form', 'layer', 'layedit'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            layedit = layui.layedit,
+            $ = layui.jquery;
+
+        var $id = getUrlId($.trim($('#menus').data('id')));
+        $('input[name="id"]').val($id);
+        //获取数据
+        $.get('/ucenter/centre/permi/department/' + $id + '.shtml', function(d) {
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+
+            if ($code != 'SUCCESS') return false;
+
+            var $companyId = '',
+                $parentId = '';
+            if ($objects.companyId != null) {
+                $companyId = $objects.companyId;
+                if ($objects.parentId != null) {
+                    $parentId = $objects.parentId;
+                }
+            }
+            $('body').companyDepartment(form, [$companyId, $parentId], ['companyId', 'parentId']);
+            $objects.mgrId != null ? getEmployee(form, parent.layer, $objects.mgrId) : getEmployee(form, parent.layer, '');
+            $('input[name="name"]').val($objects.name);
+            $('input[name="mgrName"]').val($objects.mgrName);
+
+            form.render('select');
+        }, 'json');
+
+        form.on('submit(submit)', function(data) {
+            var $parentId = data.field.parentId.length > 0 ? parseInt($.trim(data.field.parentId)) : '',
+                $companyId = data.field.companyId.length > 0 ? parseInt($.trim(data.field.companyId)) : '',
+                $mgrId = data.field.mgrId.length > 0 ? parseInt($.trim(data.field.mgrId)) : '';
+
+            if (parseInt($id) == parseInt($.trim(data.field.parentId))) {
+                parent.layer.msg('不能将自己设为上级部门');
+                return false;
+            }
+
+            //数据源
+            var $saveData = {
+                parentId: $parentId,
+                companyId: $companyId,
+                name: $.trim(data.field.name),
+                mgrId: $mgrId,
+                mgrName: $.trim(data.field.mgrName)
+            };
+
+            //保存数据，调用接口
+            $.ajax({
+                type: 'PUT',
+                url: '/ucenter/centre/permi/department/' + $id + '.shtml',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify($saveData),
+                success: function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code === 'SUCCESS') {
+                        parent.layer.alert('保存成功！', {
+                            yes: function(index) {
+                                parent.layer.close(index);
+                                window.location.reload();
+                                //清除session
+                                sessionStorage.removeItem('id');
+                            }
+                        });
+                    } else if ($code === 'ERROR_DEPARTMENT_EXIST') {
+                        parent.layer.alert('部门已存在！');
+                    } else {
+                        parent.layer.alert('保存信息失败，请重新填写！');
+                    }
+                }
+            });
+            return false;
+        });
+
+        //添加负责人  (可以选择员工作为部门负责人,添加负责人即新增员工)
+        $('#addChargePerson').on('click', function() {
+            parent.layer.open({
+                type: 2,
+                title: '新增员工',
+                shadeClose: true,
+                shade: 0.8,
+                area: ['900px', '400px'],
+                content: './addChargePerson.html',
+                end: function() {
+                    getEmployee(form, parent.layer, '');
+                }
+            });
+            return false;
+        });
+
+    });
+</script>

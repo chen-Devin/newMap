@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>车辆保险 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+</head>
+<style>
+    .layui-form-item{
+        margin:0;
+    }
+    .layui-layer-tips .layui-layer-content {
+        padding: 0;
+    }
+    
+    .time-btns .layui-btn-group a {
+        line-height: 36px;
+        width: 33%;
+        padding: 0 5px;
+    }
+    
+    .search-more {
+        margin-top: 7.5px;
+        display: none;
+    }
+</style>
+
+<body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+            <form class="layui-form layui-form-pane" autocomplete="off">
+                <div class="layui-row layui-col-space5">
+                    <div class="layui-col-sm1" style="width:5%;">
+                        <div class="layui-form-item">
+            <button class="layui-btn layui-btn-danger" onclick="window.location.href='list.html'">全部</button>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm1" style="width:20%;">
+                        <div class="layui-form-item">
+                <label class="layui-form-label">车牌号码</label>
+                                <div class="layui-input-block">
+                    <input type="text" name="carNo" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+                </div>
+                    <div class="layui-col-sm1" style="width:20%;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">险种</label>
+                            <div class="layui-input-block">
+                    <select name="insuranceType">
+              <option value=""></option>
+                                    <option value="0">交强险</option>
+              <option value="1">商业险</option>
+                                    <option value="2">车船税</option>
+            </select>
+                </div>
+            </div>
+                    </div>
+                    <div class="layui-col-sm1" style="width:20%;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">状态</label>
+                            <div class="layui-input-block">
+                    <select name="status">
+              <option value="">所有</option>
+              <option value="0">未生效</option>
+              <option value="1">生效</option>
+              <option value="3">作废</option>
+              <option value="4">失效</option>
+            </select>
+                </div>
+            </div>
+                    </div>
+                    <div class="layui-col-sm1" style="width:25%;">
+                        <div class="layui-form-item">
+                            <button class="layui-btn layui-btn-danger btn-search" lay-submit="" lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                            <button class="layui-btn search-more-btn" type="button" style="margin-left:2px;">高级查询<i class="layui-icon">&#xe625;</i></button>    
+                            <button class="layui-btn layui-btn-primary" type="reset" style="margin:0;">重置</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row layui-col-space5 search-more">
+                    <div class="layui-col-sm1" style="width:25%;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">购买日期</label>
+                            <div class="layui-input-block">
+                                <div class="layui-col-sm6">
+                    <input type="text" name="buyDataBegin" id="buyDataBegin" placeholder="" class="layui-input">
+                </div>
+                                <div class="layui-col-sm6">
+                    <input type="text" name="buyDataEnd" id="buyDataEnd" placeholder="" class="layui-input">
+                </div>
+            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm1" style="width:20%;">
+                            <div class="layui-form-item">
+                                    <label class="layui-form-label">保单号码</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="warrantyNo" autocomplete="off" class="layui-input">
+                                    </div>
+                            </div>
+                        </div>
+                </div>
+        </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+        <div class="layui-btn-group fl">
+            <button class="layui-btn layui-btn-normal" data-type="addData" data-tit="新增" data-url="modify.html?type=add">新增</button>
+            <button class="layui-btn layui-btn-normal" data-type="editData">编辑</button>
+            <button class="layui-btn layui-btn-normal" data-type="detailData">查看</button>
+            <button class="layui-btn layui-btn-normal" data-type="statusCancel" id="btn-cancellation">作废</button>
+            <button class="layui-btn layui-btn-normal" data-type="statusStart" id="btn-enabled">生效</button>
+            <button class="layui-btn layui-btn-normal" data-type="contractData" id="btn-contract">续保</button>
+            <button class="layui-btn layui-btn-normal" data-type="delData">删除</button>
+            <!--<button class="layui-btn layui-btn-normal" id="btn-export">导出</button>-->
+        </div>
+        <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="table_list"></table>
+    <!--end:表格列表-->
+
+    <!--start:快捷搜索-->
+    <!-- <div class="short-search-bar">
+      <dl>
+        <dt>数据总数<span class="layui-badge layui-bg-cyan total"></span></dt>
+        <dd><a href="">聘用<span class="layui-badge employCount"></span></a></dd>
+        <dd><a href="">挂靠<span class="layui-badge joinOperatedCount"></span></a></dd>
+        <dd><a href="">外协<span class="layui-badge outsourceCount"></span></a></dd>
+      </dl>
+    </div> -->
+    <!--end:快捷搜索-->
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'table', 'tms_tab', 'laypage', 'laydate'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            tmsTab = layui.tms_tab,
+            laypage = layui.laypage,
+            laydate = layui.laydate,
+            $ = layui.jquery;
+
+        //日期
+        laydate.render({
+            elem: '#buyDataBegin' //购买日期开始
+                ,
+            max: 0, //7天后
+            change: function(value, data) {
+            }
+        });
+        laydate.render({
+            elem: '#buyDataEnd' //购买日期结束
+                ,
+            max: 0 //7天后
+                // ,min:  //7天前
+        });
+
+        var $carNo = decodeURI(getUrlParam('trailerNo'));
+        var $carId;
+        if ($carNo != 'null') {
+            $("input[name='carNo']").val($carNo);
+            setTableData($carNo);
+        } else {
+            setTableData();
+            $carNo = '';
+        }
+        form.on('submit(search)', function(data) {
+            var $carNo = $.trim(data.field.carNo),
+                $warrantyNo = $.trim(data.field.warrantyNo),
+                $insuranceType = $.trim(data.field.insuranceType),
+                $status = $.trim(data.field.status),
+                $buyDataBegin = $.trim(data.field.buyDataBegin),
+                $buyDataEnd = $.trim(data.field.buyDataEnd);
+            setTableData($carNo, $warrantyNo, $insuranceType, $status, $buyDataBegin, $buyDataEnd);
+            return false;
+        });
+        //方法级渲染
+        function setTableData($carNo, $warrantyNo, $insuranceType, $status, $buyDataBegin, $buyDataEnd) {
+            $carNo = typeof $carNo != 'undefined' ? $carNo : '';
+            $warrantyNo = typeof $warrantyNo != 'undefined' ? $warrantyNo : '';
+            $insuranceType = typeof $insuranceType != 'undefined' ? $insuranceType : '';
+            $status = typeof $status != 'undefined' ? $status : '';
+            $buyDataBegin = typeof $buyDataBegin != 'undefined' ? $buyDataBegin : '';
+            $buyDataEnd = typeof $buyDataEnd != 'undefined' ? $buyDataEnd : '';
+            var $pageSize = 15;
+            
+            //表格高度
+            var $tableHeight = 'full-131';
+            if (!$('.search-more').is(':hidden')) {
+                $tableHeight = 'full-179';
+            }
+
+            table.render({
+                elem: '#table_list',
+                url: '/ucenter/tms/capacity/carInsurance/page.shtml?carNo=' + $carNo + '&warrantyNo=' + $warrantyNo + '&insuranceType=' + $insuranceType + '&status=' + $status + '&buyDataBegin=' + $buyDataBegin + '&buyDataEnd=' + $buyDataEnd,
+                response: {
+                    statusCode: 'SUCCESS',
+                    countName: 'objects.total',
+                    dataName: 'objects.list'
+                },
+                request: {
+                    pageName: 'pageNum',
+                    limitName: 'pageSize'
+                },
+                cols: [
+                    [{
+                        checkbox: true,
+                        fixed: true
+                    }, {
+                        title: '序号',
+                        width: 80,
+                        sort: true,
+                        templet: '#idTpl'
+                    }, {
+                        field: 'status',
+                        title: '状态',
+                        width: 80,
+                        templet: "#statusTpl"
+                    }, {
+                        field: 'warrantyNo',
+                        title: '保单号',
+                        width: 150
+                    }, {
+                        field: 'carNo',
+                        title: '车牌号码',
+                        width: 150,
+                        templet: "#carNoTpl"
+                    }, {
+                        field: 'belong',
+                        title: '车辆属性',
+                        width: 90,
+                        templet: "#belongTpl"
+                    }, {
+                        field: 'insuranceType',
+                        title: '险种',
+                        width: 80,
+                        templet: "#insuranceTypeTpl"
+                    }, {
+                        field: 'indateB',
+                        title: '起始有效期',
+                        width: 120,
+                        templet: "#indateBTpl"
+                    }, {
+                        field: 'indateE',
+                        title: '截止有效期',
+                        width: 120,
+                        templet: "#indateETpl"
+                    }, {
+                        field: 'leftDays',
+                        title: '剩余天数',
+                        width: 90,
+                        templet: "#leftDaysTpl"
+                    }, {
+                        field: 'premium',
+                        title: '保费',
+                        width: 100
+                    }, {
+                        field: 'amountClaimsMax',
+                        title: '最高理赔金额',
+                        width: 120
+                    }, {
+                        field: 'insuranceCoName',
+                        title: '承保公司',
+                        width: 200
+                    }, {
+                        field: 'premiumAssume',
+                        title: '保费承担',
+                        width: 120,
+                        templet: "#premiumAssumeTpl"
+                    }, {
+                        field: 'dateBuy',
+                        title: '购买日期',
+                        width: 120,
+                        templet: "#dateBuyTpl"
+                    }]
+                ],
+                id: 'dataReload',
+                page: true,
+                limits: [15, 30, 50, 100],
+                limit: $pageSize,
+                //height: 'full-130',
+                height: $tableHeight,
+                even: true, //开启隔行背景
+                done: function(res, curr, count) {
+                    //  $('.employCount').html(res.objects.cts.employCount);
+                    //  $('.joinOperatedCount').html(res.objects.cts.joinOperatedCount);
+                    //  $('.outsourceCount').html(res.objects.cts.outsourceCount);
+                    //  $('.total').html(res.objects.total);
+                }
+            });
+        }
+
+        var active = {
+            //新增
+            addData: function() {
+                $carId = '';
+                $carId = $.trim(getUrlParam('trailerId')) || '';
+                var $tit = $(this).attr('data-tit'),
+                    $url = $(this).attr('data-url');
+
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data,
+                    $nurl = '';
+
+                if (data.length > 0) {
+                    $carNo = data[0].carNo;
+                    $carId = data[0].carId;
+                }
+                $nurl = $url + "&carNo=" + encodeURI(encodeURI($carNo)) + "&type=add&carId=" + $carId;
+                tmsTab.add($(this), $tit, $nurl);
+            },
+            //修改
+            editData: function() { //获取选中数据
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('编辑只能选择一条数据！');
+                } else {
+                    if (data[0].status == 1) {
+                        parent.layer.alert('已生效的车辆保险不允许编辑');
+                        return false;
+                    }else if(data[0].status == 3){
+                        parent.layer.alert('已作废的车辆保险不允许编辑');
+                        return false;
+                    }
+                    tmsTab.add($(this), '编辑车辆保险(' + data[0].warrantyNo + ')', 'modify.html?type=edit&id=' + data[0].id);
+                }
+            },
+            //详情
+            detailData: function() { //获取选中数据
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('只能查看一条数据！');
+                } else {
+                    tmsTab.add($(this), '查看车辆保险(' + data[0].warrantyNo + ')', 'modify.html?type=info&id=' + data[0].id);
+                }
+            },
+            //删除
+            delData: function() { //获取选中数据
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                    return;
+                } else if (data.length > 0) {
+                    var idArr = [];
+                        var count = 0;
+                    $(data).each(function(i, value) {
+                        if(value.status == 1 ){
+                        parent.layer.alert('已生效的车辆保险不允许删除');
+                            count = 1;
+                        return false;
+                        } else if(value.status == 3 ){
+                            parent.layer.alert('已作废的车辆保险不允许删除');
+                            count = 1;
+                            return false;
+                        }else{
+                            idArr.push(value.id);
+                        };
+                        if(data.length == i + 1){
+                    parent.layer.confirm('你确定要删除所选择的车辆保险吗？', function(index) {
+                        var idArr = [];
+                                var count = 0;
+                        $(data).each(function(i, value) {
+                                    if(value.status == 1 ){
+                                        parent.layer.alert('已生效的车辆保险不允许删除');
+                                        count = 1;
+                                        return false;
+                                    } else if(value.status == 3 ){
+                                        parent.layer.alert('已作废的车辆保险不允许删除');
+                                        count = 1;
+                                        return false;
+                                    }else{
+                            idArr.push(value.id);
+                                    }
+                        });
+                                if ((idArr.length > 0) && (count == 0)) {
+                            var $saveData = {
+                                ids: idArr,
+                                status: 2
+                            }
+                            $.ajax({
+                                url: '/ucenter/tms/capacity/carInsurance/status.shtml',
+                                data: JSON.stringify($saveData),
+                                type: 'PUT',
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                beforeSend: function() {},
+                                success: function(d) {
+                                    var $code = d.code;
+                                    $msg = d.msg;
+                                    $objects = d.objects;
+
+                                    if ($code === 'SUCCESS') {
+                                        parent.layer.alert('删除成功', {
+                                            yes: function(index) {
+                                                parent.layer.close(index);
+                                                window.location.reload();
+                                            }
+                                        });
+                                    } else if ($code === 'ERROR_USER_LOGOFF') {
+                                        loginFailure();
+                                    } else {
+                                        parent.layer.alert('数据异常');
+                                    }
+                                }
+                            });
+                            return false;
+                        }
+                    });
+                }
+                    });
+                    
+                  
+            }
+            }
+        };
+
+        $('.btns-bar .layui-btn').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //生效
+        $("#btn-enabled").click(function() {
+            var checkStatus = table.checkStatus('dataReload'),
+                data = checkStatus.data;
+            if (data.length == 0) {
+                parent.layer.alert('你还未选中数据！');
+                return;
+            } else if (data.length > 0) {
+                parent.layer.confirm('你确定要生效所选择的车辆保险吗？', function(index) {
+                    var idArr = [];
+                    var count = 0;
+                    $(data).each(function(i, value) {
+                        if (value.status != 0) {
+                            parent.layer.alert('只有未生效状态的保险才能生效！');
+                            count = 1;
+                            return false;
+                        } else {
+                            idArr.push(value.id);
+                        }
+                    });
+                    if ((idArr.length > 0) && (count == 0)) {
+                        var $saveData = {
+                            ids: idArr,
+                            status: 1
+                        }
+                        $.ajax({
+                            url: '/ucenter/tms/capacity/carInsurance/status.shtml',
+                            data: JSON.stringify($saveData),
+                            type: 'PUT',
+                            dataType: 'json',
+                            contentType: 'application/json',
+                            beforeSend: function() {},
+                            success: function(d) {
+                                var $code = d.code;
+                                $msg = d.msg;
+                                $objects = d.objects;
+
+                                if ($code === 'SUCCESS') {
+                                    parent.layer.alert('生效成功');
+                                    window.location.reload();
+                                } else if ($code === 'ERROR_USER_LOGOFF') {
+                                    loginFailure();
+                                } else {
+                                    parent.layer.alert('数据异常');
+                                    return;
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        //作废
+        $("#btn-cancellation").click(function() {
+            var checkStatus = table.checkStatus('dataReload'),
+                data = checkStatus.data;
+            if (data.length == 0) {
+                parent.layer.alert('你还未选中数据！');
+                return;
+            } else if (data.length > 0) {
+                if(data[0].status == 3){
+                        parent.layer.alert('已作废的车辆保险不能继续作废');
+                        return false;
+                }
+                parent.layer.confirm('你确定要作废所选择的车辆保险吗？', function(index) {
+                    var idArr = [];
+                    $(data).each(function(i, value) {
+                        idArr.push(value.id);
+                    });
+                    if (idArr.length > 0) {
+                        var $saveData = {
+                            ids: idArr,
+                            status: 3
+                        }
+                        $.ajax({
+                            url: '/ucenter/tms/capacity/carInsurance/status.shtml',
+                            data: JSON.stringify($saveData),
+                            type: 'PUT',
+                            dataType: 'json',
+                            contentType: 'application/json',
+                            beforeSend: function() {},
+                            success: function(d) {
+                                var $code = d.code;
+                                $msg = d.msg;
+                                $objects = d.objects;
+
+                                if ($code === 'SUCCESS') {
+                                    parent.layer.alert('操作成功');
+                                    window.location.reload();
+                                } else if ($code === 'ERROR_USER_LOGOFF') {
+                                    loginFailure();
+                                } else {
+                                    parent.layer.alert('数据异常');
+                                    return;
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        //续保
+        $("#btn-contract").click(function() {
+            var checkStatus = table.checkStatus('dataReload'),
+                data = checkStatus.data;
+            if (data.length == 0) {
+                parent.layer.alert('你还未选中数据！');
+                return;
+            } else if (data.length > 1) {
+                parent.layer.alert('续保只能选择一条数据！');
+            } else {
+                if(data[0].status == 3){
+                        parent.layer.alert('已作废的车辆保险不允许续保');
+                        return false;
+                }
+                tmsTab.add($(this), '续保' + data[0].carNo, 'modify.html?type=contract&id=' + data[0].id);
+            }
+        });
+
+        //点击高级搜索
+        clickSearchMore($('.search-more-btn'), $('.search-more'), 'dataReload', 'full-179', 'full-131', table);
+
+    });
+</script>
+<script type="text/html" id="statusTpl">
+    {{# if(d.status == '0'){ }} 未生效 {{# } else if(d.status == '1'){ }} 生效 {{# } else if(d.status == '2'){ }} 删除 {{# } else if(d.status == '3'){ }} 作废 {{# } else if(d.status == '4'){ }} 失效 {{# } }}
+</script>
+<script type="text/html" id="belongTpl">
+    {{# if(d.belong == '0'){ }} 自营 {{# } else if(d.belong == '1'){ }} 合营 {{# } else if(d.belong == '2'){ }} 合作 {{# } else if(d.belong == '3'){ }} 挂靠 {{# } else if(d.belong == '4'){ }} 外协 {{# } }}
+</script>
+<script type="text/html" id="insuranceTypeTpl">
+    {{# if(d.insuranceType == '0'){ }} 交强险 {{# }else if(d.insuranceType == '1'){ }} 商业险 {{# }else if(d.insuranceType == '2'){ }} 车船税 {{# } }}
+</script>
+<script type="text/html" id="leftDaysTpl">
+    <!-- surplus 为false时，天数显示为红色。 surplus 为true时，天数显示为黑色 -->
+    <span {{ (d.surplus ? '' : ' style="color:red"') }}>
+        <!-- leftDays 小于0时，显示 0 -->
+        {{ Math.max(0, d.leftDays) }}
+        <!-- 最后， surplus 与 leftDays 两个字段互不干扰 -->
+    </span>
+</script>
+<script type="text/html" id="indateBTpl">
+    {{new Date(d.indateB).format("yyyy-MM-dd")}}
+</script>
+<script type="text/html" id="indateETpl">
+    {{new Date(d.indateE).format("yyyy-MM-dd")}}
+</script>
+<script type="text/html" id="dateBuyTpl">
+    {{new Date(d.dateBuy).format("yyyy-MM-dd")}}
+</script>
+<script type="text/html" id="premiumAssumeTpl">
+    {{# if(d.premiumAssume == 0){ }} 公司 {{# }else if(d.premiumAssume == 1){}} 司机 {{# } }}
+</script>
+<script type="text/html" id="carNoTpl">
+    {{d.carNo + " " + d.carColor}}
+</script>
+<script type="text/html" id="idTpl">
+    {{d.LAY_TABLE_INDEX+1}}
+</script>
+
+</html>

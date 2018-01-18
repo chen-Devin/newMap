@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>价格协议 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+</head>
+
+<body>
+    <form class="layui-form" autocomplete="off">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>基本信息</legend>
+        </fieldset>
+
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">单位类型</label>
+                        <div class="layui-input-block">
+                            <input type="radio" name="targetType" lay-filter="targetType" value="2" title="客户" checked>
+                            <input type="radio" name="targetType" lay-filter="targetType" value="1" title="供应商">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">单位简称</label>
+                        <div class="layui-input-block">
+                            <select name="targetName" lay-filter="targetName" lay-search lay-verify="required">
+                              <option value="" selected>请选择</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">协议号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="agreementNo" value="" class="layui-input" maxlength="30" lay-verify="required" hc-verify="protocolNumber">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">是否含税</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm5">
+                                <div class="margin-right10">
+                                    <select name="containTax" lay-verify="containTax">
+                                        <option value="1" selected="selected">是</option>
+                                        <option value="0">否</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm7">
+                                <label class="layui-form-label" style="width:65px; padding-left:0;">税点(%)</label>
+                                <div class="layui-input-block" style="margin-left:80px;">
+                                    <input type="text" name="taxRate" class="layui-input" maxlength="5" hc-verify="range|decimals2" hc-verify_min="0" hc-verify_max="100" hc-verify_field="返公司折扣">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">压车费</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="pressCost" class="layui-input" maxlength="12" hc-verify="expenst" hc-verify_field="压车费">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">异提费</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="regionCost" class="layui-input" maxlength="12" hc-verify="expenst" hc-verify_field="异提费">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm12">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">包含费用</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm11">
+                                <input type="text" name="costItem" class="layui-input" maxlength="255" lay-verify="required" disabled>
+                            </div>
+                            <div class="layui-col-sm1">
+                                <div class="btns-add margin-left10" style="text-align:left;">
+                                    <a id="costItemBtn" class="layui-icon icon-add">&#xe61f;</a>
+                                </div>
+                                <div class="layui-hide costItemObj"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 协议价格设置 -->
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>
+                协议价格设置
+                <span class="legend-btns">
+                  <a class="layui-icon icon-add tableSSC" data-type="supplierSettlementChannelsAdd" data-func="callbackSSC(obj)">&#xe61f;</a>
+                </span>
+            </legend>
+        </fieldset>
+        <table id="tableListTP" lay-filter="tableSSC"></table>
+        <input type="hidden" name="dataSSC">
+
+        <!-- 保存按钮 -->
+        <div class="layui-form-item button-bar" style="display: none">
+            <span id="continueAddContainer" style="display: none;">
+                    <input type="checkbox" title="保存后继续新增" lay-skin="primary" id="continueAddCheckbox">
+            </span>
+            <button class="layui-btn layui-btn-normal" id="vsubmit" lay-submit lay-filter="submit">保存</button>
+            <button class="layui-btn layui-btn-primary" id="vcancel">取消</button>
+        </div>
+
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/layui.district_1.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<!-- 工具库依赖 -->
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+</script>
+
+<script type="text/html" id="businessTypeTpl">
+    {{# if(d.businessType == 1){ }}
+        出口业务 
+    {{# }else if(d.businessType == 2){ }}
+        进口业务 
+    {{# } }}
+</script>
+<script>
+    layui.use(['form', 'layer', 'layedit', 'laydate', 'table'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            tmsTab = layui.tms_tab,
+            $ = layui.jquery;
+
+        var $targetId;
+
+        // $('#linkDistrict').district(form);
+        var freightAgreementArr = [],
+            costItemObjs = '',
+            $targetName;
+        var $url1 = '/ucenter/crm/supplier/supplier/page.shtml?status=1';
+        var $url2 = '/ucenter/crm/customers/customers/page.shtml?status=1';
+        var $type = $.trim(getUrlParam('do'));
+        var $ids = $.trim(getUrlParam('id'));
+        var $targetType = $.trim(getUrlParam('targetType'));
+        targetNames($url2);
+
+        var $targetName = $('select[name=targetName]');
+
+        function targetNames($url) {
+            $.get($url, function(d) {
+                // console.log(d);
+                var $code = d.code,
+                    $msg = d.msg,
+                    $objects = d.objects.list,
+                    $html = '';
+                if ($code != 'SUCCESS') return false;
+                if ($objects.length > 0) {
+                    for (var i = 0; i < $objects.length; i++) {
+                        $targetName.append('<option value="' + $objects[i].id + '"' + $html + '>' + $objects[i].nameShort + '</option>');
+                    }
+                    form.render('select');
+                }
+            })
+        }
+        form.on('radio(targetType)', function(data) {
+            $targetName[0].options.length = 1;
+            form.render('select');
+
+            //1是供货商2是客户
+            if (data.value == 1) {
+                targetNames($url1);
+            } else if (data.value == 2) {
+                targetNames($url2);
+            }
+        });
+
+        //渲染包含费用
+        var saveExpense = function(fn) {
+            HC.ajax.get({
+                url: '/ucenter/crm/agree/freightAgreement/searchFee.shtml',
+                async: false,
+                success: function(data) {
+                    var itemObj = {};
+                    $.each(data, function(i, d) {
+                        itemObj[d.id] = d.costName;
+                    });    
+                    $('.costItemObj').html(JSON.stringify(itemObj)); 
+                    if(typeof fn === 'function'){
+                        fn(data);
+                    }
+                }
+            });
+        }
+
+        var tableActive = {
+            supplierSettlementChannels: function(data, $type) {
+                if ($type == 'detail') {
+                    table.render({
+                        data: data,
+                        elem: '#tableListTP',
+                        page: true,
+                        limit: 5,
+                        id: 'dataReloadTP',
+                        cols: [
+                            [{
+                                field: 'businessType',
+                                title: '业务类型',
+                                width: 100,
+                                templet: '#businessTypeTpl',
+                                align: 'center'
+                            },{
+                                field: 'loadingTargetName',
+                                title: '装卸单位',
+                                width: 100,
+                                templet: '#channelTypeTpl',
+                                align: 'center'
+                            }, {
+                                field: 'carryName',
+                                title: '提柜地点',
+                                width: 100,
+                                align: 'center'
+                            }, {
+                                field: 'stillName',
+                                title: '还柜地点',
+                                width: 120,
+                                align: 'center'
+                            }, {
+                                field: 'isoCode',
+                                title: '箱型(GB)',
+                                width: 120,
+                                templet: '#statusTpl',
+                                align: 'center'
+                            }, {
+                                field: 'contatypesPrice',
+                                title: '协议价格',
+                                width: 110,
+                                align: 'center'
+                            }, ]
+                        ],
+                    })
+                } else {
+                    table.render({
+                        data: data,
+                        elem: '#tableListTP',
+                        page: true,
+                        limit: 5,
+                        id: 'dataReloadTP',
+                        cols: [
+                            [{
+                                field: 'businessType',
+                                title: '业务类型',
+                                width: 100,
+                                templet: '#businessTypeTpl',
+                                align: 'center'
+                            },{
+                                field: 'loadingTargetName',
+                                title: '装卸单位',
+                                width: 100,
+                                templet: '#channelTypeTpl',
+                                align: 'center'
+                            }, {
+                                field: 'carryName',
+                                title: '提柜地点',
+                                width: 100,
+                                align: 'center'
+                            }, {
+                                field: 'stillName',
+                                title: '还柜地点',
+                                width: 120,
+                                align: 'center'
+                            }, {
+                                field: 'isoCode',
+                                title: '箱型(GB)',
+                                width: 120,
+                                templet: '#statusTpl',
+                                align: 'center'
+                            }, {
+                                field: 'contatypesPrice',
+                                title: '协议价格',
+                                width: 110,
+                                align: 'center'
+                            }, {
+                                align: 'center',
+                                title: '操作',
+                                toolbar: '#bar',
+                                width: 113
+                            }]
+                        ],
+                    })
+                }
+
+            },
+            //清除一个数组的根据根据Id一组子对象arr为数组,id为指定id的值,$id为对象指定id的key
+            $clearOneArrEle: function(arr, id) {
+                for (var i = arr.length - 1; i >= 0; i--) {
+                    if (arr[i].$id == id)
+                        arr.splice(i, 1);
+                }
+            },
+            // //['60085','60084'] [] 60084
+            clearOneArrEle: function(arr, id) {
+                for (var i = arr.length - 1; i >= 0; i--) {
+                    if (arr[i].id == id) {
+                        // arr2.push(arr[i].id)
+                        arr.splice(i, 1);
+                    }
+                }
+            }
+        }
+
+        //编辑或者查看时 填充数据
+        if ($type == 'edit' || $type == 'detail') {
+            var $id = $.trim(getUrlParam('id'));
+            var $targetType = $.trim(getUrlParam('targetType'));
+            if ($id != null && $id.length != 0) {
+                $('input[name="id"]').val($id);
+                $('.continueAdd').hide();
+                $('input[name=continueAdd]').attr('checked', false);
+                $('#setting').hide();
+                $('.form-txt').hide();
+                if ($type == 'detail') {
+                    $('form input').attr('disabled', 'disabled').css({
+                        'background': '#eee'
+                    });
+                    $('form select').attr('disabled', 'disabled').css({
+                        'background': '#eee'
+                    });
+                    $('#vsubmit').hide();
+                    $('a[data-func^="callback"]').hide();
+                    $('#hold').hide();
+                    $('#costItemBtn').hide();
+                }else{
+                    $('.button-bar').show();
+                }
+                $('input[name="targetType"]').attr('disabled', 'disabled').css({
+                    'background': '#eee'
+                });
+                var a, b = $.get('/ucenter/crm/agree/freightAgreement/getDetail.shtml?id=' + $id);
+                //获取数据
+                if ($targetType == 1) {
+                    // targetNames($url1);
+                    a = $.get($url1);
+
+                } else if ($targetType == 2) {
+                    a = $.get($url2);
+
+                }
+                $.when(a, b).done(function(aData, bData) {
+                    $targetName[0].options.length = 1;
+                    var $code = aData[0].code,
+                        $msg = aData[0].msg,
+                        $objects = aData[0].objects.list,
+                        $html = '';
+                    if ($code != 'SUCCESS') return false;
+                    if ($objects.length > 0) {
+                        for (var i = 0; i < $objects.length; i++) {
+                            $targetName.append('<option value="' + $objects[i].id + '"' + $html + '>' + $objects[i].nameShort + '</option>');
+                        }
+                        form.render('select');
+                    };
+                    //渲染
+                    var $code2 = bData[0].code,
+                        $msg2 = bData[0].msg,
+                        $objects2 = bData[0].objects;
+                    if ($code === 'SUCCESS') {
+                        //单位下拉渲染
+                        $objects2.targetId != null ? $('select[name="targetName"]').val($objects2.targetId) : '';
+
+                        $('input[name="targetType"]').each(function() {
+                            if ($objects2.targetType == parseInt($(this).val())) {
+                                $(this).prop('checked', true);
+                            } else {
+                                $(this).prop('checked', false);
+                            }
+                        });
+                        $('select[name="containTax"]').each(function() {
+                            if ($objects2.containTax) {
+                                $(this).val("1");
+                            } else {
+                                $(this).val("0");
+                            }
+                        });
+
+
+                        $('input[name=agreementNo]').val($objects2.agreementNo);
+
+                        //渲染包含费用
+                        saveExpense(function(data) {
+                            var expenseArr = $objects2.costItem.split(',');
+                            var itemStr = [];
+                            $.each(expenseArr, function(i, d) {
+                                $.each(data, function(i2, d2) {
+                                    if(d == d2.id){
+                                        itemStr.push(d2.costName);
+                                    }
+                                });
+                            });  
+                            $('input[name=costItem]').val(itemStr.join(','));
+                        });
+
+                        //结算银行信息列表
+                        freightAgreementArr = $objects2.agreeList;
+                        tableActive.supplierSettlementChannels(freightAgreementArr, $type);
+                        $objects2.taxRate != null ? $('input[name="taxRate"]').val($objects2.taxRate) : '';
+                        $objects2.pressCost != null ? $('input[name="pressCost"]').val($objects2.pressCost) : '';
+                        $objects2.regionCost != null ? $('input[name="regionCost"]').val($objects2.regionCost) : '';
+                        costItemObjs = $objects2.costItem;
+                        form.render('radio');
+                        form.render('select');
+                    }
+                });
+            } else {
+                parent.layer.alert('请不要使用非法参数！', {
+                    yes: function() {
+                        parent.layer.closeAll();
+                    }
+                });
+            }
+        }else{
+            saveExpense();
+            $('.button-bar').show();
+            $('#continueAddContainer').show();
+        }
+
+        table.on('tool(tableSSC)', function(obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+            console.log(freightAgreementArr);
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值
+            var tr = obj.tr; //获得当前行 tr 的DOM对象 
+            var $data = JSON.stringify(data);
+            $('input[name=dataSSC]').attr('data-func', 'callB(' + $data + ')');
+            var $url = './freightAgreementAdd.html?do=edit';
+            if (layEvent === 'edit') { //编辑
+                //do something
+                // console.log(data); 
+                parent.layer.open({
+                    type: 2,
+                    title: '编辑协议价格',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['900px', '500px'],
+                    content: $url,
+                    success: function(layero, index) {
+
+                    },
+                    btn: ['确定', '关闭'],
+                    yes: function(index, layero) {
+                        $(layero.find('iframe')[0].contentWindow.document).find('#vsubmit').click();
+                        var cllBack = $('.tableSSC').attr('data-func')
+                        var Fun = eval(cllBack);
+                        var objs = Fun;
+                        obj.update(objs);
+                    }
+                });
+            } else if (layEvent === 'del') {
+                parent.layer.confirm('真的删除这条信息吗？', function(index) {
+                    obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                    if (data.$id) {
+                        tableActive.$clearOneArrEle(freightAgreementArr, data.$id)
+                    } else {
+                        tableActive.clearOneArrEle(freightAgreementArr, data.id)
+                    }
+                    parent.layer.close(index);
+                });
+            }
+        });
+
+        function callbackSSC(obj) {
+            if (obj == undefined) return
+            if (obj.length == 1 && obj[0].$id || obj[0].id) {
+                parent.layer.closeAll();
+                return obj[0]
+            }
+            var $id = (new Date()).getTime();
+            $.each(obj, function(i, v) {
+                v.$id = $id + i
+            })
+            freightAgreementArr = obj.concat(freightAgreementArr)
+            tableActive.supplierSettlementChannels(freightAgreementArr);
+            parent.layer.closeAll();
+            $('.tableSSC').attr('data-func', 'callbackSSC()');
+            if (obj.conAdd == 1) {
+                active.supplierSettlementChannelsAdd();
+                return
+            }
+        }
+        var active = {
+            //新增协议价格
+            supplierSettlementChannelsAdd: function() {
+                parent.layer.open({
+                    type: 2,
+                    title: '新增协议价格',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['900px', '500px'],
+                    content: './freightAgreementAdd.html?do=add',
+                    success: function(layero, index) {},
+                    btn: ['确定', '关闭'],
+                    yes: function(index, layero) {
+                        $(layero.find('iframe')[0].contentWindow.document).find('#vsubmit').click();
+                        var cllBack1 = $('.tableSSC').attr('data-func')
+                        var Fun = eval(cllBack1);
+                        Fun;
+                    }
+                });
+            },
+            expenseAdd: function() {
+                costItemObjs = costItemObjs || '';
+                parent.layer.open({
+                    type: 2,
+                    title: '新增包含费用',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['600px', '300px'],
+                    content: './expenseAdd.html?do=edit&id=' + costItemObjs,
+                    success: function(layero, index) {},
+                    btn: ['确定', '关闭'],
+                    yes: function(index, layero) {
+                        $(layero.find('iframe')[0].contentWindow.document).find('#vsubmit').click();
+                        var cllBack2 = $('#costItemBtn').attr('data-func');
+                        var expenseObj = {};
+                        if($('.costItemObj').html() !== ''){
+                            expenseObj = JSON.parse($('.costItemObj').html());
+                        }
+                        var objss = '';
+                        if (cllBack2.length > 0) {
+                            var expenseArr = cllBack2.split(',');
+                            costItemObjs = cllBack2;
+                            var objs = "";
+                            for (var i = 0; i < expenseArr.length; i++) {
+                                objs += (',' + expenseObj[expenseArr[i]]);
+                            }
+                            objss = objs.substr(1);
+                        }else{
+                            costItemObjs = '';
+                        }
+                        $('input[name=costItem]').val(objss);
+                        form.render();
+                        parent.layer.closeAll();
+                    }
+                });
+            },
+
+        };
+
+        //给新增按钮添加事件
+        $('.legend-btns a').on('click', function() {
+            active.supplierSettlementChannelsAdd();
+        });
+        $('#costItemBtn').on('click', function() {
+            active.expenseAdd();
+        });
+
+
+        //监听提交
+        if ($type == 'edit' || $type == 'add') {
+
+            form.on('submit(submit)', function(data) {
+                if (!bizUtil.validator.verifyContainer($('form'))) {
+                    return false;
+                }
+                
+                freightAgreementArr.forEach(function(item, index, input) {
+                    delete(item.$id)
+                    delete(item.conAdd)
+                    delete(item.LAY_TABLE_INDEX)
+                });
+                $targetName = $('select[name="targetName"]').find('option:selected').text();
+                //数据源       
+                var $saveData = {
+                    targetId: $.trim(data.field.targetName),
+                    targetName: $targetName,
+                    targetType: parseFloat($.trim(data.field.targetType)),
+                    agreementNo: $.trim(data.field.agreementNo),
+                    costItem: costItemObjs,
+                    containTax: (data.field.containTax == 0) ? false : true,
+                    taxRate: $.trim(data.field.taxRate),
+                    agreeList: freightAgreementArr,
+                    pressCost: $.trim(data.field.pressCost),
+                    regionCost: $.trim(data.field.regionCost),
+                };
+                var $url, $method;
+                if ($type == 'edit') {
+                    $url = '/ucenter/crm/agree/freightAgreement/' + $ids + '.shtml';
+                    $method = 'PUT';
+                } else if ($type == 'add') {
+                    $url = '/ucenter/crm/agree/freightAgreement/add.shtml';
+                    $method = 'POST';
+                }
+
+                //保存数据，调用接口
+                HC.ajax[$method.toLowerCase()]({
+                    url: $url,
+                    data: JSON.stringify($saveData),
+                    success: function(d) {
+                        parent.layer.alert('保存成功！', {
+                            yes: function(index) {
+                                //关闭窗口
+                                parent.layer.close(index);
+                                if ($("#continueAddCheckbox").is(":checked")) {
+                                    $(window.parent['f1'].document).find('.btn-search').click();
+                                    window.location.reload();
+                                } else {
+                                    parent.layer.closeAll();
+                                    //获取当前框架ID并刷新
+                                    bizUtil.frame.refreshCurrentFrame();
+                                    bizUtil.frame.refreshListFrame();
+                                    bizUtil.frame.closeCurrentIframeTab(window.parent);
+                                }
+                            }
+                        });
+                    }
+                });
+                return false;
+            });
+
+            //取消按钮事件
+            $('#vcancel').on('click', function() {
+                bizUtil.frame.closeCurrentIframeTab(window.parent);
+            });
+        }
+    });
+</script>
+
+</html>

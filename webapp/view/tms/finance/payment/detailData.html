@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>应付明细 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <style>
+      .layui-form-item{
+            margin:0;
+        }
+  </style>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane" autocomplete="off">
+            <div class="layui-row layui-col-space5">
+                <div class="layui-col-sm1" style="width:25%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">做柜日期</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <input type="text" name="beginTime" id="beginTime" placeholder="开始时间" class="layui-input">
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="endTime" id="endTime" placeholder="到期时间" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">作业号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="workNo" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">柜号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="containerNo" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">S/O</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="soType" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">订单类型</label>
+                        <div class="layui-input-block">
+                            <select name="indentType">
+                                <option value="" selected="selected">全部</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <button class="layui-btn layui-btn-danger btn-search"  lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--end: 搜索-->
+    
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+      <div class="layui-btn-group fl">
+         <button class="layui-btn layui-btn-normal" data-type="detail">查看明细</button>
+        <button class="layui-btn layui-btn-normal" data-type="rollout">运单转出</button>
+        <button class="layui-btn layui-btn-normal" data-type="rollin">运单转入</button>
+        <button class="layui-btn layui-btn-normal" data-type="deriveDetail">导出</button>
+        <button class="layui-btn layui-btn-normal" data-type="returnData">返回</button>
+      </div>
+      <!-- <div class="layui-btn-group fr">
+        <button class="layui-btn"><i class="layui-icon">&#xe614;</i>定义表头</button>
+        <button class="layui-btn"><i class="layui-icon">&#xe62d;</i>导出EXCEL</button>
+      </div> -->
+      <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+    <!--start:快捷搜索-->
+    <div  id="shortBar" style="display:none;">
+      <dl>
+        <dt>客户 ： <span class="layui-badge layui-bg-cyan targetName"></span></dt>
+        <dt>应付合计 ： <span class="layui-badge layui-bg-cyan  handleSum"></span></dt>
+      </dl>
+    </div>
+    <!--end:快捷搜索-->
+
+  </body>
+  <script type="text/html" id="doarkDateTpl">
+      {{new Date(d.doarkDate).format("yyyy-MM")}}
+  </script>
+  <script type="text/html" id="createDateTpl">
+      {{new Date(d.createDate).format("yyyy-MM-dd hh:mm:ss")}}
+  </script>
+  <script type="text/html" id="payTypeTpl">
+    {{# if(d.payType == '1'){ }} 现金 {{# } else if(d.payType == '0'){ }} 账期 {{# } }}
+</script>
+<script type="text/html" id="idTpl">
+  {{d.LAY_TABLE_INDEX+1}}
+</script>
+
+
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer','laydate', 'table', 'tms_tab'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+    var $targetName = ((decodeURI(location.href).split("?")[1]).split("&")[2]).split("=")[1]; 
+    $('.targetName').html($targetName);
+      laydate.render({
+        elem: '#beginTime'
+      });
+      laydate.render({
+        elem: '#endTime'
+      });
+      var $targetId = $.trim(getUrlParam("targetId"));
+      var $billMonth = $.trim(getUrlParam("billMonth"));
+    setTableData();
+
+    var $shortBarHtml = $('#shortBar').html();
+    $('.layui-table-tool').prepend('<div class="short-bar">' + $shortBarHtml + '</div>');
+    
+    //监听提交
+    form.on('submit(search)', function(data){
+      var $startDate = $.trim(data.field.beginTime),
+      $endDate = $.trim(data.field.endTime),
+      $jobNo = $.trim(data.field.workNo),
+      $arkNo = $.trim(data.field.containerNo),
+      $soNo = $.trim(data.field.soType),
+      $orderType = $.trim(data.field.indentType);
+      setTableData($startDate, $endDate, $jobNo, $arkNo, $soNo, $orderType );
+      return false;
+    });
+    
+    //方法级渲染
+    function setTableData($startDate, $endDate, $jobNo, $arkNo, $soNo, $orderType ){
+      typeof $startDate != 'undefined' ? $startDate = $startDate : $startDate = '';
+      typeof $endDate != 'undefined' ? $endDate = $endDate : $endDate = '';
+      typeof $jobNo != 'undefined' ? $jobNo = $jobNo : $jobNo = '';
+      typeof $arkNo != 'undefined' ? $arkNo = $arkNo : $arkNo = '';
+      typeof $soNo != 'undefined' ? $soNo = $soNo : $soNo = '';
+      typeof $orderType != 'undefined' ? $orderType = $orderType : $orderType = '';
+      var $pageSize = 15;
+
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/handleBills/search.shtml?targetId=' + $targetId + '&billMonth=' + $billMonth + '&startDate=' + $startDate +'&endDate=' + $endDate + '&jobNo=' + $jobNo + '&arkNo=' + $arkNo + '&soNo=' + $soNo + '&orderType=' + $orderType,    
+        // where: {targetId:$targetId, billMonth:$billMonth, startDate:$startDate, endDate:$endDate, jobNo:$jobNo, arkNo:$arkNo, soNo:$soNo, orderType:$orderType},
+        // method: 'post', //如果无需自定义HTTP类型，可不加该参数
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.handlePageResultDetail.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.handlePageResultDetail.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {title: '序号', width:100, align: 'center' , templet:"#idTpl"},
+          {field:'jobNo', title: '运输作业号', width:200, align: 'center', event: 'setSign', style:'cursor: pointer;color:#51a2f7;'},
+          {field:'doarkDate', title: '做柜日期', width:90, align: 'center', templet:"#doarkDateTpl"},
+          {field:'payType', title: '类型', width:90, align: 'center', templet:"#payTypeTpl"},
+          {field:'soNo', title: 'S/O', width:200, align: 'center'},
+          {field:'arkType', title: '柜型', width:130, align: 'center'},
+          {field:'carNo', title: '车牌号', width:100, align: 'center'},
+          {field:'transportCost', title: '运费', width:100, align: 'center'},
+          {field:'extraCost', title: '异常费', width:100, align: 'center'},
+          {field:'sum', title: '合计', width:100, align: 'center'},
+          // {field:'money', title: '是否请款', width:100, align: 'center'},
+          // {field:'paidCost', title: '已付金额', width:100, align: 'center'},
+          {field:'remarks', title: '备注', width:150, align: 'center'},
+          {align:'createDate', title: '创建时间', width:200, align: 'center', templet:"#createDateTpl"}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){
+          $('.handleSum').html(res.objects.smallPageResult.handleSum);
+        }
+      });
+    }
+
+    //监听工具条
+    table.on('tool(tbar)', function(obj){
+          if(obj.event === 'setSign'){
+          var data = obj.data;
+          parent.layer.open({
+            type: 2,
+            title: '订单明细',
+            shadeClose: true,
+            shade: 0.8,
+             area: ['80%', '800px'],
+            content: 'orderdetail.html?jobNo='+ data.jobNo + "&id=" + data.id
+          });
+        }
+    });
+
+    var active = {
+      //查看明细
+      detail: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else{
+          parent.layer.open({
+            type: 2,
+            title: '订单明细',
+            shadeClose: true,
+            shade: 0.8,
+             area: ['80%', '800px'],
+            content: 'orderdetail.html?jobNo='+ data[0].jobNo + "&id=" + data[0].id
+          });
+        }
+      },
+      //运单转出
+      rollout: function(){ //获取选中数据
+         var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+            var $data = [];
+            for(var $i = 0; $i< data.length; $i++){
+              $data.push(data[$i].id);
+            }
+            // console.log($data);
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else{
+          parent.layer.open({
+            type: 2,
+            title: '运单转出',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['80%', '800px'],
+            content: 'rollout.html?data='+$data
+          });
+        }
+      },
+      //运单转入
+      rollin: function(){ //获取选中数据
+         $targetId = $.trim(getUrlParam('targetId'));
+        $billMonth = $.trim(getUrlParam('billMonth'));
+          parent.layer.open({
+            type: 2,
+            title: '运单转入',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['80%', '800px'],
+            content: 'rollin.html?targetId='+$targetId + '&billMonth=' + $billMonth
+          });
+      },
+       //导出明细账单
+       deriveDetail: function(){
+        var $ids = $.trim(getUrlParam("id"));
+          $.ajax({
+            type:'GET', 
+            url:'/ucenter/general/finance/handleBills/excelHandleDetail.shtml?ids=' + $ids , 
+            success:function(d){
+              if(d.code == 'ERROR_FINANACE_EXPORT_EXCEL'){
+                parent.layer.alert('没有查询到相关数据！');
+              }else{
+                document.location.href = '/ucenter/general/finance/handleBills/excelHandleDetail.shtml?ids=' + $ids ;
+              }
+            },
+            error:function(){
+              parent.layer.alert('操作失败！');
+            }
+          });
+      },
+      //返回
+      returnData: function(){
+        tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+      },
+    };
+  
+    $('.btns-bar .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+  });
+  </script>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>派车 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+    <style>
+        .layui-form-item .layui-form-label {
+            width: 80px;
+        }
+        
+        .layui-form-item .layui-input-block {
+            margin-left: 110px;
+        }
+        
+        .layui-textarea {
+            min-height: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <form class="layui-form" autocomplete="off" style="min-width:auto;">
+        <div class="layui-row">
+            <div class="layui-col-sm6 layui-col-xs6">
+                <div class="layui-form-item layui-form-item--require">
+                    <label class="layui-form-label">应付运费</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="sendPrice" placeholder="0 ~ 1,000,000，保留2位小数" class="layui-input" maxlength="9" hc-verify="notBlank|positiveDecimals|decimals2|max" hc-verify_field="应付运费" hc-verify_max="1000000">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm6 layui-col-xs6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">预付车费</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="prepayFare" placeholder="0 ~ 10,000，保留2位小数" class="layui-input" maxlength="7" hc-verify="positiveDecimals|decimals2|max" hc-verify_field="预付车费" hc-verify_max="10000">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-row">
+            <div class="layui-col-sm6 layui-col-xs6">
+                <div class="layui-form-item layui-form-item--require">
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="copeCashFlag" title="现金结算" lay-skin="primary">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm6 layui-col-xs6">
+                <div class="layui-form-item layui-form-item--require">
+                    <div class="layui-input-block">
+                        <input type="checkbox" id="hasCascadeCheckbox" name="hasCascade" title="强制关联司机/拖车/车架" lay-filter="hasCascade" lay-skin="primary" checked>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-row">
+            <div class="layui-col-sm6 layui-col-xs6">
+                <div class="layui-form-item layui-form-item--require">
+                    <label class="layui-form-label">司机</label>
+                    <div class="layui-input-block" lay-filter="driverNameContainer">
+                        <!-- 用于保存 driverName 司机姓名 -->
+                        <input type="hidden" name="driverName">
+                        <select name="driverId" hc-field_type="number" id="driverNameList" lay-filter="driverName" lay-search hc-data_url="/ucenter/tms/capacity/driver/options.shtml?contractType=" hc-data_id_field="id" hc-data_text_field="name" hc-verify="notBlank">
+                            <option value="" selected>请选择</option>
+                            <option value="..." disabled>数据加载中...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm6 layui-col-xs6">
+                <div class="layui-form-item layui-form-item--require">
+                    <label class="layui-form-label">司机手机</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="driverMobile" name="driverMobile" readonly placeholder="" class="layui-input" maxlength="11" hc-verify="notBlank|mobile">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-row">
+            <div class="layui-col-sm6 layui-col-xs6">
+                <div class="layui-form-item layui-form-item--require">
+                    <label class="layui-form-label">拖车车牌</label>
+                    <div class="layui-input-block" lay-filter="carContainer">
+                        <!-- 用于保存 carNo 拖车车牌 -->
+                        <input type="hidden" name="carNo">
+                        <select name="carId" hc-field_type="number" id="carList" lay-filter="car" lay-search hc-data_url="/ucenter/tms/capacity/trailer/options.shtml" hc-verify="notBlank">
+                            <option value="" selected>请选择</option>
+                            <option value="..." disabled>数据加载中...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm6 layui-col-xs6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">车架车牌</label>
+                    <div class="layui-input-block" lay-filter="carframeContainer">
+                        <!-- 用于保存 carframeNo 车架车牌 -->
+                        <input type="hidden" name="carframeNo">
+                        <select name="carframeId" hc-field_type="number" id="carframeList" lay-filter="carframe" lay-search hc-data_url="/ucenter/tms/capacity/carFrame/options.shtml">
+                            <option value="" selected>请选择</option>
+                            <option value="..." disabled>数据加载中...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-row">
+            <div class="layui-col-sm6 layui-col-xs6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">供应商/车队</label>
+                    <div class="layui-input-block" lay-filter="carCompanyContainer">
+                        <!-- 用于保存 carCompanyShortname 供应商/车队 -->
+                        <input type="hidden" name="carCompanyShortname">
+                        <select name="carCompanyId" hc-field_type="number" id="carCompanyList" lay-filter="carCompany" lay-search hc-data_url="/ucenter/carteam/options.shtml">
+                            <option value="" selected>请选择</option>
+                            <option value="..." disabled>数据加载中...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm6 layui-col-xs6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">应付结算对象</label>
+                    <div class="layui-input-block" lay-filter="trailerSettlementContainer">
+                        <select name="trailerSettlementId" disabled hc-field_type="number" id="trailerSettlementList" lay-filter="trailerSettlement">
+                            <option value="" selected>请选择</option>
+                            <option value="..." disabled>数据加载中...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-row">
+            <div class="layui-col-sm12 layui-col-xs12">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">备注</label>
+                    <div class="layui-input-block">
+                        <textarea id="waybillRemark" name="waybillRemark" placeholder="0 ~ 1000位字符，可为空" class="layui-textarea" maxlength="1000"></textarea>
+                        <!-- <textarea id="waybillRemark2" name="waybillRemark" placeholder="填写司机，拖车，车架不强制关联的原因，必填项" hc-verify="notBlank" class="layui-textarea" maxlength="1000" style="display:none;"></textarea> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="buttonBar" class="layui-form-item button-bar" style="margin:10px 0 40px;">
+            <button class="layui-btn layui-btn-normal" id="vsubmit" lay-submit lay-filter="submit">确定</button>
+            <button class="layui-btn layui-btn-primary" id="vclose" type="button">取消</button>
+        </div>
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<!-- 工具库 -->
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+<script charset="utf-8" src="../order/trailerRelationManager.js"></script>
+<!-- 本页JS -->
+<script>
+    layui.use(['form', 'layer'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery;
+
+        var $id = getUrlId($.trim(getUrlParam('id')));
+
+        // 加载
+        var $_myForm = $('.layui-form');
+        bizUtil.init.initSelectData($_myForm, {
+            defaultOptions: {
+                idFieldName: 'key',
+                textFieldName: 'value'
+            }
+        });
+
+        var trailerRelationManager = TrailerRelationManager.createRelationManager({
+            isBindCascadeChangeEvent: false
+        });
+
+        var $_hasCascadeCheckbox = $('#hasCascadeCheckbox'),
+            $_driverMobile = $('#driverMobile'),
+            $_carList = $('#carList'),
+            $_waybillRemark = $('#waybillRemark');
+        form.on('checkbox(hasCascade)', function(data) {
+            var hasCascade = $_hasCascadeCheckbox.prop('checked');
+
+            // 司机手机 在强制关联时不可编辑，解除强制关联时才可编辑
+            $_driverMobile.prop('readonly', hasCascade);
+            //$_waybillRemark.prop('readonly', hasCascade);
+
+            // 如果重新勾选 强制关联，则需要关联所有关系并刷新车队和结算信息列表
+            if (hasCascade) {
+                $('.layui-layer-tips').remove();
+                $_waybillRemark.removeAttr('hc-verify').attr('placeholder', '0 ~ 1000位字符，可为空');
+                trailerRelationManager.relateAllByTrailer($_carList, false, true, true);
+            } else {
+                $_waybillRemark.attr({
+                    'placeholder': '填写司机，拖车，车架不强制关联的原因，必填项',
+                    'hc-verify': 'notBlank'
+                });
+            }
+        });
+
+        //监听提交
+        form.on('submit(submit)', function(data) {
+            if (!bizUtil.validator.verifyContainer($('form'))) {
+                return false;
+            }
+
+            //数据源
+            var $saveData = {
+                id: parseInt($id),
+                carId: parseInt(data.field.carId) || null,
+                carNo: data.field.carNo,
+                carframeId: parseInt(data.field.carframeId) || null,
+                carframeNo: data.field.carframeNo,
+                driverId: parseInt(data.field.driverId) || null,
+                driverName: data.field.driverName,
+                driverMobile: data.field.driverMobile,
+                sendPrice: parseFloat(data.field.sendPrice) || 0,
+                prepayFare: parseFloat(data.field.prepayFare) || 0,
+                copeCashFlag: data.field.copeCashFlag == 'on' ? 1 : 0,
+                hasCascade: data.field.hasCascade == 'on' ? 1 : 0,
+                carCompanyId: parseInt(data.field.carCompanyId) || null,
+                carCompanyShortname: data.field.carCompanyShortname,
+                trailerSettlementId: parseInt(data.field.trailerSettlementId) || null,
+                waybillRemark: data.field.waybillRemark
+            };
+
+            // console.log($saveData);
+            // return false;
+
+            //提交派车
+            HC.ajax['post']({
+                url: '/ucenter/tms/waybill/waybill/sendCar.shtml',
+                data: $saveData,
+                success: function() {
+                    setLayerAlert(parent.layer, '派车成功', {
+                        yes: function() {
+                            parent.layer.closeAll();
+                            // bizUtil.frame.refreshListFrame();
+                            //获取当前框架ID并刷新
+                            var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+                            parent['f' + $layId].refreshTableList();
+                        }
+                    });
+                }
+            });
+            return false;
+        });
+
+        //取消按钮
+        $('#vclose').on('click', function() {
+            parent.layer.closeAll();
+        });
+    });
+</script>
+
+</html>

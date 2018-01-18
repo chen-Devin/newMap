@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>核对账单 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+    <style>
+      body {margin:20px;}
+      span.required {color:#f00; font-family:'simsun', '宋体'; margin-right:5px; font-size:15px;}
+      .layui-form-label {width:190px;}
+      span{line-height: 38px; height: 38px}
+      .layui-form-item .layui-input-inline {padding-top: 10px; width:270px;}
+      a {color:#51a2f7 !important;}
+      .pointer{color:#51a2f7; cursor:pointer ; width:270px; overflow: hidden;white-space:nowrap;text-overflow:ellipsis;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      <div class="layui-row">
+        <div class="layui-col-sm4">
+            <div class="layui-form-item"> 
+              <label class="layui-form-label">账单号</label>
+              <div class="layui-input-block">
+                  <span id="handleBillsNo" name="handleBillsNo"></span>
+              </div>
+            </div>
+        </div>
+        <div class="layui-col-sm4">
+            <div class="layui-form-item"> 
+              <label class="layui-form-label">结算单位</label>
+              <div class="layui-input-block">
+                  <span id="targetName" name="targetName"></span>
+              </div>
+            </div>
+        </div>
+        <div class="layui-col-sm4">
+            <div class="layui-form-item"> 
+                <label class="layui-form-label">月份</label>
+              <div class="layui-input-block">
+                  <span id="billMonth" name="billMonth"></span>
+              </div>
+            </div>
+        </div>
+      </div>
+      <div class="layui-row">
+        <div class="layui-col-sm4">
+           <div class="layui-form-item"> 
+              <label class="layui-form-label">运输单量</label>
+              <div class="layui-input-block">
+                  <span id="orderCount" name="orderCount"></span>
+              </div>
+            </div>
+        </div>
+        <div class="layui-col-sm4">
+           <div class="layui-form-item"> 
+              <label class="layui-form-label">运输柜量</label>
+              <div class="layui-input-block">
+                  <span id="arkCount" name="arkCount"></span>
+              </div>
+            </div>
+        </div>
+        <div class="layui-col-sm4">
+           <div class="layui-form-item"> 
+              <label class="layui-form-label">应付运费(元)</label>
+              <div class="layui-input-block">
+                  <span id="transportCost" name="transportCost"></span>
+              </div>
+            </div>
+        </div>
+      </div>
+      <div class="layui-row">
+        <div class="layui-col-sm4">
+          <div class="layui-form-item"> 
+            <label class="layui-form-label">应付异常费(元)</label>
+            <div class="layui-input-block">
+                <span id="extraCost" name="extraCost"></span>
+            </div>
+          </div>
+        </div>
+        <div class="layui-col-sm4">
+          <div class="layui-form-item"> 
+            <label class="layui-form-label">应付合计(元)</label>
+            <div class="layui-input-block">
+                <span id="totalCost" name="totalCost"></span>
+            </div>
+          </div>
+        </div>
+        <div class="layui-col-sm4">
+          <div class="layui-form-item"> 
+            <label class="layui-form-label">对方提交应收金额(元)</label>
+            <div class="layui-input-block">
+                <span id="receiveCost" name="receiveCost"></span>
+            </div>
+          </div>
+        </div>
+       
+      </div>
+      <div class="layui-row">
+        <div class="layui-col-sm4">
+            <div class="layui-form-item"> 
+                <label class="layui-form-label">已请款金额(元)</label>
+              <div class="layui-input-block">
+                  <span id="askedCost" name="askedCost"></span>
+              </div>
+            </div>
+        </div>
+        <div class="layui-col-sm4">
+            <div class="layui-form-item"> 
+              <label class="layui-form-label">已付金额(元)</label>
+              <div class="layui-input-block">
+                  <span id="handledCost" name="handledCost"></span>
+              </div>
+            </div>
+        </div>
+        <div class="layui-col-sm4">
+            <div class="layui-form-item  layui-form-item--require"> 
+              <label class="layui-form-label">回复应付金额(元)</label>
+              <div class="layui-input-block">
+                  <div class="layui-col-sm6">
+                    <input type="text" placeholder="" name="realNeedPay" class="layui-input"  disabled style="cursor:not-allowed" >
+                  </div>
+              </div>
+            </div>
+        </div>
+      </div>
+      <div class="layui-row">
+          <div class="layui-col-sm6">
+              <div class="layui-form-item"> 
+                <label class="layui-form-label">对方备注</label>
+                <div class="layui-input-block">
+                    <div class="layui-col-sm9">
+                        <textarea id="otherRemark" name="otherRemark" class="layui-textarea" disabled style="min-height:50px;cursor:not-allowed" ></textarea>
+                    </div>
+                </div>
+              </div>
+          </div>
+          <div class="layui-col-sm6">
+              <div class="layui-form-item"> 
+                <label class="layui-form-label">备注</label>
+                <div class="layui-input-block">
+                    <div class="layui-col-sm9">
+                      <textarea id="iRemark" name="iRemark"  placeholder="" class="layui-textarea"  disabled style="min-height:50px;cursor:not-allowed"  ></textarea>
+                    </div>
+                </div>
+              </div>
+          </div>
+      </div>
+      <hr>
+      <div class="layui-row">
+        <div style="margin-left:90px">
+            <div class="layui-col-sm9">
+                <div class="layui-form-item"> 
+                注：确认应付金额与供应商/司机双方确认后需要支付给供应商/司机的金额,包含已付金额。确认应付金额与对方提交应收金额不一致时，请与供应商/司机提前沟通确认。
+              </div>
+            </div>
+        </div>
+      </div>
+      <div class="layui-row">
+          <div class="layui-col-sm6" style="height:40px">
+              <div class="layui-form-item"> 
+                <label class="layui-form-label">沟通历史</label>
+                <div class="layui-input-block">
+                    <div class="layui-col-sm9 pointer">
+                        <span class="communication">沟通历史链接</span>
+                    </div>
+                </div>
+              </div>
+          </div>
+      </div>
+      <div class="layui-row">
+          <div class="layui-col-sm6" style="height:40px">
+              <div class="layui-form-item"> 
+                <label class="layui-form-label">对方提交账单</label>
+                <div class="layui-input-block">
+                    <div class="layui-col-sm9 pointer">
+                        <span id="otherLink" name="otherLink">账单明细链接</span>
+                    </div>
+                </div>
+              </div>
+          </div>
+      </div>
+      <div class="layui-row">
+          <div class="layui-col-sm6" style="height:40px">
+              <div class="layui-form-item"> 
+                <label class="layui-form-label">回复账单</label>
+                <div class="layui-input-block">
+                    <div class="layui-col-sm9 pointer">
+                        <span id="replyLink" name="replyLink">账单明细链接</span>
+                    </div>
+                </div>
+              </div>
+          </div>
+      </div>
+
+       <!-- 存储 对方提交账单 与 回复账单 需要的id -->
+       <input type="hidden" name="myVerifyId">
+       <input type="hidden" name="otherVerifyId">
+    </form>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    laydate.render({
+      elem: '#getMoneyDate' //收款日期
+    });
+
+    
+
+    var $id = $.trim(getUrlParam('customerId'));
+    roleStatu($id);
+    var $handleBillsNo,
+        $billMonth, 
+        $myOrderCount,
+        $otherOrderCount,
+        $myArkCount,
+        $otherArkCount,
+        $myTransportCost,
+        $otherTransportCost,
+        $myExtraCost,
+        $otherExtraCost,
+        $myTotalCost,
+        $status,
+        $otherTotalCost,
+        $handleBillsId;
+
+    //渲染页面
+      function roleStatu($id){
+        // var $saveData = {
+        //   id: $id,
+        // }
+        $.ajax({
+          type:'GET', 
+          url:'/ucenter/general/finance/handleBills/queryVerify.shtml?id='+$id, 
+          // dataType:"json",
+          // contentType: "application/json",
+          // data:JSON.stringify($saveData),
+          success:function(d){
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+            if($code === 'SUCCESS'){
+                $billMonth = $objects.billMonth;
+                $handleBillsNo = $objects.handleBillsNo;
+                $handleBillsId = $objects.handleBillsId;
+                $myOrderCount = $objects.myOrderCount;
+                $otherOrderCount = $objects.otherOrderCount;
+                $myArkCount = $objects.myArkCount;
+                $otherArkCount = $objects.otherArkCount;
+                $myTransportCost = $objects.myTransportCost;
+                $otherTransportCost = $objects.otherTransportCost;
+                $myExtraCost = $objects.myExtraCost;
+                $otherExtraCost = $objects.otherExtraCost;
+                $myTotalCost = $objects.myTotalCost;
+                $otherTotalCost = $objects.otherTotalCost;
+                $status = $objects.status;
+                $('span[name="handleBillsNo"]').html($objects.handleBillsNo);
+                $('span[name="targetName"]').html($objects.targetName);
+                $('span[name="billMonth"]').html(new Date($objects.billMonth).format('yyyy-MM') );
+                $('span[name="orderCount"]').html(($objects.myOrderCount === null ? '':  $objects.myOrderCount) + ($objects.otherOrderCount === null ? '' : '/' + $objects.otherOrderCount));
+                $('span[name="arkCount"]').html(($objects.myArkCount === null ? '':  $objects.myArkCount) + ($objects.otherArkCount === null ? '' : '/' + $objects.otherArkCount));
+                $('span[name="transportCost"]').html(($objects.myTransportCost === null ? '':  $objects.myTransportCost) + ($objects.otherTransportCost === null ? '' : '/' + $objects.otherTransportCost));
+                $('span[name="extraCost"]').html(($objects.myExtraCost === null ? '':  $objects.myExtraCost) + ($objects.otherExtraCost === null ? '' : '/' + $objects.otherExtraCost));
+                $('span[name="totalCost"]').html(($objects.myTotalCost === null ? '':  $objects.myTotalCost) + ($objects.otherTotalCost === null ? '' : '/' + $objects.otherTotalCost));
+                $('span[name="askedCost"]').html($objects.askedCost);
+                $('span[name="handledCost"]').html($objects.handledCost);
+                $('span[name="receiveCost"]').html($objects.receiveCost);//对方提交实应付金额
+                $('textarea[name="otherRemark"]').html($objects.otherRemark);
+                // $('span[name="isDissent"]').html($objects.isDissent);
+                $('span[name="handleCost"]').html($objects.handleCost);
+                $('input[name="realNeedPay"]').html($objects.realNeedPay);
+                $('textarea[name="iRemark"]').html($objects.iRemark);
+                $('span[name="status"]').html($objects.status);
+                // 保存 对方提交账单 与 回复账单 需要的id
+                $('[name=myVerifyId]').val($objects.myVerifyId);
+                $('[name=otherVerifyId]').val($objects.otherVerifyId);
+            }else{
+              parent.layer.alert('操作失败！');
+            }
+          }
+        });
+      }
+
+         //对方提交账单链接
+       $('span[name="otherLink"]').on("click",function(){
+        var $handleBillsNo = $('span[name="handleBillsNo"]').html();
+        parent.layer.open({
+              type: 2,
+              title: '对方提交账单',
+              shadeClose: true,
+              shade: 0.8,
+              area: ['90%', '80%'],
+              content: 'otherLink.html?handleBillsNo=' + $('[name=otherVerifyId]').val()
+            });
+      })
+
+      //回复账单链接
+       $('span[name="replyLink"]').on("click",function(){
+        var $handleBillsNo = $('span[name="handleBillsNo"]').html();
+        parent.layer.open({
+              type: 2,
+              title: '回复账单',
+              shadeClose: true,
+              shade: 0.8,
+              area: ['90%', '80%'],
+              content: 'replyLink.html?handleBillsNo=' +  $('[name=myVerifyId]').val()
+            });
+      })
+
+    $(".btn-cancel").on("click",function(){
+      parent.layer.closeAll();
+      return false;
+    });
+
+    //差异详情
+    $(".difference").click(function(){
+      parent.layer.open({
+        type: 2,
+        title: '差异详情',
+        shadeClose: true,
+        shade: 0.8,
+        area: ['90%', '80%'],
+        content: 'difference.html'
+      });
+    });
+
+    //账单明细
+    $(".billDetail").click(function(){
+      parent.layer.open({
+        type: 2,
+        title: '应收明细',
+        shadeClose: true,
+        shade: 0.8,
+        area: ['90%', '80%'],
+        content: 'detailData.html'
+      });
+    });
+
+    //沟通历史
+    $(".communication").click(function(){
+      parent.layer.open({
+        type: 2,
+        title: '沟通历史',
+        shadeClose: true,
+        shade: 0.8,
+        area: ['1100px', '700px'],
+        content: 'communication.html?id='+ $id + '&handleBillsNo=' + $handleBillsNo
+    });
+  });
+  });
+  </script>
+</html>

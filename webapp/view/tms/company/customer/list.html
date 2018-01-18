@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>客户管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+
+</head>
+
+<body>
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane" autocomplete="off">
+            <div class="layui-inline">
+                <label class="layui-form-label">客户简称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="nameShort" placeholder="客户简称" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">客户名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" placeholder="客户名称" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">使用公司</label>
+                <div class="layui-input-block">
+                    <select name="companyUsedId" id="companyUsedIdS" lay-verify="companyUsedId" lay-search lay-filter="companyUsedId" lay-search hc-data_url="/ucenter/centre/core/organization/all.shtml">
+                        <option value="" selected>请选择</option>
+                        <option value="" disabled>数据加载中...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-inline" style="width:100px">
+                    <select name="status">
+                      <option value="" selected="selected">全部</option>
+                      <option value="1">启用</option>
+                      <option value="3">停用</option>
+                    </select>
+                </div>
+            </div>
+            <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+            <button class="layui-btn layui-btn-primary" type="reset" style="margin:0;">重置</button>
+        </form>
+    </div>
+
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+        <div class="layui-btn-group">
+            <button class="layui-btn layui-btn-normal" data-type="addData">新增</button>
+            <button class="layui-btn layui-btn-normal" data-type="editData">编辑</button>
+            <button class="layui-btn layui-btn-normal" data-type="detailData">查看</button>
+            <button class="layui-btn layui-btn-normal" data-type="statusCancel">停用</button>
+            <button class="layui-btn layui-btn-normal" data-type="statusStart">启用</button>
+            <button class="layui-btn layui-btn-normal" data-type="customerLinkman">报关行</button>
+            <button class="layui-btn layui-btn-normal" data-type="handingSite">装卸地址</button>
+            <!-- <button class="layui-btn layui-btn-normal" data-type="thirdPartyBoard">第三方平台账号</button> -->
+            <button class="layui-btn" data-type="imporTing"><i class="layui-icon">&#xe62d;</i>导入客户</button>
+        </div>
+        <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList"></table>
+    <!--end:表格列表-->
+</body>
+
+<script type="text/html" id="statusTpl">
+    {{# if(d.status == 1){ }}
+    <a lay-event="statusCancel" style="color:#1E9FFF;">启用</a> {{# }else if(d.status == 3){ }}
+    <a lay-event="statusStart" style="color:#FF5722;">停用</a> {{# }else if(d.status == 0){ }}
+    <a lay-event="statusDraft" style="color:#333333;">草稿</a> {{# } }}
+</script>
+<script type="text/html" id="createDateTpl">
+    {{new Date(d.createDate).format('yyyy-MM-dd hh:mm:ss')}}
+</script>
+<script type="text/html" id="roleDecodeTpl">
+    {{setSupplierCustomerType(d.roleDecode, 2)}}
+</script>
+<script type="text/html" id="idTpl">
+    {{d.LAY_TABLE_INDEX+1}}
+</script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+<!-- 工具库依赖 -->
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+<script>
+    layui.use(['form', 'layer', 'table', 'tms_tab'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            tmsTab = layui.tms_tab,
+            $ = layui.jquery;
+
+
+        bizUtil.layui.loadDataToSelect('#companyUsedIdS');
+        bizUtil.init.initSelectData();
+
+        setTableData({});
+        //监听提交
+        form.on('submit(search)', function(data) {
+            var $saveData = {
+                nameShort: $.trim(data.field.nameShort),
+                name: $.trim(data.field.name),
+                companyUsedId: $.trim(data.field.companyUsedId),
+                status: $.trim(data.field.status)
+            }
+            setTableData($saveData);
+            return false;
+        });
+
+        //方法级渲染
+        function setTableData($searchData) {
+            var $pageSize = 15;
+
+            table.render({
+                elem: '#tableList',
+                url: '/ucenter/crm/customers/customers/page.shtml',
+                where: $searchData,
+                response: {
+                    statusCode: 'SUCCESS',
+                    countName: 'objects.total',
+                    dataName: 'objects.list'
+                },
+                request: {
+                    pageName: 'pageNum',
+                    limitName: 'pageSize'
+                },
+                cols: [
+                    [{
+                        checkbox: true,
+                        fixed: true
+                    }, {
+                        sort: true,
+                        title: '序号',
+                        width: 80,
+                        align: 'center',
+                        templet: '#idTpl'
+                    }, {
+                        field: 'status',
+                        title: '状态',
+                        width: 80,
+                        templet: '#statusTpl',
+                        align: 'center'
+                    }, {
+                        field: 'nameShort',
+                        title: '客户简称',
+                        width: 150
+                    }, {
+                        field: 'name',
+                        title: '客户名称',
+                        width: 250
+                    }, {
+                        field: 'usc',
+                        title: '统一社会代码/身份证',
+                        width: 200,
+                        align: 'center'
+                    }, {
+                        field: 'roleDecode',
+                        title: '客户类型',
+                        width: 120,
+                        templet: '#roleDecodeTpl',
+                        align: 'center'
+                    }, {
+                        field: 'userCompany',
+                        title: '使用公司',
+                        width: 150,
+                        align: 'center'
+                    }, {
+                        field: 'companySalesman',
+                        title: '业务员',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'addressCount',
+                        title: '装卸地址个数',
+                        width: 120,
+                        align: 'center'
+                    }, {
+                        field: 'creator',
+                        title: '创建人',
+                        width: 120,
+                        align: 'center'
+                    }, {
+                        field: 'createDate',
+                        title: '创建时间',
+                        width: 180,
+                        align: 'center',
+                        templet: '#createDateTpl'
+                    }]
+                ],
+                id: 'dataReload',
+                page: true,
+                limits: [15, 30, 50, 100],
+                limit: $pageSize,
+                height: 'full-130',
+                even: true
+            });
+        }
+
+        var tFn = toolbarOperation(table, tmsTab, roleStatus);
+        var active = {
+            //新增
+            addData: function() {
+                tmsTab.add($(this), '新增客户', 'modify.html?do=add');
+            },
+            //编辑
+            editData: tFn.compose(tFn.atLeastOneChosen, tFn.onlyOneChosen, tFn.disableData, tFn.successJump)({
+                msg: {
+                    onlyOneChosen: '只能选择一个客户！',
+                    disableData: '已选择的客户已停用,不能编辑'
+                },
+                title: '编辑',
+                url: 'modify.html?do=edit&'
+            }),
+            //查看详情
+            detailData: tFn.compose(tFn.atLeastOneChosen, tFn.onlyOneChosen, tFn.successJump)({
+                msg: {
+                    onlyOneChosen: '只能选择一个客户！'
+                },
+                title: '查看',
+                url: 'modify.html?do=detail&'
+            }),
+            //停用           
+            statusCancel: tFn.compose(tFn.atLeastOneChosen, tFn.reOneOperation, tFn.reBatchOperation, tFn.onlyOneDrafts, tFn.hasDrafts, tFn.cutState)({
+                msg: {
+                    reOneOperation: '已经是停用状态！',
+                    reBatchOperation: '都已经是停用状态！',
+                    onlyOneDrafts: '草稿状态的客户不能停用！',
+                    hasDrafts: '批量停用不能包含草稿状态的客户！',
+                    cutState: '停用客户后，不能再帮他们下单，你确定要停用吗？'
+                },
+                title: '停用确认',
+                draftState: 0,
+                state: 3
+            }),
+            //启用
+            statusStart: tFn.compose(tFn.atLeastOneChosen, tFn.reOneOperation, tFn.reBatchOperation, tFn.cutState)({
+                msg: {
+                    reOneOperation: '已经是启用状态！',
+                    reBatchOperation: '都已经是启用状态！',
+                    cutState: '草稿状态的客户，启用后，将无法再变更统一社会代码/身份证，只有启用状态的客户，才能帮他们下单，你确定要启用吗？'
+                },
+                title: '启用确认',
+                draftState: 0,
+                state: 1
+            }),
+            //报关行
+            customerLinkman: tFn.compose(tFn.atLeastOneChosen, tFn.onlyOneChosen, tFn.disableData, tFn.successJump)({
+                msg: {
+                    onlyOneChosen: '只能选择一个客户！',
+                    disableData: '停用客户不能操作报关行！'
+                },
+                title: '报关行',
+                url: 'customerLinker.html?'
+            }),
+            //装卸地址
+            handingSite: tFn.compose(tFn.atLeastOneChosen, tFn.onlyOneChosen, tFn.disableData, tFn.successJump)({
+                msg: {
+                    onlyOneChosen: '只能选择一个客户！',
+                    disableData: '停用客户不能操作装卸地址'
+                },
+                title: '装卸地址',
+                url: 'handingSite.html?'
+            }),
+            //第三方平台
+            thirdPartyBoard: tFn.compose(tFn.atLeastOneChosen, tFn.onlyOneChosen, tFn.disableData, tFn.successJump)({
+                msg: {
+                    onlyOneChosen: '只能选择一个客户！',
+                    disableData: '停用客户不能操作第三方平台'
+                },
+                title: '第三方平台',
+                url: 'thirdPartyBoard.html?'
+            }),
+            //导入
+            imporTing: function() {
+                tmsTab.add($(this), '导入客户', 'imporTing.html?do=add');
+            }
+        };
+
+        $('.btns-bar .layui-btn').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //改变状态，3停用，1启用
+        function roleStatus($ids, $status) {
+            var $saveData = {
+                ids: $ids,
+                status: $status
+            }
+            $.ajax({
+                type: 'post',
+                url: '/ucenter/crm/customers/customers/use.shtml',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify($saveData),
+                success: function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code === 'SUCCESS') {
+                        if ($status == 1) {
+                            parent.layer.alert('启用成功');
+                        } else {
+                            parent.layer.alert('停用成功');
+                        }
+                        window.location.reload();
+                    } else {
+                        parent.layer.alert('状态改变失败！');
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+</html>

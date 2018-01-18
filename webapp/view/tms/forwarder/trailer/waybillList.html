@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>运单费用 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+    <style>
+        .layui-form-item {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane" autocomplete="off">
+            <div class="layui-row layui-col-space5">
+                <div class="layui-col-sm1" style="width:25%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">做柜日期</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <input type="text" name="doarkDateStart" id="doarkDateStart" readonly placeholder="起始日期" class="layui-input" style="border-right:0; border-radius:0;">
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="doarkDateEnd" id="doarkDateEnd" readonly placeholder="截止日期" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">客户名称</label>
+                        <div class="layui-input-block">
+                            <select name="customerName">
+                                <option value="" selected>请选择</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">应收状态</label>
+                        <div class="layui-input-block">
+                            <select name="receiveCostStatus">
+                                <option value="" selected>请选择</option>
+                                <option value="0">未审核</option>
+                                <option value="1">已审核</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">应付状态</label>
+                        <div class="layui-input-block">
+                            <select name="copeCostStatus">
+                                <option value="" selected>请选择</option>
+                                <option value="0">未审核</option>
+                                <option value="1">已审核</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                        <button class="layui-btn layui-btn-primary" type="reset" style="margin-left:2px; line-height:36px;">重置</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row layui-col-space5" style="margin-top: 7.5px;">
+                <div class="layui-col-sm1" style="width:25%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">S/O</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="soNumber" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">柜号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="arkNo" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">订单号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="orderNo" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+        <div class="layui-btn-group fl">
+            <button class="layui-btn layui-btn-normal" data-type="receipt">回单</button>
+            <button class="layui-btn layui-btn-normal" data-type="approve">审核通过</button>
+            <button class="layui-btn layui-btn-normal" data-type="adjustFee">调整费用</button>
+            <button class="layui-btn layui-btn-normal" data-type="waybillCashout">运单请款</button>
+            <button class="layui-btn layui-btn-normal" data-type="billCashout">账单请款</button>
+        </div>
+        <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="table-list"></table>
+    <!--end:表格列表-->
+
+    <script type="text/html" id="idTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+    <script type="text/html" id="receivableCostStatusTpl">
+        {{setExCostStatus(d.receivableCostStatus)}}
+    </script>
+    <script type="text/html" id="copeCostStatusTpl">
+        {{setExCostStatus(d.copeCostStatus)}}
+    </script>
+    <script type="text/html" id="doarkDateTpl">
+        {{setTimeFormat(d.doarkDate, 'MM-dd hh:mm')}}
+    </script>
+    <script type="text/html" id="arkTypeTpl">
+        {{setBoxType(d.arkType)}}
+    </script>
+    <script type="text/html" id="addressTpl">
+        {{setGoodsAddress(d.address)}}
+    </script>
+    <script type="text/html" id="receiveFreightTpl">
+        {{setCost(d.receiveFreight)}}
+    </script>
+    <script type="text/html" id="receiveExCostTpl">
+        {{setExcepCost(d.receiveExCost, 'receiptDetail')}}
+    </script>
+    <script type="text/html" id="hasReceiveCashTpl">
+        {{setIsChecked(d.hasReceiveCash, 1)}}
+    </script>
+    <script type="text/html" id="handleFreightTpl">
+        {{setCost(d.handleFreight)}}
+    </script>
+    <script type="text/html" id="handleExCost1Tpl">
+        {{setExcepCost(d.handleExCost, 'receiptDetail')}}
+    </script>
+    <script type="text/html" id="carExCostTpl">
+        {{setExcepCost(d.carExCost, 'receiptDetail')}}
+    </script>
+    <script type="text/html" id="hasHandleCashTpl">
+        {{setIsChecked(d.hasHandleCash, 1)}}
+    </script>
+</body>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'table', 'tms_tab', 'laydate'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            laydate = layui.laydate,
+            tmsTab = layui.tms_tab,
+            $ = layui.jquery;
+
+        //初始化日期时间
+        laydate.render({
+            elem: '#doarkDateStart'
+        });
+        laydate.render({
+            elem: '#doarkDateEnd'
+        });
+
+        //初始化客户下拉框
+        setCustomerList();
+
+        function setCustomerList() {
+            var customerList = getCustomerList();
+            if (customerList.length > 0) {
+                for (var i = 0; i < customerList.length; i++) {
+                    $('select[name="customerName"]').append('<option value="' + customerList[i].nameShort + '">' + customerList[i].nameShort + '</option>');
+                }
+                form.render('select');
+            }
+        }
+
+        //初始化表格数据
+        setTableData({});
+
+        //监听提交
+        form.on('submit(search)', function(data) {
+            var v1 = data.field.doarkDateStart,
+                v2 = data.field.doarkDateEnd;
+            if (v1.length > 0 && v2.length == 0) {
+                layer.msg('请选择截止时间');
+                return false;
+            }
+            if (v1.length == 0 && v2.length > 0) {
+                layer.msg('请选择起始时间');
+                return false;
+            }
+            if (v1.length > 0 && v2.length > 0) {
+                v1 = new Date(v1);
+                v2 = new Date(v2);
+                if (v1 > v2) {
+                    layer.msg('截止时间要大于起始时间');
+                    return false;
+                }
+            }
+
+            var $saveData = data.field;
+            setTableData($saveData);
+            return false;
+        });
+
+        window.refreshTableList = function() {
+            $('button[lay-filter="search"]').click();
+        }
+
+        //方法级渲染
+        function setTableData($searchData) {
+            table.render({
+                elem: '#tableList',
+                url: '/ucenter/tms/waybill/waybill/searchCheckFreight.shtml',
+                method: 'post',
+                where: $searchData,
+                response: {
+                    statusCode: 'SUCCESS',
+                    dataName: 'objects'
+                },
+                cols: [
+                    [{
+                        checkbox: true,
+                        fixed: true
+                    }, {
+                        field: 'id',
+                        title: '序号',
+                        width: 60,
+                        align: 'center',
+                        templet: '#idTpl'
+                    }, {
+                        field: 'receivableCostStatus',
+                        title: '应收状态',
+                        width: 90,
+                        align: 'center',
+                        templet: '#receivableCostStatusTpl'
+                    }, {
+                        field: 'copeCostStatus',
+                        title: '应付状态',
+                        width: 90,
+                        align: 'center',
+                        templet: '#copeCostStatusTpl'
+                    }, {
+                        field: 'customerName',
+                        title: '客户',
+                        width: 130,
+                        align: 'left'
+                    }, {
+                        field: 'orderNo',
+                        title: '订单号码',
+                        width: 160,
+                        align: 'center'
+                    }, {
+                        field: 'customerWaybillNo',
+                        title: '客户作业单号',
+                        width: 160,
+                        align: 'center'
+                    }, {
+                        field: 'soNumber',
+                        title: 'S/O',
+                        width: 160,
+                        align: 'center'
+                    }, {
+                        field: 'arkNo',
+                        title: '柜号',
+                        width: 130,
+                        align: 'center'
+                    }, {
+                        field: 'doarkDate',
+                        title: '做柜时间',
+                        width: 130,
+                        align: 'center',
+                        templet: '#doarkDateTpl'
+                    }, {
+                        field: 'arkType',
+                        title: '箱型',
+                        width: 80,
+                        align: 'center',
+                        templet: '#arkTypeTpl'
+                    }, {
+                        field: 'carCompanyShortname',
+                        title: '供应商/车队',
+                        width: 150,
+                        align: 'left'
+                    }, {
+                        field: 'carNo',
+                        title: '车牌',
+                        width: 130,
+                        align: 'center'
+                    }, {
+                        field: 'receiveFreight',
+                        title: '应收运费',
+                        width: 100,
+                        align: 'center',
+                        templet: '#receiveFreightTpl'
+                    }, {
+                        field: 'receiveExCost',
+                        title: '应收异常费用',
+                        width: 120,
+                        align: 'center',
+                        templet: '#receiveExCostTpl'
+                    }, {
+                        field: 'hasReceiveCash',
+                        title: '现金结算',
+                        width: 100,
+                        align: 'center',
+                        templet: '#hasReceiveCashTpl'
+                    }, {
+                        field: 'handleFreight',
+                        title: '应付运费',
+                        width: 100,
+                        align: 'center',
+                        templet: '#handleFreightTpl'
+                    }, {
+                        field: 'handleExCost',
+                        title: '应付异常费用',
+                        width: 120,
+                        align: 'center',
+                        templet: '#handleExCost1Tpl'
+                    }, {
+                        field: 'carExCost',
+                        title: '车辆成本',
+                        width: 100,
+                        align: 'center',
+                        templet: '#carExCostTpl'
+                    }, {
+                        field: 'hasHandleCash',
+                        title: '现金结算',
+                        width: 100,
+                        align: 'center',
+                        templet: '#hasHandleCashTpl'
+                    }, {
+                        field: 'confirmMan',
+                        title: '确认人',
+                        width: 120,
+                        align: 'center'
+                    }, {
+                        field: 'address',
+                        title: '装卸地点',
+                        width: 120,
+                        align: 'left',
+                        templet: '#addressTpl'
+                    }]
+                ],
+                id: 'dataReload',
+                page: false,
+                height: 'full-179',
+                even: true
+            });
+
+            //添加快捷搜索
+            var $shortBarHtml = $('#shortBar').html();
+            $('.layui-table-tool').prepend('<div class="short-bar">' + $shortBarHtml + '</div>');
+        }
+
+        var active = {
+            //回单
+            receipt: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '请选择运单');
+                } else if (data.length > 1) {
+                    setLayerAlert(parent.layer, '只能选择一条运单');
+                } else {
+                    if (data[0].receivableCostStatus == 7 || data[0].receivableCostStatus == 8) return false;
+                    if (data[0].hasDirectReturn == 0 && data[0].status != 500 && data[0].status != 310 && ((data[0].status != 510 && data[0].status != 311) || (data[0].copeCostStatus != 0 && data[0].copeCostStatus != 1))) {
+                        setLayerAlert(parent.layer, '当前状态下该运单无法回单');
+                        return false;
+                    }
+                    if (!data[0].carId) {
+                        setLayerAlert(parent.layer, '该运单未派车或无拖车车牌，无法回单');
+                        return false;
+                    }
+                    if (!data[0].arkNo) {
+                        setLayerConfirm(parent.layer, '尚未报柜或录入柜号，要继续回单吗？', function(index) {
+                            parent.layer.close(index);
+                            setReceipt(data[0].soNumber, data[0].id);
+                        });
+                        return false;
+                    }
+                    setReceipt(data[0].soNumber, data[0].id);
+
+                    //回单页面
+                    function setReceipt(so, id) {
+                        parent.layer.open({
+                            type: 2,
+                            title: '回单（S/O：' + so + '）',
+                            shadeClose: true,
+                            shade: 0.8,
+                            area: ['90%', '90%'],
+                            content: 'receipt.html?id=' + id
+                        });
+                    }
+                }
+            },
+            //审核通过
+            approve: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '请选择运单');
+                } else {
+                    if (data[0].receivableCostStatus == 7 || data[0].receivableCostStatus == 8) return false;
+
+                    var $waybillIds = [],
+                        $isPass = [],
+                        $receivableCostCount = 0,
+                        $copeCostCount = 0;
+                    for (var $i = 0; $i < data.length; $i++) {
+                        if ((data[$i].receivableCostStatus == 1) && (data[$i].status == 510 || data[$i].status == 311)) {
+                            $waybillIds.push(data[$i].id);
+                            $receivableCostCount += (data[$i].receiveFreight || 0);
+                            $copeCostCount += (data[$i].handleFreight || 0);
+                        } else {
+                            $isPass.push(1);
+                        }
+                    }
+
+                    if ($waybillIds.length == 0) {
+                        setLayerAlert(parent.layer, '没有可以通过审核的运单');
+                        return false;
+                    }
+                    if ($isPass.length > 0) {
+                        setLayerAlert(parent.layer, '只有待复核的运单才能通过审核', {
+                            yes: function(index) {
+                                parent.layer.close(index);
+                                approveData($waybillIds, $receivableCostCount, $copeCostCount);
+                            }
+                        });
+                    } else {
+                        approveData($waybillIds, $receivableCostCount, $copeCostCount);
+                    }
+
+                    //审核通过接口
+                    function approveData(ids, r, c) {
+                        setLayerConfirm(parent.layer, '确定要审核通过吗？', function(index) {
+                            var $saveData = {
+                                waybillIds: ids,
+                                receivableCostCount: r,
+                                copeCostCount: c
+                            };
+                            $.ajax({
+                                type: 'POST',
+                                url: '/ucenter/tms/waybill/waybill/updateCheckFreight.shtml',
+                                dataType: "json",
+                                contentType: "application/json",
+                                data: JSON.stringify($saveData),
+                                success: function(d) {
+                                    var $code = d.code,
+                                        $msg = d.msg,
+                                        $objects = d.objects;
+
+                                    if ($code === 'SUCCESS') {
+                                        window.refreshTableList();
+                                        // window.location.reload();
+                                    } else {
+                                        setLayerAlert(parent.layer, '操作失败');
+                                    }
+                                }
+                            });
+                            parent.layer.close(index);
+                            return false;
+                        });
+                    }
+                }
+            },
+            //调整费用
+            adjustFee: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '请选择运单');
+                } else if (data.length > 1) {
+                    setLayerAlert(parent.layer, '只能选择一条运单');
+                } else {
+                    if (data[0].receivableCostStatus == 7 || data[0].receivableCostStatus == 8) return false;
+                    if ((data[0].receivableCostStatus != 1) || (data[0].status != 510 && data[0].status != 311)) {
+                        setLayerAlert(parent.layer, '当前状态下该运单无法调整费用');
+                        return false;
+                    }
+
+                    parent.layer.open({
+                        type: 2,
+                        title: '调整费用（S/O：' + data[0].soNumber + '）',
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['90%', '90%'],
+                        content: 'adjustFee.html?id=' + data[0].id
+                    });
+                }
+            },
+            //运单请款
+            waybillCashout: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    setLayerAlert(parent.layer, '请选择运单');
+                } else {
+                    if (data[0].receivableCostStatus == 7 || data[0].receivableCostStatus == 8) return false;
+
+                    var $waybillIds = [],
+                        $arkList = [],
+                        $isPay = [],
+                        $handleFreight = 0,
+                        $f1 = 0,
+                        $f2 = 0,
+                        $f3 = 0;
+                    for (var $i = 0; $i < data.length; $i++) {
+                        if (data[$i].receivableCostStatus == 4) {
+                            var $item = {};
+                            $item.waybillId = data[$i].id;
+                            $waybillIds.push(data[$i].id);
+                            $f1 = data[$i].handleFreight || 0;
+                            $f2 = data[$i].handleExCost || 0;
+                            $f3 = data[$i].carExCost || 0;
+                            $handleFreight = $f1 + $f2 + $f3;
+                            $item.askCost = $handleFreight;
+                            $arkList.push($item);
+                        } else {
+                            $isPay.push(1);
+                        }
+                    }
+
+                    if ($waybillIds.length == 0) {
+                        setLayerAlert(parent.layer, '没有可以申请付款的运单');
+                        return false;
+                    }
+                    if ($isPay.length > 0) {
+                        setLayerAlert(parent.layer, '只有生成账单的运单才能付款');
+                        setTimeout(function() {
+                            paymentData($arkList);
+                        }, 3000);
+                    } else {
+                        paymentData($arkList);
+                    }
+
+                    //审核通过接口
+                    function paymentData(arrs) {
+                        setLayerConfirm(parent.layer, '确定要申请付款吗？', function(index) {
+                            var $saveData = {
+                                askList: arrs
+                            };
+                            $.ajax({
+                                type: 'POST',
+                                url: '/ucenter/tms/waybill/waybill/forPay.shtml',
+                                dataType: "json",
+                                contentType: "application/json",
+                                data: JSON.stringify($saveData),
+                                success: function(d) {
+                                    var $code = d.code,
+                                        $msg = d.msg,
+                                        $objects = d.objects;
+
+                                    if ($code === 'SUCCESS') {
+                                        window.refreshTableList();
+                                        // window.location.reload();
+                                    } else {
+                                        setLayerAlert(parent.layer, '操作失败');
+                                    }
+                                }
+                            });
+                            parent.layer.close(index);
+                            return false;
+                        });
+                    }
+                }
+            },
+            //账单请款
+            billCashout: function(data) {
+                tmsTab.add($(this), '申请账单付款', '../../../../view/tms/finance/payrollRequisition/apply.html');
+            }
+        };
+
+        $('.btns-bar .layui-btn').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //监听单元格
+        table.on('tool(table-list)', function(obj) {
+            var data = obj.data;
+            //查看回单详情
+            if (obj.event === 'receiptDetail' && data.carId) {
+                setReceiptDetail(data.id, data.soNumber);
+            }
+        });
+
+        //查看回单
+        function setReceiptDetail(id, no) {
+            parent.layer.open({
+                type: 2,
+                title: '查看回单详情（S/O：' + no + '）',
+                shadeClose: true,
+                shade: 0.8,
+                area: ['90%', '90%'],
+                content: 'receiptDetail.html?id=' + id
+            });
+        }
+    });
+</script>
+
+</html

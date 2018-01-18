@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>派车 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+    <style>
+        .layui-form-item .layui-form-label {
+            width: 80px;
+        }
+        
+        .layui-form-item .layui-input-block {
+            margin-left: 110px;
+        }
+        
+        .file-line:empty::after {
+            content: '最多可以上传5张照片';
+        }
+    </style>
+</head>
+
+<body>
+    <form class="layui-form" autocomplete="off" style="min-width:auto;">
+        <div class="layui-row">
+            <div class="layui-col-sm6 layui-col-xs6">
+                <div class="layui-form-item layui-form-item--require">
+                    <label class="layui-form-label">箱号</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="arkNo" placeholder="17位长度，大写字母和数字组成" maxlength="17" class="layui-input" hc-verify="notBlank" hc-verify_field="箱号">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm6 layui-col-xs6">
+                <div class="layui-form-item layui-form-item--require">
+                    <label class="layui-form-label">铅封号</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="sealNo" placeholder="30位长度" maxlength="30" class="layui-input" hc-verify="notBlank" hc-verify_field="铅封号">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-row">
+            <div class="layui-col-sm12 layui-col-xs12">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">箱门照片</label>
+                    <div class="layui-input-block">
+                        <input type="hidden" name="attId">
+                        <div class="file-line doorPhotoList"></div>
+                        <div class="file-upload-button">
+                            <i class="layui-icon icon-folder">&#xe7a0;</i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="buttonBar" class="layui-form-item button-bar" style="margin:10px 0 40px;">
+            <button class="layui-btn layui-btn-normal" id="vsubmit" lay-submit lay-filter="submit">确认报柜</button>
+            <button class="layui-btn layui-btn-primary" id="vclose" type="button">取消</button>
+        </div>
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'element'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery,
+            element = layui.element;
+
+        var $id = getUrlId($.trim(getUrlParam('id')));
+
+        //初始化报柜信息
+        $.get('/ucenter/tms/waybill/waybill/searchSubmitArk.shtml', {
+            id: $id
+        }, function(d) {
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+
+            if (!$objects) {
+                setLayerAlert(parent.layer, '数据获取异常，请关闭窗口', {
+                    yes: function() {
+                        parent.layer.closeAll();
+                    }
+                });
+                return false;
+            }
+
+            if ($code === 'SUCCESS') {
+                //初始化上传附件
+                $('.icon-folder').each(function() {
+                    HC.upload({
+                        // 触发上传的元素
+                        elem: $(this),
+                        // 多文件上传
+                        multiple: true,
+                        // 允许文件上传个数
+                        number: 5,
+                        // 允许上传的文件类型 images（默认）、file、video、audio
+                        accept: 'images',
+                        // 最大文件大小限制（单位kb，默认不限制）
+                        size: 1024,
+                    }, {
+                        layuiUpload: layui.upload,
+                        // 指定 存放文件项的容器
+                        fileItemContainer: $(this).parent().prev()
+                    });
+                });
+
+                //箱号
+                $('input[name="arkNo"]').val($objects.arkNo || '');
+                //铅封号
+                $('input[name="sealNo"]').val($objects.sealNo || '');
+                //附件id
+                $('input[name="attId"]').val($objects.attId || '');
+                //箱门照片附件
+                bizUtil.data.createFileItems(($objects.doorPhotoList || []), $('.doorPhotoList'));
+            }
+        });
+
+        //监听提交
+        form.on('submit(submit)', function(data) {
+            if (!bizUtil.validator.verifyContainer($('form'))) {
+                return false;
+            }
+
+            //数据源
+            var $saveData = {
+                id: parseInt($id),
+                arkNo: data.field.arkNo,
+                sealNo: data.field.sealNo,
+                attId: parseInt(data.field.attId) || null
+            };
+
+            //照片附件
+            var errorIds = [];
+            var getAttrData = function(obj) {
+                var attrData = bizUtil.data.getAttrDataList(obj);
+                var newAttrData = [];
+                if (attrData.length > 0) {
+                    $.each(attrData, function(k, v) {
+                        if (!v.attFileUrl) {
+                            errorIds.push(k);
+                        }
+                    });
+                }
+                if (errorIds.length == 0) {
+                    newAttrData = attrData;
+                }
+                return newAttrData;
+            }
+
+            //应收票据附件
+            var doorPhotoList = getAttrData($('.doorPhotoList'));
+            $saveData.doorPhotoList = doorPhotoList;
+
+            if (errorIds.length > 0) {
+                layer.msg('附件中有上传失败的文件，请重新上传或删除');
+                return false;
+            }
+
+            // console.log($saveData);
+            // return false;
+
+            //提交报柜
+            HC.ajax['post']({
+                url: '/ucenter/tms/waybill/waybill/submitArk.shtml',
+                data: $saveData,
+                success: function() {
+                    setLayerAlert(parent.layer, '报柜成功', {
+                        yes: function() {
+                            parent.layer.closeAll();
+                            // bizUtil.frame.refreshListFrame();
+                            //获取当前框架ID并刷新
+                            var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+                            parent['f' + $layId].refreshTableList();
+                        }
+                    });
+                }
+            });
+            return false;
+        });
+
+        //取消按钮
+        $('#vclose').on('click', function() {
+            parent.layer.closeAll();
+        });
+    });
+</script>
+
+</html>

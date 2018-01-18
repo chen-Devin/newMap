@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>未出账单明细 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+</head>
+<style>
+    .layui-form-item{
+        margin:0;
+    }
+    .search-more {
+        margin-top: 7.5px;
+        display: none;
+    }
+</style>
+<body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane" autocomplete="off">
+            <div class="layui-row layui-col-space5">
+                <div class="layui-col-sm1" style="width:25%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">做柜日期</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <input type="text" name="startTime" id="startTime" placeholder="开始时间" class="layui-input">
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="endTime" id="endTime" placeholder="到期时间" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">S/O</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="soNo" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">柜号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="arkNo" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">审核状态</label>
+                        <div class="layui-input-block">
+                            <select name="auditStatus">
+                                <option value="" selected="selected">全部</option>
+                                <option value="1">已审核</option>
+                                <option value="0">未审核</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:20%;">
+                    <div class="layui-form-item">
+                        <button class="layui-btn layui-btn-danger btn-search" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                        <button class="layui-btn search-more-btn" type="button" style="margin-left:2px;">高级查询<i class="layui-icon">&#xe625;</i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row layui-col-space5 search-more">
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">作业号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="jobNo" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">类型</label>
+                        <div class="layui-input-block">
+                            <select name="paymentType">
+                                <option value="" selected="selected">全部</option>
+                                <option value="1">现金</option>
+                                <option value="0">账期</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">核销状态</label>
+                        <div class="layui-input-block">
+                            <select name="confirmStatus">
+                                <option value="" selected="selected">全部</option>
+                                <option value="0">未核销</option>
+                                <option value="1">部分核销</option>
+                                <option value="2">全部核销</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+        <div class="layui-btn-group fl">
+            <button class="layui-btn layui-btn-normal" data-type="examineData">查看</button>
+            <button class="layui-btn layui-btn-normal" data-type="auditData">审核</button>
+            <button class="layui-btn layui-btn-normal" data-type="cancelData">核销</button>
+            <button class="layui-btn layui-btn-normal" data-type="reverseCancelData">反核销</button>
+            <button class="layui-btn layui-btn-normal" data-type="deriveDetail">导出</button>
+            <button class="layui-btn layui-btn-normal" data-type="returnData">返回</button>
+        </div>
+        <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+    <!--start:快捷搜索-->
+    <div id="shortBar" style="display:none;">
+        <dl>
+            <dt>客户：<span class="layui-badge layui-bg-cyan" id="targetName"></span></dt>
+            <dt>应收合计：<span class="layui-badge layui-bg-cyan" id="realCostSum"></span></dt>
+            <dd>未收合计：<span class="layui-badge layui-bg-cyan" id="residualCostSum"></span></dd>
+        </dl>
+    </div>
+    <!--end:快捷搜索-->
+</body>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'laydate', 'table', 'tms_tab'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            laydate = layui.laydate,
+            tmsTab = layui.tms_tab,
+            $ = layui.jquery;
+        var $startTime,
+            $endTime,
+            $jobNo,
+            $soNo,
+            $arkNo,
+            $paymentType,
+            $auditStatus,
+            $confirmStatus;
+
+        laydate.render({
+            elem: '#startTime'
+        });
+        laydate.render({
+            elem: '#endTime'
+        });
+        
+        var layIdID =  $('.layui-this', window.parent.document).attr('lay-id');
+        $(".hide").hide();
+
+
+        var $targetId = $.trim(getUrlParam("targetId"));
+        var $targetName = $.trim(getUrlParam("targetName"));
+        var $dateMonth = $.trim(getUrlParam("dateMonth"));
+        var $ids = $targetId + '_' + $targetName + '_' + $dateMonth;
+        setTableData($targetId);
+        var $shortBarHtml = $('#shortBar').html();
+        $('.layui-table-tool').prepend('<div class="short-bar">' + $shortBarHtml + '</div>');
+
+        //监听提交
+        form.on('submit(search)', function(data) {
+            $startTime = $.trim(data.field.startTime),
+                $endTime = $.trim(data.field.endTime),
+                $jobNo = $.trim(data.field.jobNo),
+                $soNo = $.trim(data.field.soNo),
+                $arkNo = $.trim(data.field.arkNo),
+                $paymentType = $.trim(data.field.paymentType),
+                $auditStatus = $.trim(data.field.auditStatus),
+                $confirmStatus = $.trim(data.field.confirmStatus);
+            setTableData($targetId, $startTime, $endTime, $jobNo, $soNo, $arkNo, $paymentType, $auditStatus, $confirmStatus);
+            return false;
+        });
+
+        //方法级渲染
+        function setTableData($targetId, $startTime, $endTime, $jobNo, $soNo, $arkNo, $paymentType, $auditStatus, $confirmStatus) {
+            typeof $targetId != 'undefined' ? $targetId = $targetId : $targetId = '';
+            typeof $startTime != 'undefined' ? $startTime = $startTime : $startTime = '';
+            typeof $endTime != 'undefined' ? $endTime = $endTime : $endTime = '';
+            typeof $jobNo != 'undefined' ? $jobNo = $jobNo : $jobNo = '';
+            typeof $soNo != 'undefined' ? $soNo = $soNo : $soNo = '';
+            typeof $arkNo != 'undefined' ? $arkNo = $arkNo : $arkNo = '';
+            typeof $paymentType != 'undefined' ? $paymentType = $paymentType : $paymentType = '';
+            typeof $auditStatus != 'undefined' ? $auditStatus = $auditStatus : $auditStatus = '';
+            typeof $confirmStatus != 'undefined' ? $confirmStatus = $confirmStatus : $confirmStatus = '';
+            var $pageSize = 15;
+
+            table.render({
+                elem: '#tableList',
+                url: '/ucenter/general/finance/financeOrders/getTheBillingDetails.shtml?status=0&ordersType=1&targetId=' + $targetId + '&startTime=' + $startTime +
+                    '&endTime=' + $endTime + '&jobNo=' + $jobNo + '&soNo=' + $soNo + '&arkNo=' + $arkNo + '&paymentType=' + $paymentType + '&auditStatus=' + $auditStatus + '&confirmStatus=' + $confirmStatus + '&dateMonth=' + $dateMonth,
+                response: {
+                    statusCode: 'SUCCESS',
+                    countName: 'objects.total', //数据总数的字段名称，默认：count
+                    dataName: 'objects.list'
+                },
+                request: {
+                    pageName: 'pageNum', //页码的参数名称，默认：page
+                    limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                },
+                cols: [
+                    [{
+                        checkbox: true,
+                        fixed: true
+                    }, {
+                        title: '序号',
+                        width: 80,
+                        align: 'center',
+                        //sort: true,
+                        templet: '#idTpl'
+                    }, {
+                        field: 'jobNo',
+                        title: '运输作业号',
+                        width: 160,
+                        align: 'center',
+                        event: 'setSign',
+                        style:'cursor: pointer;color:#51a2f7;'
+                    }, {
+                        field: 'doarkDate',
+                        title: '做柜日期',
+                        width: 90,
+                        align: 'center'
+                    }, {
+                        field: 'payType',
+                        title: '类型',
+                        width: 90,
+                        align: 'center',
+                        templet: '#payTypeTpl'
+                    }, {
+                        field: 'soNo',
+                        title: 'S/O',
+                        width: 190,
+                        align: 'center'
+                    }, {
+                        field: 'arkNo',
+                        title: '柜号',
+                        width: 190,
+                        align: 'center'
+                    }, {
+                        field: 'arkType',
+                        title: '柜型',
+                        width: 90,
+                        align: 'center'
+                    }, {
+                        field: 'carNo',
+                        title: '车牌号',
+                        width: 120,
+                        align: 'center'
+                    }, {
+                        field: 'driverName',
+                        title: '司机',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'transportCost',
+                        title: '运费',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'extraCost',
+                        title: '异常费',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'totalCost',
+                        title: '合计',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'paidCost',
+                        title: '已收金额',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'auditStatus',
+                        title: '审核状态',
+                        width: 90,
+                        align: 'center',
+                        templet: '#auditStatusTpl'
+                    }, {
+                        field: 'confirmStatus',
+                        title: '核销状态',
+                        width: 90,
+                        align: 'center',
+                        templet: '#confirmStatusTpl'
+                    }, {
+                        field: 'createDate',
+                        title: '创建时间',
+                        width: 110,
+                        align: 'center'
+                    }]
+                ],
+                id: 'dataReload',
+                page: true,
+                limits: [15, 30, 50, 100],
+                limit: $pageSize,
+                height: 'full-130',
+                even: true,
+                done: function(res, curr, count) {
+                    if (count > 0) {
+                        $("#targetName").html(res.objects.countRs.targetName);
+                        $("#realCostSum").html(res.objects.countRs.realCostSum);
+                        $("#residualCostSum").html(res.objects.countRs.residualCostSum);
+                    }
+                }
+            });
+        }
+
+         //监听工具条
+        table.on('tool(tbar)', function(obj){
+            if(obj.event === 'setSign'){
+                var data = obj.data;
+                parent.layer.open({
+                    type: 2,
+                    title: '订单明细',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['80%', '80%'],
+                    content: 'orderdetail.html?targetId=' + $targetId + '&waybillId=' + data.waybillId + '&jobNo=' + data.jobNo + '&ordersId=' + data.id
+                });
+            }
+        });
+
+        var active = {
+            //查看明细
+            examineData: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('只能选择一条数据！');
+                } else {
+                    parent.layer.open({
+                        type: 2,
+                        title: '订单明细',
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['80%', '80%'],
+                        content: 'orderdetail.html?targetId=' + $targetId + '&waybillId=' + data[0].waybillId + '&jobNo=' + data[0].jobNo + '&ordersId=' + data[0].id
+                    });
+                }
+            },
+            //审核
+            auditData: function() { //获取选中数据
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('只能选择一条数据！');
+                } else {
+                    if (data[0].auditStatus == 1) {
+                        parent.layer.alert('所选记录已审核，不需要重复审核');
+                        return;
+                    }
+                    parent.layer.open({
+                        type: 2,
+                        title: '应收费用审核',
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['80%', '80%'],
+                        content: 'audit.html?targetId=' + $targetId + '&waybillId=' + data[0].waybillId + '&jobNo=' + data[0].jobNo  + '&ordersId=' + data[0].id
+                    });
+                }
+            },
+            //核销
+            cancelData: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('请选择需核销的数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('只能选择一条数据！');
+                } else {
+                    if (data[0].confirmStatus == 2) {
+                        parent.layer.alert('所选记录已全部核销，不能再核销');
+                        return;
+                    };
+                    sessionStorage.setItem("collectionRecordId", '');
+                    tmsTab.add($(this), '核销费用('+ data[0].jobNo +')', 'chargeoff.html?ordersId=' + data[0].id + '&layIdID=' + layIdID);
+                }
+            },
+            //反核销
+            reverseCancelData: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('只能选择一条数据！');
+                } else {
+                    if(data[0].confirmStatus == 0){
+                        parent.layer.alert('所选记录尚未核销，不能反核销');
+                        return;
+                    }
+                    parent.layer.open({
+                        type: 2,
+                        title: '反核销费用',
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['90%', '80%'],
+                        content: 'reversechargeoff.html?orderId=' + data[0].id + '&lastModifyTime=' + data[0].modifyDate
+                    });
+                }
+            },
+            //导出明细账单
+            deriveDetail: function() {
+                typeof $targetId != 'undefined' ? $targetId = $targetId : $targetId = '';
+                typeof $startTime != 'undefined' ? $startTime = $startTime : $startTime = '';
+                typeof $endTime != 'undefined' ? $endTime = $endTime : $endTime = '';
+                typeof $jobNo != 'undefined' ? $jobNo = $jobNo : $jobNo = '';
+                typeof $soNo != 'undefined' ? $soNo = $soNo : $soNo = '';
+                typeof $arkNo != 'undefined' ? $arkNo = $arkNo : $arkNo = '';
+                typeof $paymentType != 'undefined' ? $paymentType = $paymentType : $paymentType = '';
+                typeof $auditStatus != 'undefined' ? $auditStatus = $auditStatus : $auditStatus = '';
+                typeof $confirmStatus != 'undefined' ? $confirmStatus = $confirmStatus : $confirmStatus = '';
+                $.ajax({
+                    type: 'GET',
+                    url: '/ucenter/general/finance/financeOrders/handleOrReceiveDetailsExcelExport.shtml?status=0&ordersType=1&zipFileName="未出账单"&fileNameArray=' + $ids + '&startTime=' + $startTime + '&endTime=' + $endTime + '&jobNo=' + $jobNo + '&soNo=' + $soNo + '&arkNo=' + $arkNo + '&paymentType=' + $paymentType + '&auditStatus=' + $auditStatus + '&confirmStatus=' + $confirmStatus,
+                    // dataType:"json",      
+                    // contentType:"application/json",               
+                    // data:JSON.stringify($saveData), 
+                    success: function(d) {
+                        // parent.layer.alert('操做成功！');
+                        document.location.href = '/ucenter/general/finance/financeOrders/handleOrReceiveDetailsExcelExport.shtml?status=0&ordersType=1&zipFileName="未出账单"&fileNameArray=' + $ids + '&startTime=' + $startTime + '&endTime=' + $endTime + '&jobNo=' + $jobNo + '&soNo=' + $soNo + '&arkNo=' + $arkNo + '&paymentType=' + $paymentType + '&auditStatus=' + $auditStatus + '&confirmStatus=' + $confirmStatus;
+                    },
+                    error: function() {
+                        parent.layer.alert('操作失败！');
+                    }
+                });
+            },
+            //返回
+            returnData: function(){
+                tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+            },
+        };
+        $('.btns-bar .layui-btn').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        //点击高级搜索
+        clickSearchMore($('.search-more-btn'), $('.search-more'), 'dataReload', 'full-179', 'full-131', table);
+    });
+</script>
+<script type="text/html" id="idTpl">
+    {{d.LAY_TABLE_INDEX+1}}
+</script>
+
+<script type="text/html" id="auditStatusTpl">
+    {{# if(d.auditStatus == '0'){ }} 未审核 {{# } else if(d.auditStatus == '1'){ }} 已审核 {{# } }}
+</script>
+<script type="text/html" id="confirmStatusTpl">
+    {{# if(d.confirmStatus == '0'){ }} 未核销 {{# } else if(d.confirmStatus == '1'){ }} 部分核销 {{# } else if(d.confirmStatus == '2'){ }} 全部核销 {{# } }}
+</script>
+<script type="text/html" id="payTypeTpl">
+    {{# if(d.payType == '1'){ }} 现金 {{# } else if(d.payType == '0'){ }} 账期 {{# } }}
+</script>
+
+</html>

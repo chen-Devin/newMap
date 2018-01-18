@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>反核销费用 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      <!--start:表格列表-->
+      <table class="layui-hide" id="tableList" lay-filter="tbar">
+      </table>
+    </form>
+    <div class="layui-form-item" style="padding-left:340px;">
+      <button class="layui-btn layui-btn-normal btn-reverseChargeoff" style="width:150px;">反核销</button>
+      <button class="layui-btn layui-btn-primary btn-cancel" type="button" style="width:150px;">返回</button>
+    </div>
+  </body>
+  <script type="text/html" id="billMonthTpl">
+    {{ setTimeDay(d.billMonth) }}
+  </script>
+  <script type="text/html" id="expenditureDateTpl">
+    {{ setTimeDay(d.expenditureDate) }}
+  </script>
+  <script type="text/html" id="createDateTpl">
+    {{ setTimeSecond(d.createDate) }}
+  </script>  
+  <script type="text/html" id="statusTpl">
+    {{#  if(d.status == '1'){ }}
+      已到帐
+    {{#  } else if(d.status == '2'){ }}
+      撤销
+    {{#  } }}
+  </script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    var $id = $.trim(getUrlParam("id"));
+    setTableData($id);
+
+    //方法级渲染
+    function setTableData($id){
+      var $pageSize = 15;
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/expenditureRecord/getExpenditureDatail.shtml?askPriceId=' + $id,
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'expenditureNo', title: '付款单号', width:100},
+          {field:'targetName', title: '单位简称', width:100},
+          {field:'askPriceNo', title: '请款号', width:100},
+          {field:'billMonth', title: '账期', width:100, templet:"#billMonthTpl"},
+          {field:'accountNo', title: '付款账号', width:100},
+          {field:'price', title: '付款金额', width:100},
+          {field:'expenditureDate', title: '付款日期', width:100, templet:"#expenditureDateTpl"},
+          {field:'described', title: '摘要', width:100},
+          {field:'status', title: '状态', width:100, templet:"#statusTpl"},
+          {field:'creator', title: '创建人', width:100},
+          {field:'createDate', title: '创建时间', width:100, templet:"#createDateTpl"}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){}
+      });
+    }
+
+    //反核销
+    $(".btn-reverseChargeoff").on("click",function(){
+      var checkStatus = table.checkStatus('dataReload'),
+          data = checkStatus.data;
+      if(data.length == 0){
+        parent.layer.alert('你还未选中数据！');
+      }else{
+        parent.layer.confirm('确认要反核销这些记录吗？', function(index){
+          var idArr = [];
+          $(data).each(function(i,value){
+            idArr.push(value.id);
+          });
+
+          var $saveData = {
+            reveId: idArr,
+            lastModifyTime: "12345"
+          }
+
+          $.ajax({
+            type:"POST", 
+            url:"/ucenter/general/finance/confirm/askUnConfirm.shtml",
+            dataType:"json",      
+            contentType:"application/json",              
+            data:JSON.stringify($saveData),
+            success:function(d){
+              var $code = d.code,
+                  $msg = d.msg,
+                  $objects = d.objects;
+                 
+              if($code === 'SUCCESS'){
+                parent.layer.alert("反核销成功", {
+                  closeBtn: 0,
+                  yes: function(index){
+                    parent.layer.close(index);
+                    $(window.parent['f1'].document).find('.btn-search').click();
+                    tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+                  }
+                });
+              }else{
+                parent.layer.alert('反核销失败');
+                return false;
+              }
+            }
+          });
+        })
+      }
+    });
+
+    //返回
+    $(".btn-cancel").on("click",function(){
+      tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+    });
+  });
+  </script>
+</html>

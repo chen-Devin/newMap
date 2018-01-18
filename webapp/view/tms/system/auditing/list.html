@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>审核 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+    <style>
+        .layui-form-item {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane" autocomplete="off">
+            <div class="layui-row layui-col-space5">
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">手机号码</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="mobile" placeholder="" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">身份证号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="idNo" placeholder="" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            <select name="status">
+                                <option value="" selected>请选择</option>
+                                <option value="6">已审核</option>
+                                <option value="4">未审核</option>
+                                <option value="5">审核不通过</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:25%;">
+                    <div class="layui-form-item">
+                        <button class="layui-btn layui-btn-danger btn-search" lay-submit lay-filter="search">
+                            <i class="layui-icon">&#xe615;</i>查询</button>
+                        </button>
+                        <button class="layui-btn layui-btn-primary" type="reset" style="margin-left:2px; line-height:36px;">重置</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start:快捷搜索-->
+    <div id="shortBar" style="display:none;">
+        <dl>
+            <dt>全部
+                <a href="javascript:void(0)">
+                    <span class="layui-badge layui-bg-cyan  totalNum search-table" data-status=""></span>
+                </a>
+            </dt>
+            <dd>
+                已审核
+                <a href="javascript:void(0)">
+                    <span class="layui-badge layui-bg-green auditedNum search-table" data-status="6"></span>
+                </a>
+            </dd>
+            <dd>
+                未审核
+                <a href="javascript:void(0)">
+                    <span class="layui-badge layui-bg-blue waitAuditNum search-table" data-status="4"></span>
+                </a>
+            </dd>
+            <dd>
+                审核不通过
+                <a href="javascript:void(0)">
+                    <span class="layui-badge notAuditNum search-table" data-status="5"></span>
+                </a>
+            </dd>
+        </dl>
+    </div>
+    <!--end:快捷搜索-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+    <script type="text/html" id="toolBar">
+        {{# if(d.status == 4){ }}
+        <a lay-event="auditing" style="cursor: pointer;color:#51a2f7;">审核</a>
+        {{# }else { }}
+        <a style="color:#333333;">审核</a> 
+        {{# } }}
+    </script>
+    <script type="text/html" id="statusTpl">
+        {{# if(d.status == 4){ }}
+        <a lay-event="statusCancel" style="color:#1E9FFF;">未审核</a> 
+        {{# }else if(d.status == 5){ }}
+        <a lay-event="statusStart" style="color:#FF5722;">不通过</a> 
+        {{# }else if(d.status == 6){ }}
+        <a lay-event="statusDraft" style="color:#333333;">已审核</a> 
+        {{# } }}
+    </script>
+    <script type="text/html" id="registerDateTpl">
+        {{new Date(d.registerDate).format("yyyy-MM-dd hh:mm:ss")}}
+    </script>
+    <script type="text/html" id="auditDateDateTpl">
+        {{new Date(d.auditDate).format("yyyy-MM-dd hh:mm:ss")}}
+    </script>
+    <script type="text/html" id="idTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+
+</body>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'table', 'tms_tab'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            tmsTab = layui.tms_tab,
+            $ = layui.jquery;
+
+
+        setTableData({ mobile: '', idNo: '', status: '' });
+
+        //监听提交
+        form.on('submit(search)', function (data) {
+            setTableData(data.field);
+            return false;
+        });
+
+        //方法级渲染
+        function setTableData(ajaxData) {
+            table.render({
+                elem: '#tableList',
+                url: '/ucenter/tms/capacity/driver/auditPage.shtml',
+                where: ajaxData,
+                response: {
+                    statusCode: 'SUCCESS',
+                    countName: 'objects.total',
+                    dataName: 'objects.list'
+                },
+                request: {
+                    pageName: 'pageNum',
+                    limitName: 'pageSize'
+                },
+                cols: [[
+                    { field: 'id', title: '序号', align: 'center', width: 90, templet: '#idTpl' },
+                    { field: 'status', title: '审核状态', align: 'center', width: 90, templet: '#statusTpl' },
+                    { field: 'mobile', title: '手机号码', align: 'center', width: 130, event: 'setSign', style: 'cursor: pointer;color:#51a2f7;' },
+                    { field: 'idNo', title: '身份证号', align: 'center', width: 200 },
+                    { field: 'name', title: '姓名', align: 'center', width: 100 },
+                    { field: 'registerDate', title: '注册时间', align: 'center', width: 200, templet: '#registerDateTpl' },
+                    { field: 'auditDate', title: '审核时间', align: 'center', width: 200, templet: '#auditDateDateTpl' },
+                    { align: 'center', title: '操作', templet: '#toolBar', width: 170 }
+                ]],
+                id: 'dataReload',
+                page: true,
+                limits: [15, 30, 50, 100],
+                limit: 15,
+                height: 'full-80',
+                even: true,
+                done: function (res, curr, count) {
+                    $('.short-bar').remove();
+                    var $shortBarHtml = $('#shortBar').html();
+                    $('.layui-table-tool').prepend('<div class="short-bar">' + $shortBarHtml + '</div>');
+                    var auditedNum = parseNum(res.objects.auditedNum);
+                    var waitAuditNum = parseNum(res.objects.waitAuditNum);
+                    var notAuditNum = parseNum(res.objects.notAuditNum);
+                    var total = auditedNum + waitAuditNum + notAuditNum;
+                    $('.totalNum').html(total);
+                    $('.auditedNum').html(auditedNum);
+                    $('.waitAuditNum').html(waitAuditNum);
+                    $('.notAuditNum').html(notAuditNum);
+                }
+            });
+        }
+
+        function parseNum(str) {
+            if(str === undefined || str === null){
+                return 0;
+            }
+
+            var number = Number(str);
+            if(isNaN(number)){
+                return 0;
+            }
+
+            return number;
+        }
+
+        //监听工具条
+        table.on('tool(tbar)', function (obj) {
+            if (obj.event === 'setSign') {
+                var data = obj.data;
+                tmsTab.add($(this), '审核' + '' + '）', 'modify.html?do=detail&id=' + data.id);
+            } else if (obj.event === 'auditing') {
+                var data = obj.data;
+                tmsTab.add($(this), '审核' + '' + '）', 'modify.html?do=edit&id=' + data.id);
+            }
+        });
+
+        $('body').on('click', '.search-table', function() {
+            $('select[name="status"]').val($(this).data('status'));
+            form.render('select');
+            $('.btn-search').click();
+        });
+
+    });
+</script>
+
+</html>

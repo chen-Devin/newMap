@@ -1,0 +1,524 @@
+<link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+<style>
+    .layui-form-item .layui-form-label {
+        width: 120px;
+    }
+    
+    .layui-form-item .layui-input-block {
+        margin-left: 150px;
+    }
+    
+    .check-form {
+        margin: 0 0 50px;
+    }
+    
+    .layui-upload-box {
+        width: 200px;
+        height: 260px;
+        line-height: 256px;
+        margin: 14px auto 0;
+        padding: 5px;
+        border: #ddd 1px solid;
+        text-align: center;
+        color: #999;
+        background: #efefef;
+        overflow: hidden;
+    }
+    
+    .layui-upload-img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+    
+    .layui-upload-main {
+        width: 100%;
+        padding: 15px 0;
+        border: #e6e6e6 1px solid;
+        text-align: center;
+    }
+</style>
+<form class="layui-form check-form" autocomplete="off" style="min-width:700px;">
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top:29px;">
+        <legend>工商信息</legend>
+    </fieldset>
+
+    <div class="layui-fluid" style="margin:0; padding:0;">
+        <div class="layui-row">
+            <div class="layui-col-sm8">
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">统一社会信用代码</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="usc" class="layui-input" maxlength="18" lay-verify="required" hc-verify="usc">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">公司名称</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="coName" class="layui-input" maxlength="255" lay-verify="required" hc-verify="companyRegex|companySize">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">法人</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="legalPerson" class="layui-input" maxlength="20" lay-verify="required" hc-verify="userName" hc-verify_field="法人">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">营业期限</label>
+                            <div class="layui-input-block">
+                                <div class="layui-col-sm6">
+                                    <div class="margin-right10">
+                                        <input type="text" name="busnissTimeB" id="busnissTimeB" placeholder="开始时间" class="layui-input" readonly lay-verify="required">
+                                    </div>
+                                </div>
+                                <div class="layui-col-sm6">
+                                    <div>
+                                        <input type="text" name="busnissTimeE" id="busnissTimeE" placeholder="到期时间" class="layui-input" readonly lay-verify="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="regDistrict">
+                    <div class="layui-row">
+                        <div class="layui-col-sm12">
+                            <div class="layui-form-item layui-form-item--require">
+                                <label class="layui-form-label">注册地址</label>
+                                <div class="layui-input-block">
+                                    <div class="layui-col-sm6">
+                                        <div class="margin-right10">
+                                            <select name="regProvince" lay-filter="regProvince">
+                                          <option value="">请选择</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-col-sm6">
+                                        <div>
+                                            <select name="regCity" lay-filter="regCity">
+                                          <option value="">请选择</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-row">
+                        <div class="layui-col-sm12">
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <div class="layui-col-sm6">
+                                        <div class="margin-right10">
+                                            <select name="regCounty" lay-filter="regCounty">
+                                          <option value="">请选择</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-col-sm6">
+                                        <div>
+                                            <select name="regStreet" lay-filter="regStreet">
+                                          <option value="">请选择</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-row">
+                        <div class="layui-col-sm12">
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <input type="hidden" name="regAreaId">
+                                    <input type="text" name="regAddress" placeholder="注册详细地址" class="layui-input" lay-verify="required" maxlength="255">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-sm4">
+                <div class="layui-row margin-left10">
+                    <div class="layui-col-sm12 layui-upload-main">
+                        <input type="hidden" id="regImgUrl" name="regImgUrl" lay-verify="regImgUrl">
+                        <button type="button" class="layui-btn" id="upload-btn1">上传营业执照</button>
+                        <div class="layui-upload-box" id="upload-imgs1">支持JPG/JPEG/PNG/GIF</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top:20px;">
+        <legend>联系信息</legend>
+    </fieldset>
+
+    <div class="layui-fluid" style="margin:0; padding:0;">
+        <div class="layui-row">
+            <div class="layui-col-sm8">
+                <div class="layui-row">
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">公司简称</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="coNameShort" class="layui-input" maxlength="20" lay-verify="required" hc-verify="companyRegex|abbreviation">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">上级公司</label>
+                            <div class="layui-input-block">
+                                <select name="parentId" lay-filter="parentId">
+                                  <option value="">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-row">
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">总经理姓名</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="managerUname" class="layui-input" maxlength="20" hc-verify="userName" hc-verify_field="总经理姓名">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">联系人</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="linkman" class="layui-input" maxlength="20" hc-verify="userName" hc-verify_field="联系人">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-row">
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">联系电话</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="linkmanMobile" class="layui-input" maxlength="20" hc-verify="tele">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">传真号码</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="linkmanFax" class="layui-input" maxlength="20" hc-verify="tele">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-row">
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">微信号</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="linkmanWechat" class="layui-input" maxlength="100" hc-verify="wechat">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm6">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">QQ</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="linkmanQq" class="layui-input" maxlength="20" hc-verify="qq">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-sm4">
+                <div class="layui-row margin-left10">
+                    <div class="layui-col-sm12 layui-upload-main">
+                        <input type="hidden" id="logoImgUrl" name="logoImgUrl" lay-verify="logoImgUrl">
+                        <button type="button" class="layui-btn" id="upload-btn2">上传公司LOGO</button>
+                        <div class="layui-upload-box" id="upload-imgs2" style="height:101px; line-height:96px;">支持JPG/JPEG/PNG/GIF</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-row">
+            <div class="layui-col-sm8">
+                <div class="layui-form-item" id="linkDistrict">
+                    <label class="layui-form-label">联系地址</label>
+                    <div class="layui-input-block">
+                        <div class="layui-col-sm3">
+                            <div class="margin-right10">
+                                <select name="linkProvince" lay-filter="linkProvince">
+                                  <option value="">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-col-sm3">
+                            <div class="margin-right10">
+                                <select name="linkCity" lay-filter="linkCity">
+                                  <option value="">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-col-sm3">
+                            <div class="margin-right10">
+                                <select name="linkCounty" lay-filter="linkCounty">
+                                  <option value="">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-col-sm3">
+                            <div>
+                                <select name="linkStreet" lay-filter="linkStreet">
+                                  <option value="">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm4">
+                <div class="margin-left10">
+                    <input type="hidden" name="linkmanAreaId">
+                    <input type="text" name="linkmanAddress" placeholder="联系详细地址" class="layui-input" maxlength="255">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-row">
+            <div class="layui-col-sm6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">电子邮箱</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="linkmanEmail" class="layui-input" maxlength="100" hc-verify="email">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">公司网址</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="weburl" placeholder="" class="layui-input" maxlength="500" hc-verify="url">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-row">
+            <div class="layui-col-sm12">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">备注</label>
+                    <div class="layui-input-block">
+                        <textarea name="remarks" placeholder="0~1000字符之间" class="layui-textarea" maxlength="1000" style="min-height:50px;" hc-verify="remarkSize"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="buttonBar" class="layui-form-item button-bar" style="margin:10px 0 30px;">
+        <button class="layui-btn layui-btn-normal" id="vsubmit" lay-submit lay-filter="submit">保存</button>
+    </div>
+</form>
+
+<script>
+    layui.use(['form', 'layer', 'layedit', 'laydate', 'upload'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            layedit = layui.layedit,
+            laydate = layui.laydate,
+            upload = layui.upload,
+            $ = layui.jquery;
+
+        laydate.render({
+            elem: '#busnissTimeB',
+            max: 0
+        });
+        laydate.render({
+            elem: '#busnissTimeE',
+            min: 0
+        });
+
+        $('#regDistrict').district(form);
+        $('#linkDistrict').district(form);
+
+        uploadImg('#upload-btn1', $('#upload-imgs1'), $('#regImgUrl'), '营业执照');
+        uploadImg('#upload-btn2', $('#upload-imgs2'), $('#logoImgUrl'), '公司LOGO');
+
+        //图片上传
+        function uploadImg($o, $m, $n, $t) {
+            upload.render({
+                elem: $o,
+                url: '/ucenter/upload.shtml',
+                multiple: false,
+                exts: 'jpg|png|gif|jpeg',
+                size: 4096,
+                before: function(obj) {
+                    layer.load();
+                    obj.preview(function(index, file, result) {
+                        $m.html('<a href="' + result + '" target="_blank"><img src="' + result + '" alt="' + file.name + '" class="layui-upload-img"></a>');
+                    });
+                    $($o).html('重新上传' + $t);
+                },
+                //上传完毕
+                done: function(res) {
+                    layer.closeAll('loading');
+                    if (res.code === 'SUCCESS') {
+                        $n.val(res.objects);
+                        layer.msg($t + '上传成功');
+                    } else {
+                        layer.msg($t + '上传失败，请重新上传');
+                    }
+                },
+                //上传失败
+                error: function(index, upload) {
+                    layer.closeAll('loading');
+                    layer.msg($t + '上传失败，请重新上传');
+                }
+            });
+        }
+
+        //初始化统一信用代码，焦点事件失去时，通过统一信用代码获取公司详情
+        $('input[name="usc"]').on('blur', function() {
+            var $usc = $.trim($(this).val());
+            if ($usc.length == 18) {
+                //获取企业详情
+                var $companyDetail = getCompanyByUsc($usc);
+                if ($companyDetail != null) {
+                    $('input[name="coName"]').val($companyDetail.coName);
+                    $('input[name="coNameShort"]').val($companyDetail.coNameShort);
+                }
+            }
+        })
+
+        form.on('submit(submit)', function(data) {
+            if (!bizUtil.validator.verifyContainer($('form'))) {
+                return false;
+            }
+
+            //城市ID
+            var $index1 = $('#regDistrict select').not(':disabled').length - 1,
+                $indexVal1 = $('#regDistrict select').eq($index1).val();
+            $indexVal1.length > 0 ? $('input[name="regAreaId"]').val($indexVal1) : '';
+
+            if ($('input[name="regAreaId"]').val().length == 0) {
+                parent.layer.msg('请选择注册地址的城市');
+                return false;
+            }
+
+            var $index2 = $('#linkDistrict select').not(':disabled').length - 1,
+                $indexVal2 = $('#linkDistrict select').eq($index2).val();
+            $indexVal2.length > 0 ? $('input[name="linkmanAreaId"]').val($indexVal2) : '';
+
+            if ($.trim(data.field.linkmanAddress).length > 0) {
+                if ($('input[name="linkmanAreaId"]').val().length == 0) {
+                    parent.layer.msg('请选择联系地址的城市');
+                    return false;
+                }
+            }
+
+            if ($.trim(data.field.regImgUrl).length == 0) {
+                parent.layer.msg('请上传营业执照');
+                return false;
+            }
+
+            var $parentId = data.field.parentId.length > 0 ? parseInt($.trim(data.field.parentId)) : '',
+                $regAreaId = $('input[name="regAreaId"]').val().length > 0 ? parseInt($.trim($('input[name="regAreaId"]').val())) : '',
+                $linkmanAreaId = $('input[name="linkmanAreaId"]').val().length > 0 ? parseInt($.trim($('input[name="linkmanAreaId"]').val())) : '';
+
+            //数据源
+            var $saveData = {
+                parentId: $parentId,
+                logo: $.trim(data.field.logoImgUrl),
+                usc: $.trim(data.field.usc),
+                coName: $.trim(data.field.coName),
+                coNameShort: $.trim(data.field.coNameShort),
+                weburl: $.trim(data.field.weburl),
+                legalPerson: $.trim(data.field.legalPerson),
+                managerUname: $.trim(data.field.managerUname),
+                busnissTimeB: $.trim(data.field.busnissTimeB),
+                busnissTimeE: $.trim(data.field.busnissTimeE),
+                regAreaId: $regAreaId,
+                regAddress: $.trim(data.field.regAddress),
+                businessLicenseAffix: $.trim(data.field.regImgUrl),
+                linkman: $.trim(data.field.linkman),
+                linkmanMobile: $.trim(data.field.linkmanMobile),
+                linkmanAreaId: $linkmanAreaId,
+                linkmanAddress: $.trim(data.field.linkmanAddress),
+                linkmanEmail: $.trim(data.field.linkmanEmail),
+                linkmanFax: $.trim(data.field.linkmanFax),
+                linkmanWechat: $.trim(data.field.linkmanWechat),
+                linkmanQq: $.trim(data.field.linkmanQq),
+                remarks: $.trim(data.field.remarks)
+            };
+
+            //保存数据，调用接口
+            HC.ajax.post({
+                url: '/ucenter/centre/permi/company/add.shtml',
+                data: JSON.stringify($saveData),
+                success: bizUtil.callback.saveSuccessAndRefresh
+            });
+            return false;
+        });
+
+        //获取公司json
+        $.get('/ucenter/centre/core/organization/all.shtml', function(d) {
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+
+            if ($code === 'SUCCESS') {
+                companyList(0, $objects);
+                form.render('select');
+            } else {
+                parent.layer.alert('获取信息失败！');
+                return false;
+            }
+        }, 'json');
+
+        //重新编绎公司json
+        function companyList($pid, $arrs) {
+            if ($pid == 0) $pid = null;
+            var $newArr = [];
+            if ($arrs.length > 0) {
+                for (var $i = 0; $i < $arrs.length; $i++) {
+                    if ($arrs[$i].parentId == $pid) {
+                        if ($arrs[$i].type == 1 && $arrs[$i].status < 3) {
+                            $('select[name="parentId"]').append('<option value="' + $arrs[$i].id + '">' + $arrs[$i].name + '</option>');
+                            if ($arrs[$i].children != null) {
+                                companyList($arrs[$i].id, $arrs[$i].children);
+                            }
+                        }
+                    }
+                }
+            }
+            return $newArr;
+        }
+
+    });
+</script>

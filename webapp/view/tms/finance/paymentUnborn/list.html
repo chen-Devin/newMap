@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>未出账单 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+      <form class="layui-form layui-form-pane">
+        <div class="layui-input-inline">
+          <label class="layui-form-label">结算单位</label>
+          <div class="layui-input-inline">
+            <input type="text" name="targetName" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">账期</label>
+          <div class="layui-input-inline">
+            <input type="text" name="dateMonth" id="dateMonth" placeholder="" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">状态</label>
+          <div class="layui-input-inline">
+            <select name="auditStatusRemarks">
+              <option value="" selected="selected">全部</option>
+              <option value="0">未审核</option>
+              <option value="1">部分审核</option>
+              <option value="2">全部审核</option>
+            </select>
+          </div>
+        </div>
+        <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+      </form>
+    </div>
+    <!--end: 搜索-->
+    
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+      <div class="layui-btn-group fl">
+        <button class="layui-btn layui-btn-normal" data-type="examineData">查看明细</button>
+        <button class="layui-btn layui-btn-normal" data-type="createBill">手动生成账单</button>
+        <button class="layui-btn layui-btn-normal" data-type="deriveDetail">导出明细账单</button>
+        <button class="layui-btn layui-btn-normal" data-type="deriveBrief">导出简要账单</button>
+      </div>
+      <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+    <!--start:快捷搜索-->
+    <div  id="shortBar" style="display:none;">
+      <dl>
+        <dt>应付合计：<span class="layui-badge layui-bg-cyan" id="realCostSum"></span></dt>
+        <dd>未付合计：<span class="layui-badge layui-bg-cyan" id="residualCostSum"></span></dd>
+      </dl>
+    </div>
+    <!--end:快捷搜索-->
+  </body>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'laydate', 'table', 'tms_tab'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    laydate.render({
+      elem: '#dateMonth'
+      ,type: 'month'
+    });
+    setTableData();
+    var $shortBarHtml = $('#shortBar').html();
+    $('.layui-table-tool').prepend('<div class="short-bar">' + $shortBarHtml + '</div>');
+    
+    //监听提交
+    form.on('submit(search)', function(data){
+      $targetName = $.trim(data.field.targetName),
+      $dateMonth = $.trim(data.field.dateMonth),
+      $auditStatusRemarks = $.trim(data.field.auditStatusRemarks);
+      setTableData($targetName, $dateMonth, $auditStatusRemarks);
+      return false;
+    });
+    
+    //方法级渲染
+    function setTableData($targetName, $dateMonth, $auditStatusRemarks){
+      typeof $targetName != 'undefined' ? $targetName = $targetName : $targetName = '';
+      typeof $dateMonth != 'undefined' ? $dateMonth = $dateMonth : $dateMonth = '';
+      typeof $auditStatusRemarks != 'undefined' ? $auditStatusRemarks = $auditStatusRemarks : $auditStatusRemarks = '';
+      var $pageSize = 15;
+
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/financeOrders/notRoYetOrdersDetails.shtml?ordersType=2&status=0&targetName=' + $targetName + '&dateMonth=' + $dateMonth + '&auditStatusRemarks=' + $auditStatusRemarks,
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'targetName', title: '结算单位', align: 'center', width:100, event: 'setSign', style:'cursor: pointer;color:#51a2f7;'},
+          {field:'targetType', title: '单位属性', align: 'center', width:120, templet:'#targetTypeTpl'},
+          {field:'billDate', title: '月份', align: 'center', width:100},
+          {field:'paymentType', title: '结算方式', align: 'center', width:90, templet:'#paymentTypeTpl'},
+          {field:'orderCount', title: '运输单量', align: 'center', width:90},
+          {field:'arkCount', title: '运输柜量', align: 'center', width:90},
+          {field:'transportCost', title: '运费', align: 'center', width:110},
+          {field:'extraCost', title: '异常费', align: 'center', width:110},
+          {field:'totalCost', title: '合计', align: 'center', width:110},
+          {field:'hadCost', title: '已付金额', align: 'center', width:110},
+          {field:'residualCost', title: '未付金额', align: 'center', width:110},
+          {field:'auditRemarks', title: '状态', align: 'center', width:120}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){
+          if(count > 0){
+            $("#realCostSum").html(res.objects.countRs.realCostSum);
+            $("#residualCostSum").html(res.objects.countRs.residualCostSum);
+          }
+        }
+      });
+    }
+
+    //监听工具条
+    table.on('tool(tbar)', function(obj){
+        if(obj.event === 'setSign'){
+          var data = obj.data;
+          tmsTab.add($(this), '未出账单明细(' + data.targetName + data.billDate + ')', 'examine.html?targetId=' + data.targetId+'&targetName='+ data.targetName + '&dateMonth=' + data.billDate);
+        }
+    });
+
+    var active = {
+      //查看明细
+      examineData: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能查看一条数据！');
+        }else{
+          tmsTab.add($(this), '未出账单明细(' + data[0].targetName + data[0].billDate + ')', 'examine.html?targetId=' + data[0].targetId+'&targetName='+ data[0].targetName + '&dateMonth=' + data[0].billDate);
+        }
+      },
+      //手动生成账单
+      createBill: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能生成一个账单！');
+        }else{
+          var $saveData = {
+            targetId: $.trim(data[0].targetId),
+            billDate: $.trim(data[0].billDate) + '-01'
+          }
+          $.ajax({
+            type:'POST', 
+            url:'/ucenter/general/finance/financeOrders/createBillByIds.shtml',
+            dataType:"json",      
+            contentType:"application/json",               
+            data:JSON.stringify($saveData), 
+            success:function(d){
+              if(d.code == "SUCCESS"){
+                // parent.layer.alert('操作成功！');
+                parent.layer.alert("操作成功", {
+                    closeBtn: 0,
+                    yes: function(index) {
+                        parent.layer.close(index);
+                        location.reload();
+                    }
+                })
+              }else{
+                parent.layer.alert(d.msg);
+              }
+            },
+            error:function(){
+              parent.layer.alert('操作失败！');
+            }
+          });
+        }
+      },
+       //导出明细账单
+      deriveDetail: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+        $data = checkStatus.data;
+        // console.log($data);
+          var $ids = [];
+        for(var $i = 0; $i< $data.length; $i++){
+          $ids.push($data[$i].targetId+'_'+$data[$i].targetName+'_'+$data[$i].billDate);
+        }
+        
+         if($data.length == 0){
+          parent.layer.alert('请选择需要导出的数据！');
+        }else{
+          $.ajax({
+            type:'GET', 
+            url:'/ucenter/general/finance/financeOrders/handleOrReceiveDetailsExcelExport.shtml?status=0&ordersType=2&zipFileName="未出账单应付(明细)"&fileNameArray='+$ids,
+            success:function(d){
+              if(d.code == 'ERROR_FINANACE_EXPORT_EXCEL'){
+                parent.layer.alert('没有查询到相关数据！');
+              }else{
+                  document.location.href = '/ucenter/general/finance/financeOrders/handleOrReceiveDetailsExcelExport.shtml?status=0&ordersType=2&zipFileName="未出账单应付(明细)"&fileNameArray='+$ids;
+              }
+            },
+            error:function(){
+              parent.layer.alert('操作失败！');
+            }
+          });
+        }
+      },
+      //导出简要账单
+      deriveBrief: function(){
+        typeof $targetName != 'undefined' ? $targetName = $targetName : $targetName = '';
+        typeof $dateMonth != 'undefined' ? $dateMonth = $dateMonth : $dateMonth = '';
+        typeof $auditStatusRemarks != 'undefined' ? $auditStatusRemarks = $auditStatusRemarks : $auditStatusRemarks = '';
+        $.ajax({
+          type:'GET', 
+          url:'/ucenter/general/finance/financeOrders/handleOrReceiveBriefExcelExport.shtml?status=0&ordersType=2&auditStatusRemarks='+$auditStatusRemarks+'&dateMonth='+$dateMonth+'&targetName='+$targetName+'&fileName="未出账单应付(简要)"',
+          success:function(d){
+            if(d.code == 'ERROR_FINANACE_EXPORT_EXCEL'){
+                parent.layer.alert('没有查询到相关数据！');
+              }else{
+                document.location.href = '/ucenter/general/finance/financeOrders/handleOrReceiveBriefExcelExport.shtml?status=0&ordersType=2&auditStatusRemarks='+$auditStatusRemarks+'&dateMonth='+$dateMonth+'&targetName='+$targetName+'&fileName="未出账单应付(简要)"'
+              }
+            },
+          error:function(){
+             parent.layer.alert('操作失败！');
+          }
+        });
+
+      }
+    };
+  
+    $('.btns-bar .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+  });
+  </script>
+  <script type="text/html" id="idTpl">
+    {{d.LAY_TABLE_INDEX+1}}
+  </script>
+  <script type="text/html" id="paymentTypeTpl">
+    {{#  if(d.paymentType == '0'){ }}
+      现金
+    {{#  } else{ }}
+      {{d.paymentType + '天'}}      
+    {{#  } }}
+  </script>
+  <script type="text/html" id="targetTypeTpl">
+    {{setUnitAttr(d.targetType)}}
+  </script>
+</html>

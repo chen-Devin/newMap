@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>银行收支明细 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+    <style>
+        .layui-form-item {
+            margin: 0;
+        }
+        
+        .layui-layer-tips .layui-layer-content {
+            padding: 0;
+        }
+    </style>
+  </head>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+      <form class="layui-form layui-form-pane">
+          <div class="layui-row layui-col-space5">
+              <div class="layui-col-sm1" style="width:25%;">
+                  <div class="layui-form-item">
+                      <label class="layui-form-label">收付款日期</label>
+                      <div class="layui-input-block">
+                          <div class="layui-col-sm6">
+                              <input type="text" name="beginTime" id="beginTime"  class="layui-input">
+                          </div>
+                          <div class="layui-col-sm6">
+                              <input type="text" name="endTime" id="endTime" class="layui-input">
+                            </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="layui-col-sm2" style="width:auto">
+                  <div class="layui-form-item time-btns">
+                      <div class="layui-btn-group">
+                          <button class="layui-btn layui-btn-primary   lastDate" data-type="lastDate" >上月</button>
+                          <button class="layui-btn time-btn-sel layui-btn-primary  thisDate" data-type="thisDate">本月</button>
+                      </div>
+                  </div>
+              </div>
+              <div class="layui-col-sm1" style="width:15%;">
+                  <div class="layui-form-item">
+                      <label class="layui-form-label">账户</label>
+                      <div class="layui-input-block">
+                          <select name="settlementChannelId">
+                            <option value="" selected="selected">全部</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+              <div class="layui-col-sm1" style="width:15%;">
+                  <div class="layui-form-item">
+                      <label class="layui-form-label">收支类型</label>
+                      <div class="layui-input-block">
+                          <select name="type">
+                              <option value="" selected="selected">全部</option>
+                              <option value="0">支出</option>
+                              <option value="1">收入</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+              <div class="layui-col-sm1" style="width:15%;">
+                  <div class="layui-form-item">
+                      <label class="layui-form-label">状态</label>
+                      <div class="layui-input-block">
+                          <select name="status">
+                              <option value="" selected="selected">全部</option>
+                              <option value="0">待审核</option>
+                              <option value="1">审核通过</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+              <div class="layui-col-sm1" style="width:10%;">
+                  <div class="layui-form-item">
+                      <button class="layui-btn layui-btn-danger btn-search" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                  </div>
+              </div>
+          </div>
+      </form>
+    <!--end: 搜索-->
+    
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+      <div class="layui-btn-group fl">
+        <button class="layui-btn layui-btn-normal" data-type="addData">新增</button>
+        <button class="layui-btn layui-btn-normal" data-type="editData">编辑</button>
+        <button class="layui-btn layui-btn-normal" data-type="detailData">查看</button>
+        <button class="layui-btn layui-btn-normal" data-type="auditData">审核</button>
+        <button class="layui-btn layui-btn-normal" data-type="cancellationData">作废</button>
+        <button class="layui-btn layui-btn-normal" data-type="deriveBrief">导出</button>
+      </div>
+      <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+  </body>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script charset="utf-8" src="./list.js"></script>
+  <script type="text/html" id="idTpl">
+    {{d.LAY_TABLE_INDEX+1}}
+  </script>
+  <script type="text/html" id="tradeDateTpl">
+    {{new Date(d.tradeDate).format("yyyy-MM-dd")}}
+  </script>
+  <script type="text/html" id="tradeTargetTypeTpl">
+    {{#  if(d.tradeTargetType == '1'){ }}
+      客户
+    {{#  } else if(d.tradeTargetType == '2'){ }}
+      供应商
+    {{#  } else if(d.tradeTargetType == '3'){ }}
+      部门
+    {{#  } else if(d.tradeTargetType == '4'){ }}
+      司机
+    {{#  } }}
+  </script>
+  <script type="text/html" id="createDateTpl">
+    {{d.createDate != null ? new Date(d.createDate).format("yyyy-MM-dd hh:mm:ss") : ""}}
+  </script>
+  <script type="text/html" id="subjectNameTpl">
+    {{# var subjectName = d.subjectName }}
+    {{# var name = subjectName == null ? "" : (subjectName.substring(subjectName.length - 1 ) == ',') ? subjectName.substring(0,subjectName.length - 1 ): subjectName }}
+    {{name.replace(/,/g,'>')}}
+  </script>
+  <script type="text/html" id="accountTpl">
+    {{d.accountNo + "(" + d.accountName + ")"}}
+  </script>
+  <script type="text/html" id="statusTpl">
+    {{#  if(d.status == '1'){ }}
+      审核通过
+    {{#  } else if(d.status == '2'){ }}
+      已作废
+    {{#  } else if(d.status == '0'){ }}
+      待审核
+    {{#  } }}
+  </script>
+</html>

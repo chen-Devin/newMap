@@ -1,0 +1,117 @@
+<link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+<style>
+    .layui-form-item .layui-form-label {
+        width: 60px;
+    }
+    
+    .layui-form-item .layui-input-block {
+        margin-left: 90px;
+    }
+    
+    .check-form {
+        margin: 0 0 50px;
+    }
+    
+    .courseTitleHint,
+    .accountNumberHint {
+        color: red
+    }
+</style>
+<form class="layui-form check-form" autocomplete="off" style="min-width:auto;">
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top:20px;">
+        <legend>添加会计科目</legend>
+    </fieldset>
+    <div class="layui-fluid" style="margin:0; padding:0;">
+        <div class="layui-row">
+            <div class="layui-col-sm3">&nbsp;</div>
+            <div class="layui-col-sm7">
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">科目名称</label>
+                            <div class="layui-input-block">
+                                <div class="layui-col-sm8">
+                                    <input type="text" name="courseTitle" maxlength="40" lay-verify="required" placeholder="不超过40个字符" class="layui-input courseTitle">
+                                </div>
+                                <div class="layui-col-sm4">
+                                    <span class="layui-form-mid margin-left10 courseTitleHint"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">上级科目</label>
+                            <div class="layui-input-block">
+                                <div class="layui-col-sm8">
+                                    <select name="parentSubject" lay-filter="parentSubject">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item" style="margin:0; color:#999;">
+                            <div class="layui-input-block">
+                                <div class="layui-col-sm12">
+                                    注：上级科目为空时，本科目就是一级科目
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">科目编号</label>
+                            <div class="layui-input-block">
+                                <div class="layui-col-sm8">
+                                    <input type="text" name="accountNumber" placeholder="只能是纯数字" class="layui-input accountNumber" maxlength="20" hc-verify="positiveIntegers" hc-verify_field="只能是纯数字">
+                                </div>
+                                <div class="layui-col-sm4">
+                                    <div class="layui-form-mid margin-left10 accountNumberHint"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">是否收入</label>
+                            <div class="layui-input-block">
+                                <div class="layui-col-sm8">
+                                    <input type="radio" name="income" value="true" title="是" checked>
+                                    <input type="radio" name="income" value="false" title="否">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm12">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">是否支出</label>
+                            <div class="layui-input-block">
+                                <div class="layui-col-sm8">
+                                    <input type="radio" name="expend" value="true" title="是" checked>
+                                    <input type="radio" name="expend" value="false" title="否">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm2">&nbsp;</div>
+        </div>
+    </div>
+    <div class="layui-form-item button-bar" style="margin:10px 0 40px;">
+        <button class="layui-btn layui-btn-normal save" lay-submit lay-filter="save" style="width:120px;">保存</button>
+    </div>
+</form>
+<script charset="utf-8" src="./addAccountant.js"></script>

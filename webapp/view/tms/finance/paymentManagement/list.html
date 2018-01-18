@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>应付款管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+      <form class="layui-form layui-form-pane">
+        <!-- <button class="layui-btn layui-btn-danger" onclick="window.location.href='list.html'">全部</button> -->
+        <div class="layui-input-inline">
+          <label class="layui-form-label">结算单位</label>
+          <div class="layui-input-inline">
+            <input type="text" name="unitAccount" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">状态</label>
+          <div class="layui-input-inline">
+            <select name="status">
+            <option value="" selected="selected">全部</option>
+            <option value="0" >未核销</option>
+            <option value="1" >部分核销</option>
+            <option value="2" >全部核销</option>
+            </select>
+          </div>
+        </div>
+        <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+      </form>
+    </div>
+    <!--end: 搜索-->
+    
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+      <div class="layui-btn-group fl">
+        <button class="layui-btn layui-btn-normal" data-type="examineData">查看明细</button>
+        <button class="layui-btn layui-btn-normal" data-type="deriveDetail">导出明细</button>
+        <button class="layui-btn layui-btn-normal" data-type="deriveBrief">导出全部</button>
+      </div>
+      <!-- <div class="layui-btn-group fr">
+        <button class="layui-btn"><i class="layui-icon">&#xe614;</i>定义表头</button>
+        <button class="layui-btn"><i class="layui-icon">&#xe62d;</i>导出EXCEL</button>
+      </div> -->
+      <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+      <!--start:快捷搜索-->
+      <div id="shortBar" style="display:none;">
+      <dl>
+        <dt>实应付合计 ： <span class="layui-badge layui-bg-cyan realCost"></span></dt>
+        <dd>已付合计<span class="layui-badge paidCost"></span></dd>
+        <dd>未付合计<span class="layui-badge layui-bg-blue unCost"></span></dd>
+      </dl>
+    </div>
+    <!--end:快捷搜索-->
+  </body>
+  <script type="text/html" id="nonHandledCostTpl">
+      {{ d.totalHandleCost - d.totalHandledCost }}
+  </script>
+   <script type="text/html" id="statusTpl">
+    {{# if(d.status == 0){ }}
+      <p>未核销</p>
+    {{# }else if(d.status == 1){ }}
+      <p>部分核销</p>
+    {{# }else{ }}
+      <p>全部核销</p>
+    {{# } }}
+  </script>
+  <script type="text/html" id="targetTypeTpl">
+    {{setUnitAttr(d.targetType)}}
+  </script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'tms_tab'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    var $customerName,
+      $status;
+
+    setTableData();
+    var $shortBarHtml = $('#shortBar').html();
+    $('.layui-table-tool').prepend('<div class="short-bar">' + $shortBarHtml + '</div>');
+
+
+    //监听提交
+    form.on('submit(search)', function(data){
+      $customerName = $.trim(data.field.unitAccount),
+      $status = $.trim(data.field.status);
+      setTableData($customerName, $status);
+      // console.log($customerName, $status);
+      return false;
+    });
+    
+    //方法级渲染
+    function setTableData($customerName, $status){
+      typeof $customerName != 'undefined' ? $customerName = $customerName : $customerName = '';
+      typeof $status != 'undefined' ? $status = $status : $status = '';
+      var $pageSize = 15;
+
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/handleStatistics/page.shtml?customerName=' + $customerName + '&status=' + $status,
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'targetName', title: '结算单位', align: 'center', width:150, event: 'setSign', style:'cursor: pointer;color:#51a2f7;'},
+          {field:'targetType', title: '单位类型', align: 'center', width:100, templet:"#targetTypeTpl"},
+          {field:'totalHandleCost', title: '实应付总和', align: 'center', width:110},
+          {field:'totalHandledCost', title: '已付金额', align: 'center', width:110},
+          {field:'nonHandledCost', title: '未付金额', align: 'center', width:110, templet:"#nonHandledCostTpl"},
+          {align:'status', title: '核销状态', align: 'center', width:100, templet:"#statusTpl" }
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){
+          $(".realCost").html(res.objects.countRs.realCost);
+          $(".paidCost").html(res.objects.countRs.paidCost);
+          $(".unCost").html(res.objects.countRs.unCost);
+        }
+      });
+    }
+
+
+
+    //监听工具条
+    table.on('tool(tbar)', function(obj){
+        if(obj.event === 'setSign'){
+          var data = obj.data;
+          tmsTab.add($(this), '应付款明细' + data.targetName, 'examine.html?targetId=' + data.targetId + '&targetName=' + data.targetName);
+        }
+    });
+
+    var active = {
+      //查看明细
+      examineData: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+        data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else{
+        tmsTab.add($(this), '应付款明细' + data[0].targetName, 'examine.html?targetId=' + data[0].targetId + '&targetName=' + data[0].targetName);
+        }
+      },
+      //导出明细
+      deriveDetail: function(){
+       var checkStatus = table.checkStatus('dataReload'),
+        $data = checkStatus.data;
+          var $tagetIds = [];
+        for(var $i = 0; $i< $data.length; $i++){
+          $tagetIds.push($data[$i].id);
+        }
+        if($data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else{
+          $.ajax({
+            type:'GET', 
+            url:'/ucenter/general/finance/handleBills/excel.shtml?tagetIds=' + $tagetIds , 
+            success:function(d){
+              if(d.code == 'ERROR_FINANACE_EXPORT_EXCEL'){
+                parent.layer.alert('没有查询到相关数据！');
+              }else{
+                document.location.href = '/ucenter/general/finance/handleBills/excel.shtml?tagetIds=' + $tagetIds ;
+              }
+            },
+            error:function(){
+              parent.layer.alert('操作失败！');
+            }
+          });
+        }
+      },
+      //导出全部
+      deriveBrief: function(){
+        typeof $customerName != 'undefined' ? $customerName = $customerName : $customerName = '';
+        typeof $status != 'undefined' ? $status = $status : $status = ''
+        $.ajax({
+          type:'GET', 
+          url:'/ucenter/general/finance/handleStatistics/excel.shtml?customerName=' + $customerName + '&status=' + $status, 
+          success:function(d){
+            if(d.code == 'ERROR_FINANACE_EXPORT_EXCEL'){
+                parent.layer.alert('没有查询到相关数据！');
+              }else{
+                document.location.href = '/ucenter/general/finance/handleStatistics/excel.shtml?customerName=' + $customerName + '&status=' + $status;
+              }
+            },
+          error:function(){
+             parent.layer.alert('操作失败！');
+          }
+        });
+      }
+     
+    };
+  
+    $('.btns-bar .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+  });
+  </script>
+</html>

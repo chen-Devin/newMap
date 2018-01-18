@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>车架管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+</head>
+
+<body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane" action="">
+            <button class="layui-btn layui-btn-danger" onclick="window.location.href='list.html'">全部</button>
+            <div class="layui-inline">
+                <label class="layui-form-label">车架车牌</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="carFrameNo" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">拖车车牌</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="trailerNo" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">所有人</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="supplier" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <button class="layui-btn layui-btn-danger btn-search" lay-submit="" lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+            <button class="layui-btn layui-btn-primary" type="reset" style="margin:0;">重置</button>
+        </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+        <div class="layui-btn-group fl">
+            <button class="layui-btn layui-btn-normal" data-type="addData" data-tit="新增" data-url="modify.html?type=add">新增</button>
+            <button class="layui-btn layui-btn-normal" data-type="editData">编辑</button>
+            <button class="layui-btn layui-btn-normal" data-type="detailData">查看</button>
+            <button class="layui-btn layui-btn-normal" data-type="statusCancel" id="btn-disable">停用</button>
+            <button class="layui-btn layui-btn-normal" data-type="statusStart" id="btn-enabled">启用</button>
+            <button class="layui-btn layui-btn-normal" data-type="insuranceData" id="btn-insurance">保险</button>
+            <button class="layui-btn layui-btn-normal" data-type="delData">删除</button>
+            <!--<button class="layui-btn layui-btn-normal" id="btn-export">导出</button>-->
+        </div>
+        <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="table_list"></table>
+    <!--end:表格列表-->
+
+    <!--start:快捷搜索-->
+    <!-- <div class="short-search-bar">
+      <dl>
+        <dt>数据总数<span class="layui-badge layui-bg-cyan total"></span></dt>
+        <dd><a href="">聘用<span class="layui-badge employCount"></span></a></dd>
+        <dd><a href="">挂靠<span class="layui-badge joinOperatedCount"></span></a></dd>
+        <dd><a href="">外协<span class="layui-badge outsourceCount"></span></a></dd>
+      </dl>
+    </div> -->
+    <!--end:快捷搜索-->
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<!-- 添加用于绑定 跳转车辆保险页面的js -->
+<script src="../js/insurance.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'table', 'tms_tab', 'laypage'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            tmsTab = layui.tms_tab,
+            laypage = layui.laypage,
+            $ = layui.jquery;
+
+        setTableData();
+
+        //监听提交
+        form.on('submit(search)', function(data) {
+            var $carFrameNo = $.trim(data.field.carFrameNo),
+                $trailerNo = $.trim(data.field.trailerNo),
+                $supplier = $.trim(data.field.supplier);
+            setTableData($carFrameNo, $trailerNo, $supplier);
+            return false;
+        });
+
+        //方法级渲染
+        function setTableData($carFrameNo, $trailerNo, $supplier) {
+            $carFrameNo = typeof $carFrameNo != 'undefined' ? $carFrameNo : '';
+            $trailerNo = typeof $trailerNo != 'undefined' ? $trailerNo : '';
+            $supplier = typeof $supplier != 'undefined' ? $supplier : '';
+            var $pageSize = 15;
+
+            table.render({
+                elem: '#table_list',
+                url: '/ucenter/tms/capacity/carFrame/page.shtml?carFrameNo=' + $carFrameNo + '&trailerNo=' + $trailerNo + '&supplier=' + $supplier,
+                response: {
+                    statusCode: 'SUCCESS',
+                    countName: 'objects.total',
+                    dataName: 'objects.list'
+                },
+                request: {
+                    pageName: 'pageNum',
+                    limitName: 'pageSize'
+                },
+                cols: [
+                    [{
+                        checkbox: true,
+                        fixed: true
+                    }, {
+                        title: '序号',
+                        width: 80,
+                        sort: true,
+                        templet: '#idTpl'
+                    }, {
+                        field: 'status',
+                        title: '状态',
+                        width: 80,
+                        templet: "#statusTpl"
+                    }, {
+                        field: 'frameBelong',
+                        title: '车架归属',
+                        width: 90,
+                        templet: "#frameBelongTpl"
+                    }, {
+                        field: 'carNo',
+                        title: '车架车牌',
+                        width: 150,
+                        templet: "#carNoTpl"
+                    }, {
+                        field: 'trailerNo',
+                        title: '拖车车牌',
+                        width: 150,
+                        templet: "#trailerNoTpl"
+                    }, {
+                        field: 'packSize',
+                        title: '装箱尺寸',
+                        width: 100
+                    }, {
+                        field: 'axleDcode',
+                        title: '车轴',
+                        width: 100,
+                        templet: "#axleDcodeTpl"
+                    }, {
+                        field: 'qualityLoad',
+                        title: '核定载质量(KG)',
+                        width: 130
+                    }, {
+                        field: 'ownerCompanyName',
+                        title: '所有人',
+                        width: 180
+                    }, {
+                        field: 'operateRoadNo',
+                        title: '道路运输营运证号',
+                        width: 150
+                    }, {
+                        field: 'frameNo',
+                        title: '车架号',
+                        width: 100
+                    }, {
+                        field: 'forceInsuranceE',
+                        title: '交强险有效期',
+                        width: 120,
+                        templet: "#forceInsuranceETpl"
+                    }, {
+                        field: 'bizInsuranceE',
+                        title: '商业险有效期',
+                        width: 120,
+                        templet: "#bizInsuranceETpl"
+                    }, {
+                        field: 'dateReg',
+                        title: '车架登记日期',
+                        width: 120,
+                        templet: "#dateRegTpl"
+                    }]
+                ],
+                id: 'dataReload',
+                page: true,
+                limits: [15, 30, 50, 100],
+                limit: $pageSize,
+                height: 'full-130',
+                even: true, //开启隔行背景
+                done: function(res, curr, count) {
+                    //  $('.employCount').html(res.objects.cts.employCount);
+                    //  $('.joinOperatedCount').html(res.objects.cts.joinOperatedCount);
+                    //  $('.outsourceCount').html(res.objects.cts.outsourceCount);
+                    //  $('.total').html(res.objects.total);
+                }
+            });
+        }
+
+        var active = {
+            //新增
+            addData: function() {
+                var $tit = $(this).attr('data-tit'),
+                    $url = $(this).attr('data-url');
+                tmsTab.add($(this), $tit, $url);
+            },
+            //修改
+            editData: function() { //获取选中数据
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('编辑只能选择一条数据！');
+                } else {
+                    if (data[0].status == 3) {
+                        parent.layer.alert('已停用的车架不允许编辑');
+                        return false;
+                    }
+                    tmsTab.add($(this), '编辑车架(' + data[0].carNo + ')', 'modify.html?type=edit&id=' + data[0].id);
+                }
+            },
+            //详情
+            detailData: function() { //获取选中数据
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('只能查看一条数据！');
+                } else {
+                    tmsTab.add($(this), '查看车架(' + data[0].carNo + ')', 'modify.html?type=info&id=' + data[0].id);
+                }
+            },
+            //删除
+            delData: function() { //获取选中数据
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                    return;
+                } else if (data.length > 0) {
+                    parent.layer.confirm('你确定要删除所选择的车架吗？', function(index) {
+                        var idArr = [];
+                        var count = 0;
+                        $(data).each(function(i, value) {
+                            if (value.status != 0) {
+                                parent.layer.alert('只有未激活的车架信息才能删除！');
+                                count = 1;
+                                return false;
+                            } else {
+                                idArr.push(value.id);
+                            }
+                        });
+
+                        if (count == 0) {
+                            var $saveData = {
+                                ids: idArr,
+                                status: 2
+                            }
+
+                            $.ajax({
+                                url: '/ucenter/tms/capacity/carFrame/status.shtml',
+                                data: JSON.stringify($saveData),
+                                type: 'PUT',
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                beforeSend: function() {},
+                                success: function(d) {
+                                    var $code = d.code;
+                                    $msg = d.msg;
+                                    $objects = d.objects;
+
+                                    if ($code === 'SUCCESS') {
+                                        parent.layer.alert('删除成功');
+                                        $(".btn-search").click();
+                                    } else if ($code === 'ERROR_USER_LOGOFF') {
+                                        loginFailure();
+                                    } else {
+                                        parent.layer.alert('数据异常');
+                                        return;
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        };
+
+        $('.btns-bar .layui-btn').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //启用
+        $("#btn-enabled").click(function() {
+            var checkStatus = table.checkStatus('dataReload'),
+                data = checkStatus.data;
+            if (data.length == 0) {
+                parent.layer.alert('你还未选中数据！');
+                return;
+            } else if (data.length > 0) {
+                parent.layer.confirm('你确定要启用所选择的车架吗？<br/><label><input id="chkStart" checked type="checkbox">同时启用关联车辆</label>', function(index) {
+                    var idArr = [];
+                    $(data).each(function(i, value) {
+                        idArr.push(value.id);
+                    });
+                    var $saveData = {
+                        ids: idArr,
+                        status: 1
+                    }
+                    if ($(window.parent.document).find("#chkStart").is(':checked')) { //启用车架和关联车辆
+                        $saveData.cascade = true;
+                    }
+
+                    $.ajax({
+                        url: '/ucenter/tms/capacity/carFrame/status.shtml',
+                        data: JSON.stringify($saveData),
+                        type: 'PUT',
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        beforeSend: function() {},
+                        success: function(d) {
+                            var $code = d.code;
+                            $msg = d.msg;
+                            $objects = d.objects;
+
+                            if ($code === 'SUCCESS') {
+                                parent.layer.alert('启用成功');
+                                $(".btn-search").click();
+                            } else if ($code === 'ERROR_USER_LOGOFF') {
+                                loginFailure();
+                            } else {
+                                parent.layer.alert('数据异常');
+                                return;
+                            }
+                        }
+                    });
+                });
+            }
+        });
+
+        //停用
+        $("#btn-disable").click(function() {
+            var checkStatus = table.checkStatus('dataReload'),
+                data = checkStatus.data;
+            if (data.length == 0) {
+                parent.layer.alert('你还未选中数据！');
+                return;
+            } else if (data.length > 0) {
+                parent.layer.confirm('你确定要停用所选择的车架吗？<br/><label><input id="chkStop" checked type="checkbox">同时停用关联拖车</label>', function(index) {
+                    var idArr = [];
+                    var count = 0;
+                    $(data).each(function(i, value) {
+                        if (value.status != 1) {
+                            parent.layer.alert("只有启用的车架才能停用！");
+                            count = 1;
+                            return false;
+                        } else {
+                            idArr.push(value.id);
+                        }
+                    });
+                    if (count == 0) {
+                        var $saveData = {
+                            ids: idArr,
+                            status: 3
+                        }
+                        if ($(window.parent.document).find("#chkStop").is(':checked')) { //停用车架和关联车辆
+                            $saveData.cascade = true;
+                        }
+                        $.ajax({
+                            url: '/ucenter/tms/capacity/carFrame/status.shtml',
+                            data: JSON.stringify($saveData),
+                            type: 'PUT',
+                            dataType: 'json',
+                            contentType: 'application/json',
+                            beforeSend: function() {},
+                            success: function(d) {
+                                var $code = d.code;
+                                $msg = d.msg;
+                                $objects = d.objects;
+                                if ($code === 'SUCCESS') {
+                                    parent.layer.alert('停用成功');
+                                    $(".btn-search").click();
+                                } else if ($code === 'ERROR_USER_LOGOFF') {
+                                    loginFailure();
+                                } else {
+                                    parent.layer.alert('数据异常');
+                                    return;
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        // 保险按钮，点击后 会跳转到 【车辆保险】 菜单（若有选中列表记录，则附加	车牌号码）
+        $("#btn-insurance").click(createGotoInsuranceHandler(table, window.parent.document));
+    });
+</script>
+<script type="text/html" id="statusTpl">
+    {{# if(d.status == '0'){ }} 未激活 {{# } else if(d.status == '1'){ }} 启用 {{# } else if(d.status == '2'){ }} 删除 {{# } else if(d.status == '3'){ }} 停用 {{# } else if(d.status == '4'){ }} 通过认证 {{# } }}
+</script>
+<script type="text/html" id="frameBelongTpl">
+    {{# if(d.frameBelong == '0'){ }} 自营 {{# } else if(d.frameBelong == '1'){ }} 合营 {{# } else if(d.frameBelong == '2'){ }} 合作 {{# } else if(d.frameBelong == '3'){ }} 挂靠 {{# } else if(d.frameBelong == '4'){ }} 外协 {{# } }}
+</script>
+<script type="text/html" id="axleDcodeTpl">
+    {{# if(d.axleDcode == '0'){ }} 单轴 {{# } else if(d.axleDcode == '1'){ }} 双轴 {{# } else if(d.axleDcode == '2'){ }} 三轴 {{# } }}
+</script>
+<script type="text/html" id="forceInsuranceETpl">
+    {{# if(d.forceInsuranceE == null){ }} {{ }} {{# }else{ }} {{new Date(d.forceInsuranceE).format("yyyy-MM-dd")}} {{# } }}
+</script>
+<script type="text/html" id="bizInsuranceETpl">
+    {{# if(d.bizInsuranceE == null){ }} {{ }} {{# }else{ }} {{new Date(d.bizInsuranceE).format("yyyy-MM-dd")}} {{# } }}
+</script>
+<script type="text/html" id="dateRegTpl">
+    {{# if(d.dateReg == null){ }} {{ }} {{# }else{ }} {{new Date(d.dateReg).format("yyyy-MM-dd")}} {{# } }}
+</script>
+<script type="text/html" id="trailerNoTpl">
+    {{# if(d.trailerNo == '' || d.trailerNo == null ){ }} {{}} {{# }else{ }} {{d.trailerNo + " " + d.trailerColor}} {{# } }}
+</script>
+<script type="text/html" id="carNoTpl">
+    {{# if(d.carNo == ''){ }} {{# }else{ }} {{d.carNo + " " + d.carColor}} {{# } }}
+</script>
+<script type="text/html" id="idTpl">
+    {{d.LAY_TABLE_INDEX+1}}
+</script>
+
+</html>

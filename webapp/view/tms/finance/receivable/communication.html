@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>沟通历史 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+      span.required {color:#f00; font-family:'simsun', '宋体'; margin-right:5px; font-size:15px;}
+      .layui-form-label {width:190px;}
+      .layui-form-item .layui-input-inline {padding-top: 10px; width:270px;}
+      a {color:#51a2f7 !important;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      
+      <!--<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+        <legend>对方</legend>
+      </fieldset>
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">实应付金额（元）</label>
+          <div class="layui-input-inline">
+            <span id="no">2000</span>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">备注</label>
+          <div class="layui-input-inline">
+            <span id="no">订单j10001的高速费，你们算漏了</span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">账单</label>
+          <div class="layui-input-inline">
+            <a href="javascript:void(0);" class="billDetail">账单明细链接</a>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">时间</label>
+          <div class="layui-input-inline">
+            <span id="no">2017.9.1 23:23:34</span>
+          </div>
+        </div>
+      </div>-->
+    </form>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    laydate.render({
+      elem: '#getMoneyDate' //收款日期
+    });
+
+    var $billNo = $.trim(getUrlParam('billNo'));
+    var $id = $.trim(getUrlParam('id'));
+
+    roleStatus($billNo, $id);
+    
+    function roleStatus($billNo, $id){
+      var $saveData = {
+          id: $id,
+          billNo: $billNo
+        }
+       $.ajax({
+        type:'POST', 
+        url:'/ucenter/general/finance/receivedBills/record.shtml', 
+        dataType:"json",
+        contentType: "application/json",
+        data:JSON.stringify($saveData),
+        success:function(d){
+          var $code = d.code,
+              $msg = d.msg,
+              $objects = d.objects;
+          if($code === 'SUCCESS'){
+            if($objects == ''){
+              parent.layer.alert("该账单暂无历史记录", {
+                  closeBtn: 0,
+                  yes: function(index) {
+                      parent.layer.closeAll();
+                  }
+              })
+            }
+            for(var i = 0 ; i < $objects.length ; i++){
+              var title =  $objects[i].receiveCost != null ? "我方":"对方";
+              var $classBox = $objects[i].receiveCost != null ? "replyLink":"otherLink";
+              // var id = $objects[i].myid != null ? $objects[i].myid : $objects[i].otherId;
+              var receiveCostTitle =  $objects[i].receiveCost != null ? "实应收金额（元）":"实应付金额（元）" ;
+              var receiveCost = $objects[i].receiveCost != null ? $objects[i].receiveCost:$objects[i].handleCost ;
+              var modifier = $objects[i].receiveCost != null ? '<div class="layui-form-item">'+
+                  '<div class="layui-inline">'+
+                    '<label class="layui-form-label">操作者</label>'+
+                  '<div class="layui-input-inline">'+
+                    '<span id="no">'+ $objects[i].modifier +'</span>'+
+                    '</div>'+
+                  '</div>'+
+                '</div>' : "";
+              $(".layui-form").append(
+                '<div class=' + $classBox + '><fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">'+
+                '<legend>'+ title +'</legend>'+
+                '</fieldset>'+
+                '<div class="layui-form-item">'+
+                  '<div class="layui-inline">'+
+                    '<label class="layui-form-label">'+ receiveCostTitle +'</label>'+
+                    '<div class="layui-input-inline">'+
+                      '<span id="no">'+ receiveCost +'</span>'+
+                    '</div>'+
+                  '</div>'+
+                  '<div class="layui-inline">'+
+                    '<label class="layui-form-label">备注</label>'+
+                    '<div class="layui-input-inline">'+
+                      '<span id="no">'+ $objects[i].remark +'</span>'+
+                    '</div>'+
+                  '</div>'+
+                '</div>'+
+                '<div class="layui-form-item">'+
+                  '<div class="layui-inline">'+
+                    '<label class="layui-form-label">账单</label>'+
+                    '<div class="layui-input-inline">'+
+                      '<span style="color:#51a2f7; cursor:pointer;" class="idClick" id=' + $objects[i].id + ' receiveCost=' + $objects[i].receiveCost + '>账单明细链接</span>'+
+                    '</div>'+
+                  '</div>'+
+                  '<div class="layui-inline">'+
+                    '<label class="layui-form-label">时间</label>'+
+                    '<div class="layui-input-inline">'+
+                      '<span id="no">'+ new Date($objects[i].createDate).format("yyyy-MM-dd hh:mm:ss")  +'</span>'+
+                    '</div>'+
+                  '</div>'+
+                '</div>'+ modifier + '</div>'
+              )
+            }
+          }else{
+            parent.layer.alert("查询失败", {
+                  closeBtn: 0,
+                  yes: function(index) {
+                      parent.layer.closeAll();
+                  }
+              })
+          }
+        }
+      });
+      form.render();
+    }
+
+    $(".btn-cancel").on("click",function(){
+      parent.layer.closeAll();
+      return false;
+    });
+
+    $(document).on('click','.idClick',function(){
+      var title = '';
+      var $id = $(this).attr('id');
+      $title = $(this).parent().parent().parent().parent().attr('class');
+      title = $title == 'replyLink' ? '我方' : '对方';
+        parent.layer.open({
+              type: 2,
+              title: title + '提交账单',
+              shadeClose: true,
+              shade: 0.8,
+              area: ['90%', '80%'],
+              content: $title + '.html?receivedBillsNo=' + $id
+        });
+    })
+  });
+  </script>
+</html>

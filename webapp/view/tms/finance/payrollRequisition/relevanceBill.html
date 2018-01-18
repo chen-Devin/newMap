@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>所关联账单详情 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      <!--start:表格列表-->
+      <table class="layui-table main-ark">
+        <thead>
+          <tr>
+            <th>账单号</th><th>账期</th><th>结算方式</th><th>应付金额</th>
+            <th>已请款金额</th><th>未请款金额</th><th>已付金额</th><th>未付金额</th>
+            <th>付款单号</th>
+          </tr> 
+        </thead>
+        <tbody></tbody>
+      </table>
+    </form>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    var $billNo = $.trim(getUrlParam("billNo"));
+
+    //初始化主要信息
+    $.get('/ucenter/general/finance/askPrice/getBillingDetail.shtml', {billNo: $billNo}, function(d){
+      var $code = d.code,
+          $msg = d.msg,
+          $objects = d.objects;
+          
+      if($code === 'SUCCESS'){
+        var $html = '<tr>' +
+                    '<td>' + ($objects.billNo != null ? $objects.billNo : '-') + '</td>' +
+                    '<td>' + ($objects.billMonth != null ? $objects.billMonth : '-') + '</td>' +
+                    '<td>' + ($objects.paymentType != null ? $objects.paymentType : '-') + '</td>' +
+                    '<td>' + ($objects.totalCost != null ? $objects.totalCost : '-') + '</td>' +
+                    '<td>' + ($objects.askedCost != null ? $objects.askedCost : '-') + '</td>' +
+                    '<td>' + ($objects.noaskCost != null ? $objects.noaskCost : '-') + '</td>' +
+                    '<td>' + ($objects.handledCost != null ? $objects.handledCost : '-') + '</td>' +
+                    '<td>' + ($objects.noaskCost != null ? $objects.noaskCost : '-') + '</td>' +
+                    '<td>' + ($objects.expenditureNo != null  ? $objects.expenditureNo : '-') + '</td>' +
+                    '</tr>';
+        $('.main-ark tbody').append($html);
+      }
+    });
+
+
+    // setTableData($billNo);
+
+    // //方法级渲染
+    // function setTableData($billNo){
+    //   typeof $billNo != 'undefined' ? $billNo = $billNo : $billNo = '';
+    //   var $pageSize = 15;
+
+    //   table.render({
+    //     elem: '#tableList',
+    //     url: '/ucenter/general/finance/askPrice/getBillingDetail.shtml?billNo=' + $billNo,
+    //     response: {
+    //       statusCode: 'SUCCESS',
+    //       dataName: 'objects'
+    //     },
+    //     request: {
+    //       pageName: 'pageNum', //页码的参数名称，默认：page
+    //       limitName: 'pageSize' //每页数据量的参数名，默认：limit
+    //     },
+    //     cols: [[
+    //       {field:'billNo', title: '账单号', width:100},
+    //       {field:'billMonth', title: '账期', width:100},
+    //       {field:'paymentType', title: '结算方式', width:100},
+    //       {field:'totalCost', title: '应付金额', width:120},
+    //       {field:'askedCost', title: '已请款金额', width:120},
+    //       {field:'noaskCost', title: '未请款金额', width:120},
+    //       {field:'handledCost', title: '已付金额', width:120},
+    //       {field:'noaskCost', title: '未付金额', width:120},
+    //       {field:'expenditureNo', title: '付款单号', width:100}
+    //     ]],
+    //     id: 'dataReload',
+    //     page: false,
+    //     limits: [15, 30, 50, 100],
+    //     height: 'full-130',
+    //   });
+    // }
+
+    $(".btn-cancel").on("click",function(){
+      parent.layer.closeAll();
+      return false;
+    });
+  });
+  </script>
+  <script type="text/html" id="paymentTypeTpl">
+    {{#  if(d.paymentType == '0'){ }}
+      现金
+    {{#  } else{ }}
+      {{d.paymentType + '天'}}      
+    {{#  } }}
+  </script>
+</html>

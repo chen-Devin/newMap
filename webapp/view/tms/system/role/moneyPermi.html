@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>费用权限</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+    <style>
+        .layui-table {
+            margin: 5px 0;
+        }
+        
+        .layui-table td,
+        .layui-table th {
+            text-align: center;
+        }
+        
+        .layui-table td.title,
+        .layui-table th.title {
+            color: #1E9FFF;
+            background: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <form class="layui-form" method="post" autocomplete="off">
+        <fieldset class="layui-elem-field">
+            <legend>应收费用</legend>
+            <div class="layui-field-box" id="wrCostTable"></div>
+        </fieldset>
+        <fieldset class="layui-elem-field">
+            <legend>应付费用</legend>
+            <div class="layui-field-box" id="whCostTable"></div>
+        </fieldset>
+        <fieldset class="layui-elem-field">
+            <legend>车辆成本</legend>
+            <div class="layui-field-box" id="carCostTable"></div>
+        </fieldset>
+        <div class="button-bar">
+            <button class="layui-btn" id="allReadWrite">全部可看且可改</button>
+            <button class="layui-btn layui-btn-danger" id="allReadOnly">全部仅可看</button>
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit">保存</button>
+        </div>
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<!-- 工具库依赖 -->
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery;
+
+        var $id = getUrlId($.trim(getUrlParam('id')));
+
+        setTableItem(11, '#wrCostTable', 10);
+        setTableItem(12, '#whCostTable', 10);
+        setTableItem(13, '#carCostTable', 10);
+
+        //画表格（t：1应收，2应付，3车辆）（o：表格容器）（r：一行几组）
+        function setTableItem(t, o, r) {
+            var dataItems = getCostItem(t, '城配');
+            var dataItemsLen = dataItems.length;
+            var tableHtml = '',
+                trHtml1 = '', //第一行
+                trHtml2 = '', //第二行
+                trHtml3 = ''; //第三行
+            if (dataItemsLen > 0) {
+                for (var i = 0; i < dataItemsLen; i++) {
+                    tableHtml += ((i + 1) % r == 1) ?
+                        '<table class="layui-table" lay-size="sm"><colgroup><col width="12%"><col width="8%">' +
+                        '<col width="8%"><col width="8%"><col width="8%"><col width="8%"><col width="8%"><col width="8%"><col width="8%"><col width="8%"><col width="8%"><col width="8%"></colgroup>' :
+                        '';
+                    //第一行标题
+                    ((i + 1) % r == 1) ? trHtml1 = '': '';
+                    trHtml1 += ((i + 1) % r == 1) ? '<thead><tr><th>费用项</th><th>全选</th>' : '';
+                    trHtml1 += '<th><b>' + dataItems[i].costName + '</b></th>';
+                    trHtml1 += ((i + 1) % r == 0 || (i + 1) == dataItems.length) ? '</tr></thead>' : '';
+                    tableHtml += ((i + 1) % r == 0 || (i + 1) == dataItems.length) ? trHtml1 : '';
+                    //第二行仅可看
+                    ((i + 1) % r == 1) ? trHtml2 = '': '';
+                    trHtml2 += ((i + 1) % r == 1) ? '<tbody><tr class="only-look"><td class="title">仅可看</td><td class="title"><input type="checkbox" name="readOnly" lay-filter="roCheckAll" lay-skin="primary"></td>' : '';
+                    trHtml2 += '<td><input type="checkbox" name="ro' + dataItems[i].costId + '" value="' + dataItems[i].costId + '" elem-name="roInput" lay-skin="primary"></td>';
+                    trHtml2 += ((i + 1) % r == 0 || (i + 1) == dataItems.length) ? '</tr>' : '';
+                    tableHtml += ((i + 1) % r == 0 || (i + 1) == dataItems.length) ? trHtml2 : '';
+                    //第三行可看且可改
+                    ((i + 1) % r == 1) ? trHtml3 = '': '';
+                    trHtml3 += ((i + 1) % r == 1) ? '<tr class="read-write"><td class="title">可看且可改</td><td class="title"><input type="checkbox" name="readWrite" lay-filter="rwCheckAll" lay-skin="primary"></td>' : '';
+                    trHtml3 += '<td><input type="checkbox" name="rw' + dataItems[i].costId + '" value="' + dataItems[i].costId + '" elem-name="rwInput" lay-skin="primary"></td>';
+                    trHtml3 += ((i + 1) % r == 0 || (i + 1) == dataItems.length) ? '</tr></tbody>' : '';
+                    tableHtml += ((i + 1) % r == 0 || (i + 1) == dataItems.length) ? trHtml3 : '';
+                    tableHtml += ((i + 1) % r == 0 || (i + 1) == dataItems.length) ? '</table>' : '';
+                }
+            }
+            $(o).append(tableHtml);
+            //补缺空td
+            //计算表格总数
+            var tableLen = Math.ceil(dataItemsLen / r);
+            //计算单元格总数
+            var colLen = tableLen * r;
+            //计算需要补缺的空td个数
+            var spaceColLen = colLen - dataItemsLen;
+            //循环，最后一个表格添加空td
+            var tdHtml = '<td></td>';
+            for (var j = 0; j < spaceColLen; j++) {
+                $(o).find('table:last-child tr').append(tdHtml);
+            }
+            form.render('checkbox');
+        }
+
+        //全选按钮：全选可看且可改，全选可看
+        var allCheckFlag = {
+            allReadWrite: false,
+            allReadOnly: false
+        }
+
+        function allCheckboxBtn(id, target, other) {
+            $(id).click(function(ev) {
+                var myFlag = (id == "#allReadOnly") ? "allReadOnly" : "allReadWrite";
+                var otherFlag = (id == "#allReadOnly") ? "allReadWrite" : "allReadOnly";
+
+                //如果已经选中就取消选中
+                if (allCheckFlag[myFlag]) {
+                    $(target).find("input").prop('checked', false);
+                    allCheckFlag[myFlag] = false;
+                } else {
+                    $(target).find("input").prop('checked', true);
+                    $(other).find("input").prop('checked', false);
+                    allCheckFlag[myFlag] = true;
+                    allCheckFlag[otherFlag] = false;
+                }
+
+                form.render('checkbox');
+                return false;
+            });
+        }
+        allCheckboxBtn("#allReadWrite", "table .only-look td", "table .read-write td");
+        allCheckboxBtn("#allReadOnly", "table .read-write td", "table .only-look td");
+
+        //单行全选复选框：全选可看且可改，全选可看（b：按钮，o：input）
+        function allCheckboxTd(b, o) {
+            form.on('checkbox(' + b + ')', function(data) {
+                var checkboxItems = $(this).parent().parent().find('input[elem-name="' + o + '"]');
+                var siblingTr = $(this).parents("tr").siblings("tr");
+
+                if (data.elem.checked) {
+                    checkboxItems.prop('checked', true);
+                    $(siblingTr).find("td").find("input").prop('checked', false);
+                } else {
+                    checkboxItems.prop('checked', false);
+                }
+                form.render('checkbox');
+            });
+        }
+        allCheckboxTd('rwCheckAll', 'rwInput'); //单行全选复选框：可看且可改
+        allCheckboxTd('roCheckAll', 'roInput'); //单行全选复选框：可看
+
+        //非全选input的选中情况
+        form.on('checkbox', function(data) {
+            var type = $(this).attr("elem-name");
+            var siblingTr = $(this).parents("tr").siblings("tr");
+            var thisInputOfTr = $(this).parents("tr").find(".title input");
+
+            if (!type) {
+                return false;
+            }
+
+            if (data.elem.checked) {
+                //选中这个  相对的那个input不选中
+                var relativeInput = (type == "roInput") ? 'rw' + data.value : 'ro' + data.value;
+                $('input[name=' + relativeInput + ']').prop("checked", false);
+                siblingTr.find(".title input").prop('checked', false);
+
+                var tdInput = $(this).parents("tr");
+                rowAllChecked(tdInput, thisInputOfTr);
+
+            } else {
+                $(thisInputOfTr).prop('checked', false);
+            }
+
+            form.render('checkbox');
+        });
+
+        //判断是否一行input全部选中了
+        function rowAllChecked(tr, checkBox) {
+            if ($(tr).find("td:not(.title) input").length == $(tr).find("td:not(.title) input:checked").length) {
+                $(checkBox).prop('checked', true);
+            }
+        }
+
+        //获取费用权限
+        HC.ajax.get({
+            url: '/ucenter/centre/permi/role/' + $id + '/fieldAuthorization.shtml',
+            data: {
+                roleId: $id
+            },
+            success: setChecked
+        });
+
+        function setChecked(data) {
+            var datas = [];
+
+            $.each(data.fields, function(i, d) {
+                datas.push({
+                    fieldId: d.fieldId,
+                    permission: d.permission
+                });
+            });
+
+            // 1只读  2读写  
+            $.each(datas, function(i, d) {
+                var type = d.permission == 1 ? "ro" : "rw";
+                $("input[name=" + type + d.fieldId + "]").prop("checked", true);
+            });
+
+            $.each($("tbody tr"), function(i, d) {
+                rowAllChecked($(this), $(this).find(".title input"));
+            });
+
+            form.render('checkbox');
+            moneyPermiSubmit(datas);
+        }
+
+        //监听提交
+        function moneyPermiSubmit(oldData) {
+            form.on('submit(submit)', function(data) {
+                var sdArrs = [],
+                    sdObjItem = {};
+
+                //仅可看
+                $('input[elem-name="roInput"]:checked').each(function() {
+                    sdObjItem = {};
+                    sdObjItem.fieldId = parseInt($.trim($(this).val()));
+                    sdObjItem.permission = 1;
+                    sdArrs.push(sdObjItem);
+                });
+
+                //可看且可改
+                $('input[elem-name="rwInput"]:checked').each(function() {
+                    sdObjItem = {};
+                    sdObjItem.fieldId = parseInt($.trim($(this).val()));
+                    sdObjItem.permission = 2;
+                    sdArrs.push(sdObjItem);
+                });
+
+                var saveData = {
+                    addFieldIds: sdArrs,
+                    roleId: $id
+                }
+
+                //添加删除的数据
+                var delArr = [];
+                $.each(oldData, function(i, d) {
+                    var flag = true;
+                    $.each(sdArrs, function(i2, d2) {
+                        if (d.fieldId == d2.fieldId) {
+                            flag = false;
+                        }
+                    });
+                    if (flag) {
+                        delArr.push(d.fieldId);
+                    }
+                });
+                saveData.removeFieldIds = delArr;
+
+                //todo，保存接口
+                HC.ajax.put({
+                    url: '/ucenter/centre/permi/role/' + $id + '/fieldAuthorization.shtml',
+                    data: JSON.stringify(saveData),
+                    success: bizUtil.callback.saveSuccessAndRefresh
+                });
+
+                return false;
+            });
+        }
+
+
+    });
+</script>
+
+</html>

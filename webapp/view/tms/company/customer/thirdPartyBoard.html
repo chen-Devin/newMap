@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>编辑客户 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+</head>
+
+<body>
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+        <legend>
+            第三方平台账户
+            <span class="legend-btns">
+              <a class="layui-icon icon-add tableTP" data-type="thirdPartyBoardAdd" data-func="callbackTP(obj)">&#xe61f;</a>
+            </span>
+        </legend>
+    </fieldset>
+    <table id="tableList" lay-filter="test"></table>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+</script>
+<script type="text/html" id="statusTpl">
+    {{# if(d.isDefault == 1){ }}
+    <a lay-event="statusCancel" style="color:#1E9FFF;">是</a> {{# }else{ }}
+    <a lay-event="statusStart" style="color:#FF5722;">否</a> {{# } }}
+</script>
+<script>
+    layui.use(['table', 'layer', 'layedit', 'laydate'], function() {
+        var table = layui.table,
+            layer = layui.layer,
+            $ = layui.jquery;
+
+        var $id = $.trim(getUrlParam('id'));
+        setTableData($id);
+
+        function setTableData(id) {
+            id = typeof id != 'undefined' ? id : '';
+            table.render({
+                elem: '#tableList',
+                url: '/ucenter/crm/customers/customersThird/search.shtml?custId=' + id,
+                response: {
+                    statusCode: 'SUCCESS',
+                    dataName: 'objects'
+                },
+                cols: [
+                    [{
+                        field: 'businessType',
+                        title: '业务类型',
+                        width: 120,
+                        align: 'center'
+                    }, {
+                        field: 'platformDcode',
+                        title: '平台名称',
+                        width: 150,
+                        align: 'center'
+                    }, {
+                        field: 'weburl',
+                        title: '平台链接',
+                        width: 251
+                    }, {
+                        field: 'operateType',
+                        title: '操作类型',
+                        width: 150,
+                        align: 'center'
+                    }, {
+                        field: 'loginAccid',
+                        title: '登录账号',
+                        width: 150,
+                        align: 'center'
+                    }, {
+                        field: 'payDcode',
+                        title: '支付方式',
+                        width: 100,
+                        align: 'center'
+                    }, {
+                        field: 'payAccid',
+                        title: '支付账号',
+                        width: 150,
+                        align: 'center'
+                    }, {
+                        align: 'center',
+                        title: '操作',
+                        toolbar: '#bar',
+                        width: 120
+                    }]
+                ],
+                id: 'dataReload',
+                page: false,
+                height: 'full-90',
+                even: true
+            });
+        }
+
+        table.on('tool(test)', function(obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值
+            var tr = obj.tr; //获得当前行 tr 的DOM对象
+
+            if (layEvent === 'edit') { //编辑
+                parent.layer.open({
+                    type: 2,
+                    title: '编辑第三方平台账号',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['900px', '450px'],
+                    content: './addEdit/thirdPartyTpl.html?do=edit&addressId=' + data.areaId,
+                    success: function(layero, index) {
+                        for (var key in data) {
+                            data[key] != null ? data[key] : '';
+                        }
+                        var inputLists = $(layero.find('iframe')[0].contentWindow.document).find('input')
+                        for (var j = 0; j < inputLists.length; j++) {
+                            $(inputLists[j]).val(data[inputLists[j]['name']]);
+                        }
+                    },
+                    btn: ['确定', '关闭'],
+                    yes: function(index, layero) {
+                        $(layero.find('iframe')[0].contentWindow.document).find('#vsubmit').click();
+
+                        var cllBack = $('.tableTP').attr('data-func')
+                        var Fun = eval(cllBack);
+                        var objs = Fun;
+                        // Fun;
+                        delete objs.$id;
+                        delete objs.conAdd;
+                        objs['id'] = data.id;
+                        $.ajax({
+                            type: 'PUT',
+                            url: '/ucenter/crm/customers/customersThird/' + $id + '.shtml',
+                            dataType: "json",
+                            contentType: "application/json",
+                            data: JSON.stringify(objs),
+                            success: function(d) {
+                                var $code = d.code,
+                                    $msg = d.msg,
+                                    $objects = d.objects;
+
+                                if ($code === 'SUCCESS') {
+                                    obj.update(objs);
+                                    parent.layer.closeAll();
+                                    parent.layer.alert('保存成功！', {
+                                        yes: function() {
+                                            parent.layer.closeAll();
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            } else if (layEvent === 'del') {
+                parent.layer.confirm('真的删除这条信息吗？', function(index) {
+                    $.ajax({
+                        type: 'DELETE',
+                        url: '/ucenter/crm/customers/customersThird/' + data.id + '.shtml',
+                        success: function(d) {
+                            var $code = d.code,
+                                $msg = d.msg,
+                                $objects = d.objects;
+
+                            if ($code === 'SUCCESS') {
+                                parent.layer.closeAll();
+                                parent.layer.alert('删除成功！', {
+                                    yes: function() {
+                                        obj.del();
+                                        parent.layer.closeAll();
+                                    }
+                                });
+                            }
+                        }
+                    });
+                });
+            }
+        });
+
+        function callbackCB(obj) {
+            if (typeof obj.data === 'object') {
+                obj = obj.data
+            }
+            return obj
+        }
+
+        var active = {
+            //新增第三方平台
+            thirdPartyBoardAdd: function() {
+                parent.layer.open({
+                    type: 2,
+                    title: '新增第三方平台',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['900px', '450px'],
+                    content: './addEdit/thirdPartyTpl.html?do=add',
+                    success: function(layero, index) {},
+                    btn: ['确定', '关闭'],
+                    yes: function(index, layero) {
+                        $(layero.find('iframe')[0].contentWindow.document).find('#vsubmit').click();
+                        var cllBack = $('.tableTP').attr('data-func')
+                        var Fun = eval(cllBack);
+                        var objs = Fun;
+                        var reb = false;
+
+                        if (objs.conAdd == 1) {
+                            reb = true;
+                        }
+                        delete objs.conAdd;
+                        $.ajax({
+                            type: 'post',
+                            url: '/ucenter/crm/customers/customersBroker/add.shtml?id=' + $id,
+                            dataType: "json",
+                            contentType: "application/json",
+                            data: JSON.stringify(objs),
+                            success: function(d) {
+                                var $code = d.code,
+                                    $msg = d.msg,
+                                    $objects = d.objects;
+
+                                if ($code === 'SUCCESS') {
+                                    parent.layer.closeAll();
+                                    var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+                                    parent['f' + $layId].location.reload();
+                                    if (reb) {
+                                        reb = false
+                                        form.render();
+                                        active.thirdPartyBoardAdd();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        };
+
+        //给按钮按钮添加事件
+        $('.legend-btns a').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>
+
+</html>

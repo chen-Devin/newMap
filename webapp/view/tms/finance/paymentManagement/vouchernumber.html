@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>关联付款单号 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      <h4>付款总额：<span class="countResult"></span></h4>
+      <!--start:表格列表-->
+      <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+      <!--end:表格列表-->
+    </form>
+  </body>
+  <script type="text/html" id="createDateTpl">
+      {{new Date(d.createDate).format("yyyy-MM-dd hh:mm:ss")}}
+  </script>
+  <script type="text/html" id="billMonthTpl">
+      {{new Date(d.billMonth).format("yyyy-MM")}}
+  </script>
+  <script type="text/html" id="expenditureDateTpl">
+      {{new Date(d.expenditureDate).format("yyyy-MM")}}
+  </script>
+  <script type="text/html" id="bankTpl">
+      {{ d.bankName + d.bankSubBranch + ':' + d.accountNo }}
+  </script>
+  <script type="text/html" id="statusTpl">
+      {{# if(d.status == 1){ }}
+      <p>已到账</p>
+      {{# }else{ }}
+      <p>撤销</p>
+      {{# } }}
+  </script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    
+    var $billId = $.trim(getUrlParam("billId"));
+    setTableData($billId);
+
+    //方法级渲染
+    function setTableData($billId){
+      var $pageSize = 15;
+
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/expenditureRecord/search.shtml?billId=' + $billId,
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.details'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {field:'expenditureNo', title: '付款单号', width:200, },
+          {field:'targetName', title: '单位简称', width:100},
+          {field:'askPriceNo', title: '请款号', width:200},
+          {field:'billMonth', title: '账期', width:150, templet:"#billMonthTpl"},
+          {field:'bank', title: '付款账号', width:400, templet:"#bankTpl"},
+           {field:'price', title: '付款金额', width:100, },
+          {field:'expenditureDate', title: '付款日期', width:150, templet:"#expenditureDateTpl"},
+          {field:'described', title: '摘要', width:100},
+          {field:'status', title: '状态', width:100, templet:"#statusTpl"},
+          {field:'creator', title: '创建人', width:150},
+          {field:'createDate', title: '创建时间', width:300, templet:"#createDateTpl"}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){
+          $(".countResult").html(res.objects.countResult);
+        }
+      });
+    }
+  });
+  </script>
+</html>

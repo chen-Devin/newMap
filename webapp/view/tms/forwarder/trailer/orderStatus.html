@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>订单状态 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+    <style>
+        body {
+            margin: 20px;
+        }
+        
+        #orderStatus {
+            margin: 0;
+        }
+        
+        #orderStatus dl {
+            text-align: center;
+        }
+        
+        #orderStatus dl dt,
+        #orderStatus dl dd {
+            display: inline-block;
+        }
+        
+        #orderStatus dl dt .status-item {
+            margin: 0 auto;
+            width: 70px;
+            height: 70px;
+            line-height: 70px;
+            border-radius: 40px;
+            border: #34a8ff 2px solid;
+            color: #34a8ff;
+            font-size: 14px;
+        }
+        
+        #orderStatus dl dt .status-item.gray {
+            color: #bbb;
+            border: #bbb 2px solid;
+        }
+        
+        #orderStatus dl dt .status-time {
+            margin: 10px auto;
+            width: 80px;
+            height: 30px;
+            line-height: 15px;
+        }
+        
+        #orderStatus dl dt .status-time.gray {
+            color: #bbb;
+        }
+        
+        #orderStatus dl dd .status-arrow {
+            margin: 0 15px;
+            line-height: 68px;
+            height: 110px;
+            font-family: 'SimSun', '宋体';
+            font-size: 30px;
+            font-weight: normal;
+            color: #34a8ff;
+            overflow: hidden;
+        }
+        
+        #orderStatus dl dd .status-arrow.gray {
+            color: #bbb;
+        }
+        
+        #waybillList {
+            margin: 20px auto 0;
+            width: 1051px;
+            overflow: hidden;
+        }
+        
+        #waybillList table.table-list td.td-item {
+            border-bottom: #ddd 1px solid;
+        }
+        
+        #waybillList table.table-list td.td-item:last-child {
+            border-right: #ddd 1px solid;
+        }
+        
+        #waybillList table.table-item {
+            width: 350px;
+            border-left: #bbb 2px solid;
+            border-top: #ddd 1px solid;
+        }
+        
+        #waybillList table.table-item td {
+            padding: 0;
+            line-height: 24px;
+        }
+        
+        #waybillList table.table-item td.td1 {
+            width: 25%;
+            text-align: center;
+            background: url(../../static/images/icon_arrow1.png) 0 center no-repeat;
+        }
+        
+        #waybillList table.table-item td.td2 {
+            width: 25%;
+            text-align: right;
+            padding-right: 3px;
+        }
+        
+        #waybillList table.table-item td.td3 {
+            width: 50%;
+            text-align: left;
+        }
+        
+        #waybillList table.table-item td .bw {
+            color: #34a8ff;
+            font-weight: bold;
+        }
+        
+        #waybillList table.table-item td .bu {
+            color: #34a8ff;
+            text-decoration: underline;
+        }
+        
+        #waybillList table.table-item tr:first-child td.td2,
+        #waybillList table.table-item tr:first-child td.td3 {
+            padding-top: 8px;
+        }
+        
+        #waybillList table.table-item tr:last-child td.td2,
+        #waybillList table.table-item tr:last-child td.td3 {
+            padding-bottom: 8px;
+        }
+        
+        #btnLeft,
+        #btnRight {
+            width: 50px;
+            height: 50px;
+            line-height: 52px;
+            border-radius: 26px;
+            background: #999;
+            position: fixed;
+            top: 45%;
+            text-align: center;
+            filter: alpha(opacity=40);
+            -moz-opacity: 0.4;
+            opacity: 0.4;
+            transition: all .5s;
+            -moz-transition: all .5s;
+            -webkit-transition: all .5s;
+            -o-transition: all .5s;
+        }
+        
+        #btnLeft i,
+        #btnRight i {
+            font-size: 30px;
+            color: #fff;
+        }
+        
+        #btnLeft {
+            left: 25px;
+            display: none;
+        }
+        
+        #btnRight {
+            right: 25px;
+            display: none;
+        }
+        
+        #btnLeft:hover,
+        #btnRight:hover {
+            filter: alpha(opacity=100);
+            -moz-opacity: 1;
+            opacity: 1;
+            background: #1aa094;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="orderStatus">
+        <dl></dl>
+        <div class="clr"></div>
+    </div>
+    <div id="waybillList">
+        <table class="table-list">
+            <tr class="tr-list"></tr>
+        </table>
+    </div>
+    <a id="btnLeft"><i class="layui-icon">&#xe603;</i></a><a id="btnRight"><i class="layui-icon">&#xe602;</i></a>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use('layer', function() {
+        var layer = layui.layer;
+
+        var $id = getUrlId($.trim(getUrlParam('id')));
+
+        //读取订单状态跟踪接口
+        $.get('/ucenter/tms/driver/app/getOrderTrack.shtml', {
+            orderId: $id
+        }, function(d) {
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+
+            if ($code === 'SUCCESS') {
+                if ($objects) {
+                    var $statusArray = $objects.statusArray,
+                        $trackArray = $objects.trackArray;
+
+                    //订单状态
+                    if ($statusArray && $statusArray.length > 0) {
+                        for (var $i = 0; $i < $statusArray.length; $i++) {
+                            var $status = $statusArray[$i].status,
+                                $statusFlag = $statusArray[$i].flag,
+                                $statusName = setOrderStatusTxt($statusArray[$i].status),
+                                $statusCreateDate = $statusArray[$i].createDate != null ? setTimeFormat($statusArray[$i].createDate, 'yyyy-MM-dd hh:mm') : '0000-00-00 00:00',
+                                $class = !$statusFlag ? ' gray' : '';
+
+                            var $statusHtml = ($i < ($statusArray.length - 1)) ? [
+                                '<dt><div class="status-item' + $class + '">' + $statusName + '</div><div class="status-time' + $class + '">' + $statusCreateDate + '</div></dt>',
+                                '<dd><div class="status-arrow' + $class + '">⇒</div></dd>'
+                            ].join('') : [
+                                '<dt><div class="status-item' + $class + '">' + $statusName + '</div><div class="status-time' + $class + '">' + $statusCreateDate + '</div></dt>'
+                            ].join('');
+                            $('#orderStatus dl').append($statusHtml);
+                        }
+                    }
+
+                    //运单列表
+                    if ($trackArray && $trackArray.length > 0) {
+                        for (var $j = 0; $j < $trackArray.length; $j++) {
+                            var $trackHtml = ['<td class="td-item" valign="top">'];
+
+                            //抬头
+                            var $_title = $trackArray[$j].title;
+                            $trackHtml.push(
+                                '<table class="table-item">',
+                                '<tr><td rowspan="7" class="td1"></td>',
+                                '<td class="td2">运单号码：</td><td class="td3"><span class="bw">', ($_title.jobNo || '--'), '</span></td></tr>',
+                                '<tr><td class="td2">S/O：</td><td class="td3">', ($_title.soNumber || '--'), '</td></tr>',
+                                '<tr><td class="td2">车牌号码：</td><td class="td3">', ($_title.carNo || '--'), '</td></tr>',
+                                '<tr><td class="td2">司机：</td><td class="td3">', ($_title.drvierName || '--'), '</td></tr>',
+                                '<tr><td class="td2">提空地点：</td><td class="td3">', ($_title.emptyAddress || '--'), '</td></tr>',
+                                '<tr><td class="td2">箱号/箱型：</td><td class="td3">', ($_title.arkNo || '--'), ' / ', ($_title.arkType || '--'), '</td></tr>',
+                                '<tr><td class="td2">铅封号：</td><td class="td3">', ($_title.sealNo || '--'), '</td></tr>',
+                                '</table>'
+                            );
+
+                            //还柜
+                            var $_returnContainer = $trackArray[$j].returnContainer;
+                            $trackHtml.push(
+                                '<table class="table-item">',
+                                '<tr><td rowspan="4" class="td1">还柜</td>',
+                                '<td class="td2">时间：</td><td class="td3">', (setTimeFormat($_returnContainer.createDate, 'yyyy-MM-dd hh:mm') || '--'), '</td></tr>',
+                                '<tr><td class="td2">司机：</td><td class="td3">', ($_returnContainer.driverName || '--'), ' / ', ($_returnContainer.carNo || '--'), '</td></tr>',
+                                '<tr><td class="td2">位置：</td><td class="td3">', ($_returnContainer.lot || '--'), ' / ', ($_returnContainer.lat || '--'), '</td></tr>',
+                                '<tr><td class="td2">码头：</td><td class="td3">', ($_returnContainer.stateWhere || '--'), '</td></tr>',
+                                '</table>'
+                            );
+
+                            //报重
+                            var $_weightData = $trackArray[$j].weightData;
+                            $trackHtml.push(
+                                '<table class="table-item">',
+                                '<tr><td rowspan="4" class="td1">报重</td>',
+                                '<td class="td2">时间：</td><td class="td3">', (setTimeFormat($_weightData.createDate, 'yyyy-MM-dd hh:mm') || '--'), '</td></tr>',
+                                '<tr><td class="td2">司机：</td><td class="td3">', ($_weightData.driverName || '--'), ' / ', ($_weightData.carNo || '--'), '</td></tr>',
+                                '<tr><td class="td2">箱号：</td><td class="td3">', ($_weightData.arkNo || '--'), '</td></tr>',
+                                // '<tr><td class="td2">重量：</td><td class="td3">', ($_weightData.emptyWeight || 0) + ($_weightData.goodsWeight || 0), 'KG</td></tr>',
+                                '<tr><td class="td2">重量：</td><td class="td3">', ($_weightData.vgmWeight || 0), 'KG</td></tr>',
+                                '</table>'
+                            );
+
+                            //签离
+                            var $_signOut = $trackArray[$j].signOut;
+                            $trackHtml.push(
+                                '<table class="table-item">',
+                                '<tr><td rowspan="4" class="td1">签离</td>',
+                                '<td class="td2">时间：</td><td class="td3">', (setTimeFormat($_signOut.createDate, 'yyyy-MM-dd hh:mm') || '--'), '</td></tr>',
+                                '<tr><td class="td2">司机：</td><td class="td3">', ($_signOut.driverName || '--'), ' / ', ($_signOut.carNo || '--'), '</td></tr>',
+                                '<tr><td class="td2">箱号/铅封号：</td><td class="td3">', ($_signOut.arkNo || '--'), ' / ', ($_signOut.sealNo || '--'), '</td></tr>',
+                                '<tr><td class="td2">地点：</td><td class="td3">', ($_signOut.stateWhere || '--'), '</td></tr>',
+                                '</table>'
+                            );
+
+                            //签到
+                            var $_signIn = $trackArray[$j].signIn;
+                            $trackHtml.push(
+                                '<table class="table-item">',
+                                '<tr><td rowspan="4" class="td1">签到</td>',
+                                '<td class="td2">时间：</td><td class="td3">', (setTimeFormat($_signIn.createDate, 'yyyy-MM-dd hh:mm') || '--'), '</td></tr>',
+                                '<tr><td class="td2">司机：</td><td class="td3">', ($_signIn.driverName || '--'), ' / ', ($_signIn.carNo || '--'), '</td></tr>',
+                                '<tr><td class="td2">位置：</td><td class="td3">', ($_signIn.lot || '--'), ' / ', ($_signIn.lat || '--'), '</td></tr>',
+                                '<tr><td class="td2">地点：</td><td class="td3">', ($_signIn.stateWhere || '--'), '</td></tr>',
+                                '</table>'
+                            );
+
+                            //报柜
+                            var $_sendConta = $trackArray[$j].sendConta;
+                            $trackHtml.push(
+                                '<table class="table-item">',
+                                '<tr><td rowspan="4" class="td1">报柜</td>',
+                                '<td class="td2">时间：</td><td class="td3">', (setTimeFormat($_sendConta.createDate, 'yyyy-MM-dd hh:mm') || '--'), '</td></tr>',
+                                '<tr><td class="td2">司机：</td><td class="td3">', ($_sendConta.driverName || '--'), ' / ', ($_sendConta.carNo || '--'), '</td></tr>',
+                                '<tr><td class="td2">箱号/铅封号：</td><td class="td3">', ($_sendConta.arkNo || '--'), ' / ', ($_sendConta.sealNo || '--'), '</td></tr>',
+                                '<tr><td class="td2">重量：</td><td class="td3">', ($_sendConta.grossWeight || 0), 'KG / ', ($_sendConta.nuloadLoad || 0), 'KG / ', ($_sendConta.emptyWeight || 0), 'KG</td></tr>',
+                                '</table>'
+                            );
+
+                            //提柜到场
+                            var $_arrived = $trackArray[$j].arrived;
+                            $trackHtml.push(
+                                '<table class="table-item">',
+                                '<tr><td rowspan="4" class="td1">提柜到场</td>',
+                                '<td class="td2">时间：</td><td class="td3">', (setTimeFormat($_arrived.createDate, 'yyyy-MM-dd hh:mm') || '--'), '</td></tr>',
+                                '<tr><td class="td2">司机：</td><td class="td3">', ($_arrived.driverName || '--'), ' / ', ($_arrived.carNo || '--'), '</td></tr>',
+                                '<tr><td class="td2">位置：</td><td class="td3">', ($_arrived.lot || '--'), ' / ', ($_arrived.lat || '--'), '</td></tr>',
+                                '<tr><td class="td2">地点：</td><td class="td3">', ($_arrived.heavyAddress || '--'), '</td></tr>',
+                                '</table>'
+                            );
+
+                            //出车
+                            var $_runOrder = $trackArray[$j].runOrder;
+                            $trackHtml.push(
+                                '<table class="table-item">',
+                                '<tr><td rowspan="4" class="td1">出车</td>',
+                                '<td class="td2">时间：</td><td class="td3">', (setTimeFormat($_runOrder.createDate, 'yyyy-MM-dd hh:mm') || '--'), '</td></tr>',
+                                '<tr><td class="td2">司机：</td><td class="td3">', ($_runOrder.driverName || '--'), ' / ', ($_runOrder.carNo || '--'), '</td></tr>',
+                                '</table>'
+                            );
+
+                            //司机接单
+                            var $_orderTaking = $trackArray[$j].orderTaking;
+                            $trackHtml.push(
+                                '<table class="table-item">',
+                                '<tr><td rowspan="4" class="td1">司机接单</td>',
+                                '<td class="td2">时间：</td><td class="td3">', (setTimeFormat($_orderTaking.createDate, 'yyyy-MM-dd hh:mm') || '--'), '</td></tr>',
+                                '<tr><td class="td2">司机：</td><td class="td3">', ($_orderTaking.driverName || '--'), ' / ', ($_orderTaking.carNo || '--'), '</td></tr>',
+                                '</table>'
+                            );
+
+                            //缴约柜费
+                            var $_arkPay = $trackArray[$j].arkPay;
+                            $trackHtml.push(
+                                '<table class="table-item">',
+                                '<tr><td rowspan="4" class="td1">缴约柜费</td>',
+                                '<td class="td2">时间：</td><td class="td3">', (setTimeFormat($_arkPay.createDate, 'yyyy-MM-dd hh:mm') || '--'), '</td></tr>',
+                                '<tr><td class="td2">S/O：</td><td class="td3">', ($_arkPay.soNumber || '--'), ' / ', ($_arkPay.arkType || '--'), '</td></tr>',
+                                '<tr><td class="td2">费用：</td><td class="td3">', ($_arkPay.arkFee || '--'), '</td></tr>',
+                                '<tr><td class="td2">提柜：</td><td class="td3">', ($_arkPay.emptyAddress || '--'), '</td></tr>',
+                                '</table>'
+                            );
+
+                            //催缴约柜费
+                            var $_ark = $trackArray[$j].ark;
+                            $trackHtml.push(
+                                '<table class="table-item">',
+                                '<tr><td rowspan="4" class="td1">催缴约柜费</td>',
+                                '<td class="td2">时间：</td><td class="td3">', (setTimeFormat($_ark.createDate, 'yyyy-MM-dd hh:mm') || '--'), '</td></tr>',
+                                '<tr><td class="td2">S/O：</td><td class="td3">', ($_ark.soNumber || '--'), ' / ', ($_ark.arkType || '--'), '</td></tr>',
+                                '<tr><td class="td2">费用：</td><td class="td3">', ($_ark.arkFee || '--'), '</td></tr>',
+                                '<tr><td class="td2">提柜：</td><td class="td3">', ($_ark.emptyAddress || '--'), '</td></tr>',
+                                '</table>'
+                            );
+
+                            //EIR打单
+                            var $_eir = $trackArray[$j].eir;
+                            $trackHtml.push(
+                                '<table class="table-item">',
+                                '<tr><td rowspan="4" class="td1">EIR打单</td>',
+                                '<td class="td2">时间：</td><td class="td3">', (setTimeFormat($_eir.createDate, 'yyyy-MM-dd hh:mm') || '--'), '</td></tr>',
+                                '<tr><td class="td2">S/O：</td><td class="td3">', ($_eir.soNumber || '--'), '</td></tr>',
+                                '<tr><td class="td2">提柜：</td><td class="td3">', ($_eir.emptyAddress || '--'), '</td></tr>',
+                                '</table>'
+                            );
+
+                            $trackHtml.push('</td>');
+                            $('#waybillList .table-list tr.tr-list').append($trackHtml.join(''));
+                        }
+                        dataSlider($('#waybillList'));
+                    }
+                }
+            }
+            return false;
+        }, 'JSON');
+    });
+
+    //查看状态照片
+    function flowDetail($obj) {
+        $obj.on('click', function() {
+            var $dataType = $(this).attr('data-type'),
+                $dataId = $(this).attr('data-id'),
+                $css = '',
+                $html = '';
+
+            $css = '<style>' +
+                '.tip-table {color:#333; line-height:20px; font-size:13px; width:100%;}' +
+                '.tip-table tr {border-bottom:#ccc 1px solid;}' +
+                '.tip-table tr:last-child {border:0;}' +
+                '.tip-table tr td:last-child {padding:5px 0 10px;}' +
+                '.tip-table img {max-width:180px; max-height:150px;}' +
+                '</style>';
+
+            switch ($dataType) {
+                case 't1':
+                    $html = '<table class="tip-table">' +
+                        '<tr><td width="15%" align="center"><b>到<br>场</b></td><td>时间：2017-01-01 22:00<br>原因：路途交通堵塞<br>图片：<br><img src="/view/frame/static/images/test.jpg"></td></tr>' +
+                        '<tr><td width="15%" align="center"><b>去<br>途</b></td><td>时间：2017-01-01 22:00<br>原因：路途交通堵塞<br>图片：<br><img src="/view/frame/static/images/test.jpg"></td></tr>' +
+                        '</table>';
+                    break;
+            }
+
+            layer.tips($css + $html, this, {
+                tips: [2, '#eee'],
+                time: 999999,
+                shadeClose: true,
+                shade: 0.2,
+                area: '250px'
+            });
+        });
+    }
+
+    //左右滚动
+    function dataSlider($obj) {
+        var $sliderBoxWidth = $obj.width(),
+            $sliderTable = $obj.find('.table-list'),
+            $sliderTableWidth = $sliderTable.width(),
+            $sliderTableItemLen = $sliderTable.find('td.td-item').length;
+        $items = Math.ceil($sliderTableItemLen / 3),
+            $index = 0,
+            $ml = 0;
+
+        if ($sliderTableItemLen <= 3) {
+            $('#btnLeft').hide();
+            $('#btnRight').hide();
+        } else {
+            $('#btnRight').show();
+        }
+
+        $('#btnRight').on('click', function() {
+            $index++;
+            $ml = ($sliderBoxWidth - 1) * $index;
+            $sliderTable.animate({
+                marginLeft: '-' + $ml + 'px'
+            }, 500);
+            if ($index <= $items - 1) $('#btnLeft').show();
+            if ($index == $items - 1) $(this).hide();
+        });
+
+        $('#btnLeft').on('click', function() {
+            $index--;
+            $ml = ($sliderBoxWidth - 1) * $index;
+            $sliderTable.animate({
+                marginLeft: '-' + $ml + 'px'
+            }, 500);
+            if ($index >= 0) $('#btnRight').show();
+            if ($index == 0) $(this).hide();
+        });
+    }
+</script>
+
+</html>

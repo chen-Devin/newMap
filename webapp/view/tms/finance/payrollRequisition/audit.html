@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>请款单审核 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+      span.required {color:#f00; font-family:'simsun', '宋体'; margin-right:5px; font-size:15px;}
+      .layui-form-label {width:180px;}
+      .layui-form-item .layui-input-inline {padding-top: 10px; width:280px;}
+      a {color:#51a2f7 !important;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">请款单</label>
+          <div class="layui-input-inline">
+            <span id="askPriceNo"></span>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">结算单位</label>
+          <div class="layui-input-inline">
+            <span id="targetName"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">请款人</label>
+          <div class="layui-input-inline">
+            <span id="asker"></span>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">请款日期</label>
+          <div class="layui-input-inline">
+            <span id="askPriceDate"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">请款摘要</label>
+          <div class="layui-input-inline">
+            <span id="described"></span>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">请款单类型</label>
+          <div class="layui-input-inline">
+            <span id="askPriceType"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">结算方式</label>
+          <div class="layui-input-inline">
+            <span id="paymentType"></span>
+          </div>
+        </div>
+        <div class="layui-inline jobsNo">
+          <label class="layui-form-label">请款运单</label>
+          <div class="layui-input-inline">
+            <a href="javascript:void(0);" id="jobsNo"></a>
+          </div>
+        </div>
+        <div class="layui-inline billNo">
+          <label class="layui-form-label">请款账单</label>
+          <div class="layui-input-inline">
+            <a href="javascript:void(0);" id="billNo"></a>
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">账期</label>
+          <div class="layui-input-inline">
+            <span id="billMonth"></span>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">应付总额</label>
+          <div class="layui-input-inline">
+            <span id="totalCost"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">已请款金额（元）</label>
+          <div class="layui-input-inline">
+            <span id="askedCost"></span>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">本期请款金额（元）</label>
+          <div class="layui-input-inline">
+            <span id="askCost"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">审核</label>
+          <div class="layui-input-inline" style="padding-top:0;">
+            <input type="radio" name="auditStatus" value="1" title="通过" checked="checked">
+            <input type="radio" name="auditStatus" value="2" title="不通过">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">备注</label>
+          <div class="layui-input-inline">
+            <textarea id="auditRemarks" name="auditRemarks" maxlength="1000" placeholder="" class="layui-textarea"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item" style="padding-left:340px;">
+        <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit" style="width:150px;">提交</button>
+        <button class="layui-btn layui-btn-primary btn-cancel" type="button" style="width:150px;">返回</button>
+      </div>
+    </form>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    var $id = $.trim(getUrlParam("id")),
+        $askPriceType = $.trim(getUrlParam("askPriceType"));
+
+    if($askPriceType == 1){
+      $(".billNo").hide();
+    }else{
+      $(".jobsNo").hide();
+    }
+
+    //调用接口
+    $.ajax({
+      type:"GET", 
+      url:"/ucenter/general/finance/askPrice/askPriceDatail.shtml?id=" + $id,
+      dataType:"json",      
+      contentType:"application/json",
+      success:function(d){
+        var $code = d.code,
+            $msg = d.msg,
+            $objects = d.objects;
+           
+        if($code === 'SUCCESS'){
+          $("#askPriceNo").html($objects.askPriceNo);
+          $("#targetName").html($objects.targetName);
+          $("#asker").html($objects.asker);
+          $("#askPriceDate").html($objects.askPriceDate != null ? new Date($objects.askPriceDate).format("yyyy-MM-dd") : "");
+          $("#described").html($objects.described);
+          $("#askPriceType").html($objects.askPriceType == 1 ? "运单请款" : "账单请款");
+          $("#paymentType").html($objects.paymentType);
+          $("#jobsNo").html($objects.jobsNo);
+          $("#billNo").html($objects.billNo);
+          $("#billMonth").html($objects.billMonth != null ? new Date($objects.billMonth).format("yyyy-MM-dd") : "");
+          $("#totalCost").html($objects.totalCost);
+          $("#askedCost").html($objects.askedCost);
+          $("#askCost").html($objects.askCost);
+        }
+      }
+    });
+
+    //监听提交
+    form.on('submit(submit)', function(data){
+      //数据源
+      var $saveData = {
+        auditStatus: $.trim(data.field.auditStatus),
+        auditRemarks: $.trim(data.field.auditRemarks)
+      }
+
+      //调用接口
+      $.ajax({
+        type:"PUT", 
+        url:"/ucenter/general/finance/askPrice/" + $id + ".shtml", 
+        dataType:"json",      
+        contentType:"application/json",               
+        data:JSON.stringify($saveData),
+        success:function(d){
+          var $code = d.code,
+              $msg = d.msg,
+              $objects = d.objects;
+             
+          if($code === 'SUCCESS'){
+            parent.layer.alert("审核成功", {
+              closeBtn: 0,
+              yes: function(index){
+                parent.layer.close(index);
+                $(window.parent['f1'].document).find('.btn-search').click();
+                tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+              }
+            });
+          }else{
+            parent.layer.alert('审核失败');
+            return false;
+          }
+        }
+      });
+      return false;
+    });
+
+    //关联运单
+    $("#jobsNo").click(function(){
+      parent.layer.open({
+        type: 2,
+        title: '关联运单',
+        shadeClose: true,
+        shade: 0.8,
+        area: ['90%', '80%'],
+        content: 'relevanceWaybill.html?jobsNo=' + $("#jobsNo").text()
+      });
+    });
+
+    //关联账单
+    $("#billNo").click(function(){
+      parent.layer.open({
+        type: 2,
+        title: '关联账单',
+        shadeClose: true,
+        shade: 0.8,
+        area: ['90%', '80%'],
+        content: 'relevanceBill.html?billNo=' + $("#billNo").text()
+      });
+    });
+
+    //返回
+    $(".btn-cancel").on("click",function(){
+      tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+    });
+  });
+  </script>
+</html>

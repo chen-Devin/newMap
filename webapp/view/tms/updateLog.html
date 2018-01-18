@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>更新日志 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+        body {
+            margin: 20px;
+        }
+        
+        h3.layui-timeline-title {
+            font-size: 18px;
+            line-height: 20px;
+        }
+        
+        h3.layui-timeline-title span.time {
+            font-size: 13px;
+            color: #666;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <ul class="layui-timeline">
+        <!-- TODO: 使用js动态生成，方便接口化及结构管理 -->
+        <li class="layui-timeline-item">
+            <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+            <div class="layui-timeline-content layui-text">
+                <h3 class="layui-timeline-title">
+                    v1.0.5
+                    <span class="time">2018.01.14</span>
+                </h3>
+                <p>
+                    1. App上线<br>
+                    2. 拖车公司用户录入集港订单，修改集港运单时，增加提柜地点的录入<br>
+                    3. 东部港区的名称改为盐田港，西部港区改为蛇口港（含蛇口，赤湾，妈湾），增加大铲湾港<br>
+                </p>
+            </div>
+        </li>
+        <li class="layui-timeline-item">
+            <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+            <div class="layui-timeline-content layui-text">
+                <h3 class="layui-timeline-title">
+                    v1.0.4
+                    <span class="time">2018.01.08</span>
+                </h3>
+                <p>
+                    1. 车辆增加证照附件上传管理功能<br>
+                    2. 拖车增加结算对象管理功能，外协车辆的营运证号改为非必填<br>
+                    3. 派车/回单时，允许选择应付费用的结算对象<br>
+                    4. 增加调度报柜功能，允许上传报柜的照片<br>
+                    5. 城配运单与回单中增加客户单号的录入<br>
+                    6. 客户未上平台时，客户账单自动确认<br>
+                    7. 司机未注册App账号时，派车后自动接单/作业并允许直接回单<br>
+                    8. 财务管理功能与流程优化<br>
+                </p>
+            </div>
+        </li>
+        <li class="layui-timeline-item">
+            <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+            <div class="layui-timeline-content layui-text">
+                <h3 class="layui-timeline-title">
+                    v1.0.3
+                    <span class="time">2017.12.26</span>
+                </h3>
+                <p>
+                    1. 保险管理中险种下拉框增加车船税，取消公司折扣的录入项，同一车辆的保险过期后一直警示提醒，直至新的保险生效(仍需要优化)<br>
+                    2. 运单列表增加状态查询条件，客户查询条件改为从下拉框选择，默认按照作业日期降序排序，提供选择其他信息排序的功能<br>
+                    3. 运单提交时允许司机/手机号码为空<br>
+                    4. 做柜流水统计中允许查询所有状态的单证，并增加状态查询条件<br>
+                    5. 增加客户下单统计，按年/按月单量分布以及按月各个装卸地点的单量分布<br>
+                </p>
+            </div>
+        </li>
+        <li class="layui-timeline-item">
+            <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+            <div class="layui-timeline-content layui-text">
+                <h3 class="layui-timeline-title">
+                    v1.0.2
+                    <span class="time">2017.12.21</span>
+                </h3>
+                <p>
+                    1. 新增客户／供应商，有一个草稿状态，可以编辑全部资料，启用后，就不能变更统一社会代码/身份证了<br>
+                    2. 员工管理，设置角色和单独设置权限的，分开了<br>
+                    3. 银行收支，增加了编辑、查看、审核、作废功能<br>
+                </p>
+            </div>
+        </li>
+        <!-- 最后一个不要底部padding -->
+        <li class="layui-timeline-item" style="padding-bottom: 0;">
+            <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+            <div class="layui-timeline-content layui-text">
+                <h3 class="layui-timeline-title">
+                    v1.0.1
+                    <span class="time">2017.12.18</span>
+                </h3>
+                <p>
+                    1. 客户管理，装卸地址新增后，没有刷新页面取最新数据，已解决<br>
+                    3. 城配运单，可以搜索了<br>
+                    4. 城配运单中，保存线路时，应收运费也加进去，下次使用后，就能带出运费、装卸地址等信息<br>
+                    5. 回单允许修改应收、应付的运费<br>
+                    6. 银行收支中，增加了会计科目，增加审核流程，这个调整有点大，还在开发中<br>
+                    7. 保险中，保费是0-999999.99，理赔金额是0-9999999.99<br>
+                    8. 修复其他bug
+                </p>
+            </div>
+        </li>
+
+        <!-- START：单个时间轴 -->
+        <!-- <li class="layui-timeline-item">
+            <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+            <div class="layui-timeline-content layui-text">
+                <h3 class="layui-timeline-title">
+                    version
+                    <span class="time">buildTime</span>
+                </h3>
+                <p>
+                    1更新内容一<br>
+                    2更新内容二<br>
+                    3更新内容三
+                </p>
+            </div>
+        </li> -->
+        <!-- END：单个时间轴 -->
+
+        <!-- 补充一个空的 .layui-timeline-item 才能出现时间轴竖线 -->
+        <li class="layui-timeline-item" style="display: none;"></li>
+    </ul>
+</body>
+
+</html>

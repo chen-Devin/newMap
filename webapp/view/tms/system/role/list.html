@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>角色管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+</head>
+
+<body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane">
+            <!-- <button class="layui-btn layui-btn-danger" onclick="window.location.href='list.html'">全部</button> -->
+            <div class="layui-input-inline">
+                <label class="layui-form-label">角色名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="roleName" placeholder="角色名称" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">所属系统</label>
+                <div class="layui-input-inline">
+                    <select name="platformId">
+            <option value="" selected="selected">全部</option>
+            </select>
+                </div>
+            </div>
+            <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+            <button class="layui-btn layui-btn-primary" type="reset" style="margin:0;">重置</button>
+        </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+        <div class="layui-btn-group fl">
+            <button class="layui-btn layui-btn-normal" data-type="addData">新增</button>
+            <button class="layui-btn layui-btn-normal" data-type="editData">编辑</button>
+            <button class="layui-btn layui-btn-normal" data-type="delData">删除</button>
+            <button class="layui-btn layui-btn-normal" data-type="setMenuPermi">设置菜单权限</button>
+            <button class="layui-btn layui-btn-normal" data-type="setMoneyPermi">设置费用权限</button>
+            <button class="layui-btn layui-btn-normal" data-type="setRoleUser">角色成员</button>
+        </div>
+        <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+    <script type="text/html" id="toolBar">
+        <a lay-event="edit" style="color:#2F4056;" title="编辑"><i class="layui-icon" style="font-size:19px;">&#xe642;</i></a>&nbsp;
+        <a lay-event="del" style="color:#2F4056;" title="删除"><i class="layui-icon" style="font-size:19px;">&#xe640;</i></a>&nbsp;
+        <a lay-event="menuPermi" style="color:#2F4056;" title="设置菜单权限"><i class="layui-icon" style="font-size:19px;">&#xe614;</i></a>&nbsp;
+        <a lay-event="moneyPermi" style="color:#2F4056;" title="设置费用权限"><i class="layui-icon" style="font-size:19px;">&#xe631;</i></a>&nbsp;
+        <a lay-event="roleUser" style="color:#2F4056;" title="设置角色成员"><i class="layui-icon" style="font-size:16px;">&#xe613;</i></a>
+    </script>
+</body>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'table', 'tms_tab'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            tmsTab = layui.tms_tab,
+            $ = layui.jquery;
+
+        setTableData();
+
+        //子系统接口
+        $.get('/ucenter/code/common/system/search.shtml', function(d) {
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+
+            if ($code != 'SUCCESS') return false;
+
+            if ($objects.length > 0) {
+                for (var $i = 0; $i < $objects.length; $i++) {
+                    $('select[name="platformId"]').append('<option value="' + $objects[$i].id + '">' + $objects[$i].name + '</option>');
+                }
+                form.render('select');
+            }
+        }, 'json');
+
+        //监听提交
+        form.on('submit(search)', function(data) {
+            var $roleName = $.trim(data.field.roleName),
+                $platformId = $.trim(data.field.platformId);
+            setTableData($roleName, $platformId);
+            return false;
+        });
+
+        //方法级渲染
+        function setTableData($roleName, $platformId) {
+            typeof $roleName != 'undefined' ? $roleName = $roleName : $roleName = '';
+            typeof $platformId != 'undefined' ? $platformId = $platformId : $platformId = '';
+            var $pageSize = 15;
+
+            table.render({
+                elem: '#tableList',
+                url: '/ucenter/centre/permi/role/page.shtml',
+                where: {
+                    name: $roleName,
+                    platformId: $platformId
+                },
+                response: {
+                    statusCode: 'SUCCESS',
+                    countName: 'objects.total', //数据总数的字段名称，默认：count
+                    dataName: 'objects.list'
+                },
+                request: {
+                    pageName: 'pageNum', //页码的参数名称，默认：page
+                    limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                },
+                cols: [
+                    [{
+                            checkbox: true,
+                            fixed: true
+                        }, {
+                            field: 'id',
+                            title: '序号',
+                            width: 90,
+                            sort: true
+                        }, {
+                            field: 'name',
+                            title: '角色名称',
+                            width: 100
+                        }, {
+                            field: 'platformName',
+                            title: '所属系统',
+                            width: 150
+                        }, {
+                            field: 'remarks',
+                            title: '描述',
+                            width: 250
+                        },
+                        //{field:'roleUsers', title: '角色成员', width:300},
+                        {
+                            align: 'center',
+                            title: '操作',
+                            toolbar: '#toolBar',
+                            width: 170,
+                            fixed: 'right'
+                        }
+                    ]
+                ],
+                id: 'dataReload',
+                page: true,
+                limits: [15, 30, 50, 100],
+                limit: $pageSize,
+                height: 'full-130',
+                even: true,
+                done: function(res, curr, count) {}
+            });
+        }
+
+        //监听工具条
+        table.on('tool(tbar)', function(obj) {
+            var data = obj.data;
+            if (obj.event === 'del') {
+                parent.layer.confirm('删除角色后，属于此角色的用户，将释放属于这些角色所拥有的权限，您确定要删除角色吗？', function(index) {
+                    var $ids = [];
+                    $ids.push(data.id);
+                    roleStatus($ids, 2);
+                    parent.layer.close(index);
+                });
+            } else if (obj.event === 'edit') {
+                parent.layer.open({
+                    type: 2,
+                    title: '编辑角色（' + data.name + '）',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['650px', '400px'],
+                    content: 'modify.html?do=edit&id=' + data.id
+                });
+            } else if (obj.event === 'menuPermi') {
+                parent.layer.open({
+                    type: 2,
+                    title: '设置角色（' + data.name + '）菜单权限',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['800px', '520px'],
+                    content: 'menuPermi.html?id=' + data.id
+                });
+            } else if (obj.event === 'moneyPermi') {
+                parent.layer.open({
+                    type: 2,
+                    title: '设置角色（' + data.name + '）费用权限',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['70%', '90%'],
+                    content: 'moneyPermi.html?id=' + data.id
+                });
+            } else if (obj.event === 'roleUser') {
+                parent.layer.open({
+                    type: 2,
+                    title: '设置角色（' + data.name + '）的角色成员',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['700px', '500px'],
+                    content: 'roleUser.html?id=' + data.id
+                });
+            }
+        });
+
+        var active = {
+            //新增
+            addData: function() {
+                //tmsTab.add($(this), '新增角色', 'modify.html?do=add');
+                parent.layer.open({
+                    type: 2,
+                    title: '新增角色',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['650px', '400px'],
+                    content: 'modify.html?do=add'
+                });
+            },
+            //编辑
+            editData: function() { //获取选中数据
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('只能选择一条数据！');
+                } else {
+                    //tmsTab.add($(this), '编辑角色（' + data[0].name + '）', 'edit.html?type=edit&id=' + data[0].id);
+                    parent.layer.open({
+                        type: 2,
+                        title: '编辑角色（' + data[0].name + '）',
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['650px', '400px'],
+                        content: 'modify.html?do=edit&id=' + data[0].id
+                    });
+                }
+            },
+            //删除
+            delData: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('请选择需删除的数据！');
+                } else {
+                    parent.layer.confirm('删除角色后，属于此角色的用户，将释放属于这些角色所拥有的权限，您确定要删除角色吗？', function(index) {
+                        var $ids = [];
+                        for (var $i = 0; $i < data.length; $i++) {
+                            $ids.push(data[$i].id);
+                        }
+                        roleStatus($ids, 2);
+                        parent.layer.close(index);
+                    });
+                }
+            },
+            //设置菜单权限
+            setMenuPermi: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('只能选择一条数据！');
+                } else {
+                    parent.layer.open({
+                        type: 2,
+                        title: '设置角色（' + data[0].name + '）菜单权限',
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['800px', '520px'],
+                        content: 'menuPermi.html?id=' + data[0].id
+                    });
+                }
+            },
+            //设置费用权限
+            setMoneyPermi: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('只能选择一条数据！');
+                } else {
+                    parent.layer.open({
+                        type: 2,
+                        title: '设置角色（' + data[0].name + '）费用权限',
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['70%', '90%'],
+                        content: 'moneyPermi.html?id=' + data[0].id
+                    });
+                }
+            },
+            //设置角色成员
+            setRoleUser: function() {
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('只能选择一条数据！');
+                } else {
+                    parent.layer.open({
+                        type: 2,
+                        title: '设置角色（' + data[0].name + '）的角色成员',
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['700px', '500px'],
+                        content: 'roleUser.html?id=' + data[0].id
+                    });
+                }
+            }
+        };
+
+        $('.btns-bar .layui-btn').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //改变状态，1正常，2删除
+        function roleStatus($ids, $status) {
+            var $saveData = {
+                ids: $ids,
+                status: $status
+            }
+
+            $.ajax({
+                type: 'PUT',
+                url: '/ucenter/centre/permi/role/status.shtml',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify($saveData),
+                success: function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code === 'SUCCESS') {
+                        window.location.reload();
+                    } else {
+                        parent.layer.alert('操作失败！');
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+</html>

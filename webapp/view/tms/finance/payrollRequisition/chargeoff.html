@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>请款单核销 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+    <style>
+      body {width:1000px}
+       .layui-input-block span{ display:inline-block; height:38px; line-height: 38px}
+       .pointer{color:#51a2f7; cursor:pointer ; width:270px; overflow: hidden;white-space:nowrap;text-overflow:ellipsis;}
+       .no-drop{cursor:no-drop;}
+      /* span.required {color:#f00; font-family:'simsun', '宋体'; margin-right:5px; font-size:15px;}
+      .layui-form-label {width:180px;}
+      .layui-form-item .layui-input-inline {padding-top: 10px; width:280px;}
+      a {color:#51a2f7 !important;} */
+    </style>
+  </head>
+  <body>
+      <form class="layui-form" autocomplete="off" style="min-width:800px;">
+          <div class="layui-fluid">
+              <div class="layui-row">
+                  <div class="layui-col-sm6">
+                      <div class="layui-form-item">
+                          <label class="layui-form-label">请款单</label>
+                          <div class="layui-input-block">
+                              <span id="askPriceNo"></span>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="layui-col-sm6">
+                          <div class="layui-form-item">
+                          <label class="layui-form-label">结算单位</label>
+                          <div class="layui-input-block">
+                              <span id="targetName"></span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="layui-row">
+                  <div class="layui-col-sm6">
+                      <div class="layui-form-item">
+                          <label class="layui-form-label">请款人</label>
+                          <div class="layui-input-block">
+                              <span id="asker"></span>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="layui-col-sm6">
+                          <div class="layui-form-item">
+                              <label class="layui-form-label">请款日期</label>
+                          <div class="layui-input-block">
+                              <span id="askPriceDate"></span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="layui-row">
+                  <div class="layui-col-sm6">
+                      <div class="layui-form-item">
+                          <label class="layui-form-label">请款单类型</label>
+                          <div class="layui-input-block">
+                              <span id="askPriceType"></span>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="layui-col-sm6">
+                      <div class="layui-form-item jobsNo">
+                          <label class="layui-form-label">请款运单</label>
+                          <div class="layui-input-block">
+                              <a href="javascript:void(0);" id="jobsNo"></a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="layui-row">
+                  <div class="layui-col-sm6">
+                      <div class="layui-form-item">
+                          <label class="layui-form-label">本期请款金额(元)</label>
+                          <div class="layui-input-block">
+                              <span id="askCost"></span>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="layui-col-sm6">
+                          <div class="layui-form-item jobsNo">
+                              <label class="layui-form-label">本期已付金额(元)</label>
+                          <div class="layui-input-block">
+                              <span id="handledCost"></span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="layui-row">
+                  <div class="layui-col-sm6">
+                      <div class="layui-form-item layui-form-item--require">
+                          <label class="layui-form-label">操作类型</label>
+                          <div class="layui-input-block">
+                              <div class="layui-col-sm8">
+                                <select name="operationType" lay-filter="operationType">
+                                    <option value="0">核销同时生成收支记录</option>
+                                    <option value="1">关联收支记录进行核销</option>
+                                  </select>
+                              </div>
+                              <div class="layui-col-sm4 ">
+                                <div class="margin-left10 collectionRecord" style="height:38px;line-height:38px">选择银行收支</div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="layui-col-sm6">
+                          <div class="layui-form-item layui-form-item--require">
+                              <label class="layui-form-label">付款账户</label>
+                          <div class="layui-input-block">
+                              <select name="channel" lay-verify="channel">
+                                <option value="">请选择</option>
+                              </select>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="layui-row">
+                  <div class="layui-col-sm6">
+                      <div class="layui-form-item layui-form-item--require">
+                          <label class="layui-form-label">付款金额(元)</label>
+                          <div class="layui-input-block">
+                              <input type="text" name="payMentCost" id="payMentCost" lay-verify="payMentCost" placeholder="" class="layui-input">
+                          </div>
+                      </div>
+                  </div>
+                  <div class="layui-col-sm6">
+                          <div class="layui-form-item layui-form-item--require">
+                              <label class="layui-form-label">付款日期</label>
+                          <div class="layui-input-block">
+                              <input type="text" name="payMentTime" id="payMentTime" lay-verify="payMentTime" class="layui-input">
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="layui-row">
+                  <div class="layui-col-sm6">
+                      <div class="layui-form-item ">
+                          <label class="layui-form-label">摘要</label>
+                          <div class="layui-input-block">
+                              <textarea name="described" id="described" style="min-height:50px;" class="layui-textarea"></textarea>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="layui-col-sm6">
+                      <div class="layui-form-item ">
+                        <label class="layui-form-label">备注</label>
+                        <div class="layui-input-block">
+                            <textarea name="remark" id="remark" style="min-height:50px;" class="layui-textarea"></textarea>
+                        </div>
+                      </div>
+                  </div>
+              </div> 
+              <div class="layui-row">
+                  <div class="layui-col-md12">
+                      <div class="layui-form-item"  style="text-align:center;margin-left:-80px">
+                          <div class="layui-input-block button-bar">
+                              <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit" style="width:150px;">核销</button>
+                              <button class="layui-btn layui-btn-primary btn-cancel" type="button" style="width:150px;">返回</button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <br><hr>
+            <div>
+                <span>注：1.当直接给某供应商打款时，可以直接进行核销，且选择操作类型为核销同时生成收支记录时，核销后，会同时生成一条支出记录</span><br>
+                <span>2.假如先登记银行收支，然后进行核销，此时选择操作类型是关联收支记录进行核销，核销后，不会再生成收入记录。</span><br>
+                <span>3.操作类型是：关联收支记录进行核销时，请点击“选择付款记录”进行选择具体那条付款记录</span>
+            </div>
+      </form>
+
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    laydate.render({
+      elem: '#payMentTime' //付款日期
+    });
+
+    var $collectionRecordId = sessionStorage.getItem("collectionRecordId");
+    console.log($collectionRecordId);
+    //自定义验证规则
+    form.verify({
+      channel: function(value){
+        if(value.length == 0){
+          return '请选择付款账户';
+        }
+      },
+      payMentCost: function(value){
+        if(value.length == 0){
+          return '请输入付款金额';
+        }else if(!$jsReg.plus.test(value)){
+          return '付款金额只能输入正数(小数点后两位)';
+        }
+      },
+      payMentTime: function(value){
+        if(value.length == 0){
+          return '请选择付款日期';
+        }
+      }
+    });
+
+    function operationTypeClick(){
+        $('select[name="channel"]').prop('disabled',true);
+        $('input[name="payMentCost"]').prop('disabled',true);
+        $('input[name="payMentTime"]').prop('disabled',true);
+        $('textarea[name="described"]').prop('disabled',true);
+        $('.collectionRecord').addClass('pointer');
+        $('.collectionRecord').removeClass('no-drop');
+        $('.collectionRecord').off('click');
+        collectionRecordClick();
+        form.render();
+    }
+
+    form.on('select(operationType)', function(data) {
+      if(data.value == 0){
+        $('select[name="channel"]').prop('disabled',false);
+        $('input[name="payMentCost"]').prop('disabled',false);
+        $('input[name="payMentTime"]').prop('disabled',false);
+        $('textarea[name="described"]').prop('disabled',false);
+        $('.collectionRecord').removeClass('pointer');
+        $('.collectionRecord').addClass('no-drop');
+        $('.collectionRecord').off('click');
+        form.render();
+      }else{
+        operationTypeClick();
+      }
+    })
+
+    //焦点事件
+    $('#payMentCost').focus(function(){
+      // layer.tips('200位字符', '#payMentCost', {
+      //   tips: [3, '#78BA32']
+      // });
+    });
+    $('#payMentCost').blur(function(){
+      if($(this).val().length == 0){
+        layer.tips('请输入付款金额', '#payMentCost', {
+          tips: [3, '#d84747']
+        });
+      }else if($(this).val().length > 0){
+        if(!$jsReg.plus.test($(this).val())){
+          layer.tips('付款金额只能输入正数(小数点后两位)', '#payMentCost', {
+            tips: [3, '#d84747']
+          });
+        }
+      }
+    });
+
+    function collectionRecordClick(){
+        $('.collectionRecord').click(function(){
+            parent.layer.open({
+                type: 2,
+                title: '查找关联的收支记录',
+                shadeClose: true,
+                shade: 0.8,
+                area: ['90%', '90%'],
+                content: 'collectionRecord.html',
+                end: function () {
+                    location.reload();
+                }
+            });
+        })
+    }
+
+    var $id = $.trim(getUrlParam("id")),
+        $askPriceType = $.trim(getUrlParam("askPriceType"));
+
+    // if($askPriceType == 1){
+    //   $(".billNo").hide();
+    // }else{
+    //   $(".jobsNo").hide();
+    // }
+
+    //调用接口
+    $.ajax({
+      type:"GET", 
+      url:"/ucenter/general/finance/askPrice/askPriceDatail.shtml?id=" + $id,
+      dataType:"json",      
+      contentType:"application/json",
+      success:function(d){
+        var $code = d.code,
+            $msg = d.msg,
+            $objects = d.objects;
+           
+        if($code === 'SUCCESS'){
+          $("#askPriceNo").html($objects.askPriceNo);
+          $("#targetName").html($objects.targetName);
+          $("#asker").html($objects.asker);
+          $("#askPriceDate").html($objects.askPriceDate != null ? new Date($objects.askPriceDate).format("yyyy-MM-dd") : "");
+          $("#described").html($objects.described);
+          $("#remark").html($objects.remark);
+          $("#askPriceType").html($objects.askPriceType == 1 ? "运单请款" : "账单请款");
+          $("#paymentType").html($objects.paymentType);
+          $("#jobsNo").html($objects.jobsNo);
+          $("#billNo").html($objects.billNo);
+          $("#billMonth").html($objects.billMonth != null ? new Date($objects.billMonth).format("yyyy-MM-dd") : "");
+          $("#totalCost").html($objects.totalCost);
+          $("#askCost").html($objects.askCost);
+          $("#handledCost").html($objects.handledCost);
+        }
+      }
+    });
+
+    if($collectionRecordId != ''){
+        $('select[name="operationType"]').val(1);
+        operationTypeClick();
+        $.ajax({
+        type:"GET", 
+            //   url:"/ucenter/general/finance/settlementChannel/"+ $collectionRecordId +".shtml",
+            url:"/ucenter/general/finance/bankFlow/"+ $collectionRecordId +".shtml",
+            dataType:"json",      
+            contentType:"application/json",
+            success:function(d){
+                var $code = d.code,
+                    $msg = d.msg,
+                    $objects = d.objects;
+                    console.log($objects);
+                
+                if($code === 'SUCCESS'){
+                    var settlementChannelId = $objects.settlementChannelId;
+                      //加载收款账户下拉框数据
+                    $.get('/ucenter/general/finance/settlementChannel/searchBankNameAccountNo.shtml', function(d){
+                        var $code = d.code,
+                            $msg = d.msg,
+                            $objects = d.objects;
+
+                        if($code != 'SUCCESS') return false;
+                        
+                        if($objects.length > 0){
+                        for(var $i = 0; $i < $objects.length; $i++){
+                            if($objects[$i].accountName != null && $objects[$i].accountNo != null && $objects[$i].status == 1){
+                            $('select[name="channel"]').append('<option value="'+ $objects[$i].id +'">'+ $objects[$i].accountNo + '(' + $objects[$i].accountName +')</option>');
+                            }
+                        }
+                        $('select[name="channel"]').val(settlementChannelId);
+                        form.render('select');
+                        }
+                    }, 'json');
+                    
+                    // $('select[name="channel"]').val($objects.settlementChannelId);
+                    $('input[name="payMentCost"]').val($objects.handle);
+                    $('input[name="payMentTime"]').val($objects.tradeDate != null ? new Date($objects.tradeDate).format('yyyy-MM-dd') : '');
+                    $('textarea[name="described"]').val($objects.described);
+                    $('textarea[name="remark"]').val($objects.remark);
+                    operationTypeClick();
+                    form.render();
+                }
+            }
+        });
+    }else{
+        $('.collectionRecord').addClass('no-drop');
+         //加载收款账户下拉框数据
+        $.get('/ucenter/general/finance/settlementChannel/searchBankNameAccountNo.shtml', function(d){
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+
+            if($code != 'SUCCESS') return false;
+            
+            if($objects.length > 0){
+            for(var $i = 0; $i < $objects.length; $i++){
+                if($objects[$i].accountName != null && $objects[$i].accountNo != null && $objects[$i].status == 1){
+                $('select[name="channel"]').append('<option value="'+ $objects[$i].id +'">'+ $objects[$i].accountNo + '(' + $objects[$i].accountName +')</option>');
+                }
+            }
+            form.render('select');
+            }
+        }, 'json');
+    }
+
+    //监听提交
+    form.on('submit(submit)', function(data){
+      //数据源
+      var $saveData = {
+        askNo: $.trim($("#askPriceNo").text()),
+        channel: $.trim(data.field.channel),
+        payMentCost: $.trim(data.field.payMentCost),
+        paiedCost: $.trim($("#handledCost").text()),
+        described: $.trim(data.field.described),
+        remark: $.trim(data.field.remark),
+        payMentTime: $.trim(data.field.payMentTime),
+        bankFlowId: $collectionRecordId
+      }
+
+      //调用接口
+      $.ajax({
+        type:"POST", 
+        url:"/ucenter/general/finance/confirm/askConfirm.shtml", 
+        dataType:"json",      
+        contentType:"application/json",               
+        data:JSON.stringify($saveData),
+        success:function(d){
+          var $code = d.code,
+              $msg = d.msg,
+              $objects = d.objects;
+             
+          if($code === 'SUCCESS'){
+            parent.layer.alert("核销成功", {
+              closeBtn: 0,
+              yes: function(index){
+                parent.layer.close(index);
+                $(window.parent['f1'].document).find('.btn-search').click();
+                tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+              }
+            });
+          }else{
+            parent.layer.alert('核销失败');
+            return false;
+          }
+        }
+      });
+      return false;
+    });
+
+    //关联运单
+    $("#jobsNo").click(function(){
+      parent.layer.open({
+        type: 2,
+        title: '关联运单',
+        shadeClose: true,
+        shade: 0.8,
+        area: ['90%', '80%'],
+        content: 'relevanceWaybill.html?jobsNo=' + $("#jobsNo").text()
+      });
+    });
+
+    //关联账单
+    $("#billNo").click(function(){
+      parent.layer.open({
+        type: 2,
+        title: '关联账单',
+        shadeClose: true,
+        shade: 0.8,
+        area: ['90%', '80%'],
+        content: 'relevanceBill.html?billNo=' + $("#billNo").text()
+      });
+    });
+
+    //返回
+    $(".btn-cancel").on("click",function(){
+      tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+    });
+  });
+  </script>
+</html>

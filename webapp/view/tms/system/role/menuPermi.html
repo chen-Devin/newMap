@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>角色管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+        body {
+            margin: 20px;
+        }
+        
+        .layui-table {
+            margin: 3px 0 15px;
+        }
+        
+        .layui-table td {
+            padding: 0;
+        }
+        
+        .layui-table th span {
+            float: right;
+        }
+        
+        .layui-table th span input[type=checkbox] {
+            vertical-align: -2px;
+        }
+        
+        #menuPermi,
+        #btnsPermi {
+            padding: 12px 15px;
+            height: 300px;
+            overflow: auto;
+            background: #fff;
+        }
+        
+        #btnsPermi dl {
+            margin: 0;
+        }
+        
+        #btnsPermi dl dt {
+            border-bottom: #ddd 1px dotted;
+            padding-bottom: 5px;
+        }
+        
+        #btnsPermi dl dd {
+            margin: 5px 0;
+            padding: 5px;
+            border: #ddd 1px solid;
+        }
+        
+        #btnsPermi dl dd h4 {
+            padding: 0 3px;
+            font-size: 12px;
+            color: #055bae;
+        }
+        
+        #btnsPermi .layui-form-checkbox {
+            margin: 5px 3px;
+        }
+        
+        .warm-prompt {
+            line-height: 16px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="warm-prompt">菜单权限：复选框勾选，勾选的一级菜单，单击菜单名称可查看功能权限，双击菜单名称展开。</div>
+    <table class="layui-table" id="menuBox">
+        <colgroup>
+            <col width="50%">
+            <col width="50%">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>菜单权限</th>
+                <th>按钮权限</th>
+                <!-- <th>按钮权限<span><input type="checkbox" name="checkAll"> 全选</span></th> -->
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div id="menuPermi">
+                        <ul id="menus"></ul>
+                    </div>
+                </td>
+                <td>
+                    <div id="btnsPermi">
+                        <form class="layui-form" method="post" autocomplete="off">
+                            <div id="subBtns"></div>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="layui-form-item" style="text-align:center;">
+        <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit">保存</button>
+        <button class="layui-btn layui-btn-primary" id="vclose">关闭</button>
+    </div>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<script charset="utf-8" src="/view/frame/static/js/menuPermi.js?v=1.0"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use('form', function() {
+        var $id = getUrlId($.trim(getUrlParam('id')));
+        var form = layui.form;
+        var $url = '/ucenter/centre/permi/role/' + $id + '/authorization.shtml';
+
+        $('#menuBox').treeMenu($url);
+
+        //提交表单
+        form.on('submit(submit)', function(data) {
+            var $selMenuObjs = $('#menus input[name="mids"]:checked'),
+                $notSelMenuObjs = $('#menus input[name="mids"]').not(':checked'),
+                $selBtnObjs = $('#subBtns input[name="btnId"]:checked'),
+                $notSelBtnObjs = $('#subBtns input[name="btnId"]').not(':checked'),
+                $addFunctionIds = [],
+                $removeFunctionIds = [];
+
+            //菜单权限================
+            //选中
+            $selMenuObjs.each(function() {
+                $addFunctionIds.push(parseInt($(this).val().split('//')[0]));
+            });
+            //未选中
+            $notSelMenuObjs.each(function() {
+                $removeFunctionIds.push(parseInt($(this).val().split('//')[0]));
+            });
+
+            //按钮权限================
+            //选中
+            $selBtnObjs.each(function() {
+                $addFunctionIds.push(parseInt($(this).val()));
+            });
+            //未选中
+            $notSelBtnObjs.each(function() {
+                $removeFunctionIds.push(parseInt($(this).val()));
+            });
+
+            //数据源
+            var $saveData = {
+                addFunctionIds: $addFunctionIds,
+                removeFunctionIds: $removeFunctionIds
+            }
+
+            //保存数据，调用接口
+            $.ajax({
+                type: 'PUT',
+                url: '/ucenter/centre/permi/role/' + $id + '/authorization.shtml',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify($saveData),
+                success: function(d) {
+                    var $code = d.code,
+                        $msg = d.msg,
+                        $objects = d.objects;
+
+                    if ($code === 'SUCCESS') {
+                        setLayerAlert(parent.layer, '保存成功', {
+                            yes: function() {
+                                parent.layer.closeAll();
+
+                                //获取当前框架ID
+                                var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+                                parent['f' + $layId].location.reload();
+                            }
+                        });
+                    } else {
+                        setLayerAlert(parent.layer, '保存失败');
+                    }
+                }
+            });
+
+            return false;
+        });
+    });
+</script>
+
+</html>

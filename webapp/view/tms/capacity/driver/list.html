@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>司机管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+</head>
+<style>
+    .layui-form-item{
+        margin:0;
+    }
+</style>
+<body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+            <form class="layui-form layui-form-pane" autocomplete="off">
+                <div class="layui-row layui-col-space5">
+                    <div class="layui-col-sm1" style="width:5%;">
+                        <div class="layui-form-item">
+                            <button class="layui-btn layui-btn-danger" onclick="window.location.href='list.html'">全部</button>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm1" style="width:20%;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">司机姓名</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="name" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm1" style="width:20%;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">手机号码</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="mobile" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm1" style="width:20%;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">身份证号</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="idNo" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm1" style="width:20%;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">驾驶车辆</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="carNo" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm1" style="width:15%;">
+                        <div class="layui-form-item">
+                            <button class="layui-btn layui-btn-danger btn-search" lay-submit="" lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                            <button class="layui-btn layui-btn-primary" type="reset" style="margin:0;">重置</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+        <div class="layui-btn-group fl">
+            <button class="layui-btn layui-btn-normal" data-type="addData" data-tit="新增" data-url="modify.html?do=add">新增</button>
+            <button class="layui-btn layui-btn-normal" data-type="editData">编辑</button>
+            <button class="layui-btn layui-btn-normal" data-type="detailData">查看</button>
+            <button class="layui-btn layui-btn-normal" data-type="statusCancel" id="btn-disable">停用</button>
+            <button class="layui-btn layui-btn-normal" data-type="statusStart" id="btn-enabled">启用</button>
+            <button class="layui-btn layui-btn-normal" data-type="delData">删除</button>
+            <!--<button class="layui-btn layui-btn-normal" id="btn-export">导出</button>-->
+        </div>
+        <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="table_list"></table>
+    <!--end:表格列表-->
+
+    <!--start:快捷搜索-->
+    <!-- <div class="short-search-bar">
+      <dl>
+        <dt>数据总数<span class="layui-badge layui-bg-cyan total"></span></dt>
+        <dd><a href="">聘用<span class="layui-badge employCount"></span></a></dd>
+        <dd><a href="">挂靠<span class="layui-badge joinOperatedCount"></span></a></dd>
+        <dd><a href="">外协<span class="layui-badge outsourceCount"></span></a></dd>
+      </dl>
+    </div> -->
+    <!--end:快捷搜索-->
+    <!-- <div id="comfirmHtml">
+      你确定要停用所选择的司机吗？<br/>
+      <label><input id="chkStop" checked type="checkbox">同时停用关联车辆(车架)</label>
+    </div> -->
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_comm.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+
+<script>
+    layui.use(['form', 'layer', 'table', 'tms_tab', 'laypage'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table,
+            tmsTab = layui.tms_tab,
+            laypage = layui.laypage,
+            $ = layui.jquery;
+
+        setTableData();
+
+        //监听提交
+        form.on('submit(search)', function(data) {
+            var $name = $.trim(data.field.name),
+                $mobile = $.trim(data.field.mobile),
+                $idNo = $.trim(data.field.idNo),
+                $carNo = $.trim(data.field.carNo);
+            setTableData($name, $mobile, $idNo, $carNo);
+            return false;
+        });
+
+        //方法级渲染
+        function setTableData($name, $mobile, $idNo, $carNo) {
+            $name = typeof $name != 'undefined' ? $name : '';
+            $mobile = typeof $mobile != 'undefined' ? $mobile : '';
+            $idNo = typeof $idNo != 'undefined' ? $idNo : '';
+            $carNo = typeof $carNo != 'undefined' ? $carNo : '';
+            var $pageSize = 15;
+
+            table.render({
+                elem: '#table_list',
+                url: '/ucenter/tms/capacity/driver/page.shtml?name=' + $name + "&mobile=" + $mobile + "&idNo=" + $idNo + "&carNo=" + $carNo,
+                response: {
+                    statusCode: 'SUCCESS',
+                    countName: 'objects.total',
+                    dataName: 'objects.list'
+                },
+                request: {
+                    pageName: 'pageNum',
+                    limitName: 'pageSize'
+                },
+                cols: [
+                    [{
+                        checkbox: true,
+                        fixed: true
+                    }, {
+                        title: '序号',
+                        width: 80,
+                        sort: true,
+                        templet: '#idTpl'
+                    }, {
+                        field: 'status',
+                        title: '状态',
+                        width: 100,
+                        templet: "#statusTpl"
+                    }, {
+                        field: 'name',
+                        title: '司机姓名',
+                        width: 100
+                    }, {
+                        field: 'mobile',
+                        title: '手机号码',
+                        width: 150
+                    }, {
+                        field: 'carNo',
+                        title: '驾驶车辆',
+                        width: 150,
+                        templet: "#carNoTpl"
+                    }, {
+                        field: 'idNo',
+                        title: '身份证号',
+                        width: 200
+                    }, {
+                        field: 'contractType',
+                        title: '合同类型',
+                        width: 100,
+                        templet: "#contractTypeTpl"
+                    }, {
+                        field: 'driversLicenseLevelDcode',
+                        title: '准驾车型',
+                        width: 90
+                    }, {
+                        field: 'driversLicenseDateE',
+                        title: '驾驶证有效期',
+                        width: 130,
+                        templet: "#driversLicenseDateETpl"
+                    }, {
+                        field: 'ownerCompanyName',
+                        title: '所属公司',
+                        width: 250
+                    }, {
+                        field: 'driverNo',
+                        title: '司机编号',
+                        width: 150
+                    }, {
+                        field: 'positionDateE',
+                        title: '合作终止日期',
+                        width: 150,
+                        templet: "#positionDateETpl"
+                    }]
+                ],
+                id: 'dataReload',
+                page: true,
+                limits: [15, 30, 50, 100],
+                limit: $pageSize,
+                height: 'full-130',
+                even: true, //开启隔行背景
+                done: function(res, curr, count) {
+                    //  $('.employCount').html(res.objects.cts.employCount);
+                    //  $('.joinOperatedCount').html(res.objects.cts.joinOperatedCount);
+                    //  $('.outsourceCount').html(res.objects.cts.outsourceCount);
+                    //  $('.total').html(res.objects.total);
+                }
+            });
+        }
+
+        var active = {
+            //新增
+            addData: function() {
+                var $tit = $(this).attr('data-tit'),
+                    $url = $(this).attr('data-url');
+                tmsTab.add($(this), $tit, $url);
+            },
+            //修改
+            editData: function() { //获取选中数据
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('编辑只能选择一条数据！');
+                } else {
+                    if (data[0].status == 3) {
+                        parent.layer.alert('司机停用后，不能被编辑！');
+                    } else {
+                        tmsTab.add($(this), '编辑司机(' + data[0].name + ')', 'modify.html?type=edit&id=' + data[0].id);
+                    }
+                }
+            },
+            //详情
+            detailData: function() { //获取选中数据
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                } else if (data.length > 1) {
+                    parent.layer.alert('只能查看一条数据！');
+                } else {
+                    tmsTab.add($(this), '查看司机(' + data[0].name + ')', 'modify.html?type=info&id=' + data[0].id);
+                }
+            },
+            //删除
+            delData: function() { //获取选中数据
+                var checkStatus = table.checkStatus('dataReload'),
+                    data = checkStatus.data;
+                if (data.length == 0) {
+                    parent.layer.alert('你还未选中数据！');
+                    return;
+                } else if (data.length > 0) {
+                    parent.layer.confirm('你确定要删除所选择的司机吗？', function(index) {
+                        var idArr = [];
+                        var count = 0;
+                        $(data).each(function(i, value) {
+                            if (value.status != 0) {
+                                parent.layer.alert('只有未激活的司机信息才能删除！');
+                                count = 1;
+                                return false;
+                            } else {
+                                idArr.push(value.id);
+                            }
+                        });
+
+                        if (count == 0) {
+                            var $saveData = {
+                                ids: idArr,
+                                status: 2
+                            }
+
+                            $.ajax({
+                                url: '/ucenter/tms/capacity/driver/status.shtml',
+                                data: JSON.stringify($saveData),
+                                type: 'PUT',
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                beforeSend: function() {},
+                                success: function(d) {
+                                    var $code = d.code;
+                                    $msg = d.msg;
+                                    $objects = d.objects;
+
+                                    if ($code === 'SUCCESS') {
+                                        parent.layer.alert('删除成功');
+                                        $(".btn-search").click();
+                                    } else if ($code === 'ERROR_USER_LOGOFF') {
+                                        loginFailure();
+                                    } else {
+                                        parent.layer.alert('数据异常');
+                                        return;
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        };
+
+        $('.btns-bar .layui-btn').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //启用
+        $("#btn-enabled").click(function() {
+            var checkStatus = table.checkStatus('dataReload'),
+                data = checkStatus.data;
+            if (data.length == 0) {
+                parent.layer.alert('你还未选中数据！');
+                return;
+            } else if (data.length > 0) {
+                parent.layer.confirm('你确定要启用所选择的司机吗？<br/><label><input id="chkStart" checked type="checkbox">同时启用关联车架和拖车</label>', function(index) {
+                    var idArr = [];
+                    $(data).each(function(i, value) {
+                        idArr.push(value.id);
+                    });
+                    var $saveData = {
+                        ids: idArr,
+                        status: 1
+                    }
+                    if ($(window.parent.document).find("#chkStart").is(':checked')) { //启用司机和关联车辆
+                        $saveData.cascade = true;
+                    }
+
+                    $.ajax({
+                        url: '/ucenter/tms/capacity/driver/status.shtml',
+                        data: JSON.stringify($saveData),
+                        type: 'PUT',
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        beforeSend: function() {},
+                        success: function(d) {
+                            var $code = d.code;
+                            $msg = d.msg;
+                            $objects = d.objects;
+
+                            if ($code === 'SUCCESS') {
+                                parent.layer.alert('启用成功');
+                                $(".btn-search").click();
+                            } else if ($code === 'ERROR_USER_LOGOFF') {
+                                loginFailure();
+                            } else {
+                                parent.layer.alert('数据异常');
+                                return;
+                            }
+                        }
+                    });
+                });
+            }
+        });
+
+        //停用
+        $("#btn-disable").click(function() {
+            var checkStatus = table.checkStatus('dataReload'),
+                data = checkStatus.data;
+            if (data.length == 0) {
+                parent.layer.alert('你还未选中数据！');
+                return;
+            } else if (data.length > 0) {
+                parent.layer.confirm('你确定要停用所选择的司机吗？<br/><label><input id="chkStop" checked type="checkbox">同时停用关联车架和拖车</label>', function(index) {
+                    var idArr = [];
+                    var count = 0;
+                    // var statusArr = [];
+                    $(data).each(function(i, value) {
+                        if (value.status != 1) {
+                            parent.layer.alert('只有状态为启用的司机才能停用！');
+                            count = 1;
+                            return false;
+                        } else {
+                            idArr.push(value.id);
+                        }
+                        // idArr.push(value.id);
+                        // statusArr.push(value.status);
+                    });
+
+                    if (count == 0) {
+                        var $saveData = {
+                            ids: idArr,
+                            status: 3
+                        }
+
+                        if ($(window.parent.document).find("#chkStop").is(':checked')) { //停用车架和关联车辆
+                            $saveData.cascade = true;
+                        }
+
+                        $.ajax({
+                            url: '/ucenter/tms/capacity/driver/status.shtml',
+                            data: JSON.stringify($saveData),
+                            type: 'PUT',
+                            dataType: 'json',
+                            contentType: 'application/json',
+                            beforeSend: function() {},
+                            success: function(d) {
+                                var $code = d.code;
+                                $msg = d.msg;
+                                $objects = d.objects;
+
+                                if ($code === 'SUCCESS') {
+                                    parent.layer.alert('停用成功');
+                                    $(".btn-search").click();
+                                } else if ($code === 'ERROR_USER_LOGOFF') {
+                                    loginFailure();
+                                } else {
+                                    parent.layer.alert('数据异常');
+                                    return;
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    });
+</script>
+<script type="text/html" id="statusTpl">
+    {{# if(d.status == '0'){ }} 未激活 {{# } else if(d.status == '1'){ }} 启用 {{# } else if(d.status == '3'){ }} 停用 {{# } else if(d.status == '4'){ }} 通过认证 {{# } }}
+</script>
+<script type="text/html" id="contractTypeTpl">
+    {{# if(d.contractType == 'EMPLOY'){ }} 聘用 {{# } else if(d.contractType == 'JOIN_OPERATED'){ }} 挂靠 {{# } else if(d.contractType == 'OUTSOURCE'){ }} 外协 {{# } }}
+</script>
+<script type="text/html" id="carNoTpl">
+    {{# if(d.carNo == "" || d.carNo == null ){ }} {{}} {{# }else{ }} {{d.carNo + " " + d.carColor}} {{# } }}
+</script>
+<script type="text/html" id="idTpl">
+    {{d.LAY_TABLE_INDEX+1}}
+</script>
+<script type="text/html" id="positionDateETpl">
+    {{# if(d.positionDateE == null){ }} {{ }} {{# }else{ }} {{new Date(d.positionDateE).format("yyyy-MM-dd")}} {{# } }}
+</script>
+<script type="text/html" id="driversLicenseDateETpl">
+    {{# if(d.driversLicenseDateE == null){ }} {{ }} {{# }else{ }} {{new Date(d.driversLicenseDateE).format("yyyy-MM-dd")}} {{# } }}
+</script>
+
+</html>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>收款记录 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <style>
+      .layui-form-item{
+          margin:0;
+      }
+  </style>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+        <form class="layui-form layui-form-pane" autocomplete="off">
+            <div class="layui-row layui-col-space5">
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">客户简称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="shortName" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">收款单号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="recordNo" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">账单号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="billNo" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:15%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">收款账号</label>
+                        <div class="layui-input-block">
+                            <select name="channelId">
+                                <option value="" selected="selected">请选择</option>
+                                </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:25%;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">收款日期</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm6">
+                                <input type="text" name="beginDate" id="beginDate" placeholder="开始时间" class="layui-input">
+                            </div>
+                            <div class="layui-col-sm6">
+                                <input type="text" name="endDate" id="endDate" placeholder="到期时间" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm1" style="width:10%;">
+                    <div class="layui-form-item">
+                        <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--end: 搜索-->
+    
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+      <div class=" fl">
+        <button class="layui-btn layui-btn-normal" data-type="derive">导出</button>
+      </div>
+      <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+    <!--start:快捷搜索-->
+    <div id="shortBar" style="display:none;">
+      <dl>
+        <dt>已收款合计：<span class="layui-badge layui-bg-cyan" id="countResult"></span></dt>
+      </dl>
+    </div>
+    <!--end:快捷搜索-->
+
+  </body>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'tms_tab', "laydate"], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        laydate = layui.laydate,
+        table = layui.table,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+        laydate.render({
+          elem: '#beginDate'
+        });
+        laydate.render({
+          elem: '#endDate'
+        });
+
+    setTableData();
+    var $shortBarHtml = $('#shortBar').html();
+    $('.layui-table-tool').prepend('<div class="short-bar">' + $shortBarHtml + '</div>');
+
+       //加载收款账号下拉框数据
+      $.get('/ucenter/general/finance/settlementChannel/searchBankNameAccountNo.shtml', function(d) {
+        var $code = d.code,
+            $msg = d.msg,
+            $objects = d.objects;
+        if ($code != 'SUCCESS') return false;
+        if ($objects.length > 0) {
+            for (var $i = 0; $i < $objects.length; $i++) {
+                if ($objects[$i].accountName != null && $objects[$i].accountNo != null && $objects[$i].status == 1) {
+                    $('select[name="channelId"]').append('<option value="' + $objects[$i].id + '">' + $objects[$i].accountNo + '(' + $objects[$i].accountName + ')</option>');
+                }
+            }
+            form.render('select');
+        }
+    }, 'json');
+
+    var $shortName,
+      $recordNo,
+      $billNo,
+      $channelId,
+      $beginDate,
+      $endDate;
+    
+    //监听提交
+    form.on('submit(search)', function(data){
+      $shortName = $.trim(data.field.shortName),
+      $recordNo = $.trim(data.field.recordNo),
+      $billNo = $.trim(data.field.billNo),
+      $channelId = $.trim(data.field.channelId),
+      $beginDate = $.trim(data.field.beginDate),
+      $endDate = $.trim(data.field.endDate);
+      setTableData($shortName, $recordNo, $billNo, $channelId, $beginDate, $endDate);
+      return false;
+    });
+    
+    //方法级渲染
+    function setTableData($shortName, $recordNo, $billNo, $channelId, $beginDate, $endDate){
+      typeof $shortName != 'undefined' ? $shortName = $shortName : $shortName = '';
+      typeof $recordNo != 'undefined' ? $recordNo = $recordNo : $recordNo = '';
+      typeof $billNo != 'undefined' ? $billNo = $billNo : $billNo = '';
+      typeof $channelId != 'undefined' ? $channelId = $channelId : $channelId = '';
+      typeof $beginDate != 'undefined' ? $beginDate = $beginDate : $beginDate = '';
+      typeof $endDate != 'undefined' ? $endDate = $endDate : $endDate = '';
+      var $pageSize = 15;
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/revenueRecord/page.shtml',
+        where: {
+                shortName:$shortName,
+                recordNo:$recordNo,
+                billNo:$billNo,
+                channelId:$channelId,
+                beginDate:$beginDate,
+                endDate:$endDate
+               },
+        method: 'post',
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {field:'revenueNo', title: '收款单号', align: 'center', width:180},
+          {field:'customerName', title: '客户简称', align: 'center', width:150},
+          {field:'billNo', title: '账单号', align: 'center', width:200},
+          {field:'billMonth', title: '账期', align: 'center', width:90},
+          {field:'accountNo', title: '收款账号', align: 'center', width:210},
+          {field:'price', title: '收款金额', align: 'center', width:100},
+          {field:'revenueDate', title: '收款日期', align: 'center', width:110, templet:'#revenueDateTpl'},
+          {field:'described', title: '摘要', align: 'center', width:150},
+          {field:'status', title: '状态', align: 'center', width:90, templet:'#statusTpl'},
+          {field:'creator', title: '创建人', align: 'center', width:110},
+          {field:'createDate', title: '创建时间', align: 'center', width:200, templet:'#createDateTpl'}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){
+          if(count > 0){
+            $("#countResult").html(res.objects.countRs);
+          }
+        }
+      });
+    }
+
+    
+
+    var active = {
+      //导出
+      derive: function(){
+        console.log($shortName, $recordNo, $billNo, $channelId, $beginDate, $endDate);
+        typeof $shortName != 'undefined' ? $shortName = $shortName : $shortName = '';
+        typeof $recordNo != 'undefined' ? $recordNo = $recordNo : $recordNo = '';
+        typeof $billNo != 'undefined' ? $billNo = $billNo : $billNo = '';
+        typeof $channelId != 'undefined' ? $channelId = $channelId : $channelId = '';
+        typeof $beginDate != 'undefined' ? $beginDate = $beginDate : $beginDate = '';
+        typeof $endDate != 'undefined' ? $endDate = $endDate : $endDate = '';
+        console.log($shortName, $recordNo, $billNo, $channelId, $beginDate, $endDate);
+        $.ajax({
+          type:'GET', 
+          url:'/ucenter/general/finance/revenueRecord/excel.shtml?shortName=' + $shortName + '&recordNo=' + $recordNo + '&billNo=' + $billNo + '&channelId=' + $channelId + '&beginDate=' + $beginDate + '&endDate=' + $endDate , 
+          success:function(d){
+            if(d.code == 'ERROR_FINANACE_EXPORT_EXCEL'){
+                parent.layer.alert('没有查询到相关数据！');
+              }else{
+                document.location.href = '/ucenter/general/finance/revenueRecord/excel.shtml?shortName=' + $shortName + '&recordNo=' + $recordNo + '&billNo=' + $billNo + '&channelId=' + $channelId + '&beginDate=' + $beginDate + '&endDate=' + $endDate ;
+            }
+          },
+          error:function(){
+             parent.layer.alert('操作失败！');
+          }
+          
+        });
+      }
+    };
+  
+    $('.btns-bar .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+  });
+  </script>
+  <script type="text/html" id="revenueDateTpl">
+    {{new Date(d.revenueDate).format("yyyy-MM-dd")}}
+  </script>
+  <script type="text/html" id="createDateTpl">
+    {{new Date(d.createDate).format("yyyy-MM-dd hh:mm:ss")}}
+  </script>
+  <script type="text/html" id="statusTpl">
+    {{#  if(d.status == '1'){ }}
+      已到帐
+    {{#  } else if(d.status == '2'){ }}
+      撤销
+    {{#  } }}
+  </script>
+</html>

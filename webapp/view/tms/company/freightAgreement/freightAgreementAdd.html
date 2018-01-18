@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>添加协议价格 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+</head>
+
+<body>
+    <form class="layui-form" autocomplete="off" style="min-width:800px;">
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">业务类型</label>
+                        <div class="layui-input-block">
+                            <input type="radio" style="padding-right:0px" name="businessType" lay-filter="businessType" value="1" title="出口业务" checked>
+                            <input type="radio" name="businessType" lay-filter="businessType" value="2" title="进口业务">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">装卸单位</label>
+                        <div class="layui-input-block">
+                            <select name="loadingTargetName" lay-filter="loadingTargetName" id="loadingTargetName" lay-verify="required" hc-data_id_field="key"
+                                hc-data_text_field="value" lay-search hc-data_url="/ucenter/customersAddress/options.shtml?customersId=">
+                                <option value="全部" selected>全部</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">提柜地点</label>
+                        <div class="layui-input-block">
+                            <select name="carryName" id="carryName" lay-filter="carryName" lay-verify="required" hc-data_id_field="key" hc-data_text_field="value"
+                                lay-search hc-data_url="/ucenter/footholdRange/options.shtml">
+                                <option value="">请选择</option>
+                                <option value="" disabled>数据加载中...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">还柜地点</label>
+                        <div class="layui-input-block">
+                            <select name="stillName" id="stillName" lay-filter="stillName" lay-verify="required" hc-data_id_field="key" hc-data_text_field="value"
+                                lay-search hc-data_url="/ucenter/footholdRange/options.shtml">
+                                <option value="">请选择</option>
+                                <option value="" disabled>数据加载中...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row box-line-container" data-data_type="box">
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">箱型</label>
+                        <div class="layui-input-block">
+                            <select name="isoCode" lay-verify="isoCode" lay-filter="isoCode">
+                                <option value="">请选择</option>
+                                <option value="107" selected>20GP</option>
+                                <option value="108">40GP</option>
+                                <option value="23">45GP</option>
+                                <option value="">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-sm6">
+                    <div class="layui-form-item layui-form-item--require">
+                        <label class="layui-form-label">价格</label>
+                        <div class="layui-input-block">
+                            <div class="layui-col-sm9">
+                                <div class="margin-right10">
+                                    <input type="text" name="contatypesPrice" lay-filter="contatypesPrice" class="layui-input" maxlength="12" lay-verify="required"
+                                        hc-verify="expenst" hc-verify_field="价格">
+                                </div>
+                            </div>
+                            <div class="layui-col-sm2">
+                                <div class="btns-add">
+                                    <a class="layui-icon icon-del btn-delete">&#xe640;</a>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm1">
+                                <div class="btns-add">
+                                    <a class="layui-icon icon-add btn-add">&#xe61f;</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="buttonBar" class="layui-form-item">
+            <button class="layui-btn" id="vsubmit" lay-submit lay-filter="submit" style="display: none;">保存</button>
+            <button class="layui-btn" style="display:none;">取消</button>
+        </div>
+
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<!-- 底层工具库 -->
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<!-- 基础业务工具方法 -->
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+<!-- 订单相关的公共代码 -->
+<script charset="utf-8" src="/view/tms/forwarder/js/orderCommon.js"></script>
+<script>
+    layui.use(['form', 'layer'], function () {
+        // console.log(parent);
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery;
+
+        var datas,
+            id,
+            $type = $.trim(getUrlParam('do')),
+            $id,
+            $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+
+
+        form.on('radio(channelType)', function (data) {
+            if (data.value == "1" || data.value == "2") {
+                $(".row-bank").hide();
+                $("select[name='bankName']").attr("lay-verify", "");
+                $("input[name='bankSubBranch']").attr("lay-verify", "");
+            } else {
+                $(".row-bank").show();
+                $("select[name='bankName']").attr("lay-verify", "required");
+                $("input[name='bankSubBranch']").attr("lay-verify", "branch");
+            };
+        });
+
+        //加载下拉列表
+        var renderSelect = function(type, id) {
+            bizUtil.layui.loadDataToSelect('#' + type, {afterRenderCallback: function () {
+                    if($type == 'edit'){
+                       $('select[name='+ type +']').val(Fun[id]);
+                       form.render('select');
+                    }   
+                }
+            });
+        }
+
+        var customersId = $(window.parent['f' + $layId].document).find('select[name="targetName"]').val();
+        $('#loadingTargetName').attr('hc-data_url', '/ucenter/customersAddress/options.shtml?customersId=' + customersId);
+        
+        var targetType = $(window.parent['f' + $layId].document).find('input[name="targetType"]:checked').val();
+
+        if(customersId !== '' && targetType !=='1'){
+            renderSelect('loadingTargetName', 'loadingTargetId');
+        }
+
+        renderSelect('carryName', 'carryId');
+        renderSelect('stillName', 'stillId');
+
+        //自定义验证规则
+        var lists = [{
+            // 该属性供内部使用，用于标识 配置类型
+            _cnName: '箱型信息',
+            _type: 'box',
+            lineClassName: 'box-line-container',
+            lineDeleteTips: '一组箱型信息中最少要有一个箱型记录',
+            addOperationSelector: '.btn-add',
+            deleteOperationSelector: '.btn-delete',
+            isBindCopyEvent: false
+        }];
+        // 一键绑定 船务信息、箱型信息、装卸地点 的 删除、添加、复制 事件
+        orderCommon.shippingEvent.fastBindEvent(lists, 'form');
+
+        var Fun;
+        if ($type == 'edit') {
+            $('.btns-add').remove();
+            $('button.layui-btn-primary').hide();
+            $('input[name="contatypesPrice"]').parent().removeClass('margin-right10');
+            $('input[name="contatypesPrice"]').parent().parent().removeClass('layui-col-sm9').addClass('layui-col-sm12');
+            var callBa = $(window.parent['f' + $layId].document).find('input[name=dataSSC]').attr('data-func');
+            Fun = eval(callBa);
+            Fun;
+            delete (Fun.conAdd);
+            $('input[name="businessType"]').each(function () {
+                if (Fun.businessType == parseInt($(this).val())) {
+                    $(this).prop('checked', true);
+                } else {
+                    $(this).prop('checked', false);
+                }
+            });
+            $('input[name=contatypesPrice]').val(Fun.contatypesPrice);
+            $('select[name=isoCode]').val(Fun.contatypesId);
+            $id = Fun.$id || "";
+            id = Fun.id || "";
+            form.render('radio');
+            form.render('select');
+        };
+
+        if ($type == 'add') {
+            var trLength = $(window.parent['f' + $layId].document).find('#tableListTP').siblings('.layui-table-view').find('.layui-table-body table tr').length;
+
+            if (trLength > 0) {
+                $('select[name="isoCode"]').val('');
+            } else {
+                $('.layui-fluid').append($(".box-line-container").clone(true));
+                $(".box-line-container:last").find('select[name="isoCode"]').val('108');
+            }
+            form.render('select');
+
+        }
+        //监听提交
+        function callB(obj) {
+            return obj
+        }
+
+        if ($type == 'edit' || $type == 'add') {
+            form.on('submit(submit)', function (data) {
+                if (!bizUtil.validator.verifyContainer($('form'))) {
+                    return false;
+                }
+
+                var aaa = [];
+                var $saveDataHD = {
+                    businessType: parseInt($.trim(data.field.businessType)),
+                    loadingTargetId: $.trim(data.field.loadingTargetName),
+                    loadingTargetName: $('#loadingTargetName').find('option:selected').text(),
+                    carryId: $.trim(data.field.carryName),
+                    carryName: $('#carryName').find('option:selected').text(),
+                    stillId: $.trim(data.field.stillName),
+                    stillName: $('#stillName').find('option:selected').text(),
+                    $id: $id,
+                    id: id
+                };
+
+                $('.box-line-container').each(function () {
+                    aaa.push({
+                        contatypesId: $(this).find('select').val(),
+                        isoCode: $(this).find('select option:selected').text(),
+                        contatypesPrice: $(this).find('input[name=contatypesPrice]').val()
+                    })
+                });
+                $.each(aaa, function (i, obj) {
+                    $.extend(obj, $saveDataHD);
+                })
+                var datas = JSON.stringify(aaa);
+                $(window.parent['f' + $layId].document).find('.tableSSC').attr('data-func', 'callbackSSC(' + datas + ')');
+
+                return false;
+            });
+
+        }
+    });
+</script>
+
+</html>

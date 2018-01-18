@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>编辑客户 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+    <style>
+        .layui-input-block {
+            margin-left: 20px;
+        }
+        .site-block {
+            height: 100%;
+            padding: 10px;
+            border: 1px solid #eee;
+            height: 450px;
+            overflow-y: auto;
+            border-right: none;
+        }
+        .layui-table-view{
+            margin-top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <form class="layui-form" autocomplete="off" style="min-width:800px;">
+        <div class="layui-fluid">
+            <div class="layui-row" style="margin-top: 20px;">
+                <div class="layui-col-md3">
+                    <div class="site-text site-block">
+                        <ul class="supplier-list">
+                            <li>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" lay-filter="chooseSup" name="driverId" title="司机" lay-skin="primary"/>
+                                </div>
+                            </li>   
+                        </ul>
+                    </div>
+                </div>
+                <div class="layui-col-md9">
+                    <table class="layui-table" id="table_list" lay-filter="table_list">
+                    </table>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md5">
+                    <label class="layui-form-label" style="float:right;"></label>
+                </div>
+                <div class="layui-col-md2">
+                    <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="submit">保存</button>
+                    <button class="layui-btn layui-btn-primary btn-close" type="button">取消</button>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/tms_common/utils.js?v=1.0"></script>
+<!-- 工具库依赖 -->
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+<script>
+    layui.use(['form', 'layer', 'table'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            table = layui.table;
+
+        var dodo = $.trim(getUrlParam('do'));
+        var type = $.trim(getUrlParam('type'));
+
+        var driverId = $.trim(getUrlParam('driverId'));
+        var carBelong = $.trim(getUrlParam('carBelong'));
+        var id = $.trim(getUrlParam('id'));
+
+        var targetId = $.trim(getUrlParam('targetId'));
+        var targetType = $.trim(getUrlParam('targetType'));
+        var accountNo = $.trim(getUrlParam('accountNo'));  
+
+        var driverName = '';
+
+        if(location.search.substring(1).split('&').length > 2){
+            var param = decodeURI(location.search.substring(1).split('&')[3].split('=')[1]);
+            if(location.search.substring(1).split('&')[3].split('=')[0] === 'driverName'){
+                driverName = param;
+                
+                if(driverName && driverName !== '请选择'){
+                    $('input[name="driverId"]').attr('title', driverName + '(司机)');
+                }               
+            }else{
+                $('input[name="driverId"]').attr('title', param);
+            }
+            form.render();
+        }  
+        
+        var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+        var doc = $(window.parent['f' + $layId].document);
+
+        var getSupplier = function () {
+            //如果车辆归属为 自营 合营  合作 就不查询供应商了
+            if(carBelong == 0 || carBelong == 1 || carBelong == 2){
+                $(doc).find('.ckObj').text('');
+                getSettlementInfo({
+                    driverId: driverId,
+                    supplierId: ''
+                });
+                return;
+            }
+            HC.ajax.get({
+                url: '/ucenter/crm/supplier/supplier/page.shtml',
+                data: {
+                    pageNum: 1,
+                    status: 1,
+                    //typeCode: 550
+                },
+                success: function(data){                                     
+                    var liStr = [];
+                    var supplierIdArr = [];
+                    $.each(data.list, function(i, d) {
+                        if(d.typeDcode == '550' || d.typeDcode == '553'){
+                            liStr.push([
+                                '<li><div class="layui-input-block"><input type="checkbox" lay-filter="chooseSup" name="' + d.id + '"title="' + d.nameShort + '"lay-skin="primary"/></div></li>']);    
+                            supplierIdArr.push(d.id);                             
+                        }                                         
+                    });
+                    $('.supplier-list').append(liStr.join(''));
+                   
+                    var ckObj = $(doc).find('.existedCkdObj').text();
+                    if(ckObj){
+                        var ck = JSON.parse(ckObj);
+                        
+                        $('.supplier-list input').each(function(i, d) {
+                            var ids = $(this).attr('name');
+                            var context = this;
+                            
+                            $.each(ck, function(i2, d2) {
+                                if(i === 0){
+                                    if(driverId == d2.targetId && d2.targetType == 2){
+                                        $(context).parent().remove();
+                                    }
+                                }else{
+                                    if(ids == d2.targetId){
+                                        $(context).parent().remove();
+                                    }
+                                }                                                             
+                            });                                                    
+                        });
+                    }
+                   
+                    form.render();
+                    getSettlementInfo({
+                        driverId: driverId,
+                        supplierId: supplierIdArr.join(',')
+                    });
+                },
+                complete: function() {
+                    $(doc).find('.ckObj').text('');
+                }
+            });
+        };
+
+        if(dodo === 'edit'){
+            var data = {
+                driverId: targetId,
+                supplierId: ''
+            }
+            if(targetType == 1){
+                data = {
+                    driverId: '',
+                    supplierId: targetId 
+                }
+            }
+            getSettlementInfo(data);
+            
+        }else{
+            getSupplier();
+        }
+
+        
+        var groupArrById = function (arr, param) {
+            if(param === 'driverId'){
+                return arr.driverList || [];
+            }
+            var items = [];
+            $.each(arr.supplierList, function(i, d) {
+                if(d.targetId == param){
+                    items.push(d);
+                }
+            }); 
+            return items;          
+        }
+
+        var removeTableData = function (arr, removeArr) {
+            var primaryArr = arr;
+            $.each(primaryArr, function(i, d) {
+                $.each(removeArr, function(i2, d2) {
+                    var flag = true;
+                    for(var key in d2){
+                        if(d2[key] !== d[key]){
+                            flag = false;
+                        }
+                    }
+                    if(flag){
+                        primaryArr[i] = '';
+                    }
+                });
+            });
+
+            //删除数组里的空字符串
+            var i = 0,
+                len = primaryArr.length;
+            for(i; i < len; i++){
+                if(primaryArr[i] === ''){
+                    primaryArr.splice(i, 1);
+                    i = i - 1;
+                }
+            }
+
+            return primaryArr;
+        }
+
+        table.init('table_list', {
+            cols: [[
+                    { field: 'ck', checkbox: true },
+                    { field: 'targetName', title: '司机/供应商', width: 140 },
+                    { field: 'channelType', title: '渠道', align: 'center', width: 80, templet: "#channelTypeTpl" },
+                    { field: 'bankName', title: '开户银行', width: 160, },
+                    { field: 'accountName', title: '账户名称', width: 120 },
+                    { field: 'accountNo', title: '账号', width: 150 }
+                ]],
+            id: 'dataReload',
+            height: 'full-85',
+            page: false,
+            limit: 999999
+        });
+
+        //获取供应商/司机 对应的 银行账号信息
+        function getSettlementInfo(data) {            
+            HC.ajax.get({
+                url: '/ucenter/tms/capacity/trailerSettlement/byDriverOrSupplierId.shtml',
+                data: data,
+                success: function(data){                       
+                    var tableData = [];                               
+                    if(dodo === 'edit'){
+                        $('.supplier-list input').prop('checked', true).attr('disabled', 'disabled');
+                        tableData = tableData.concat(groupArrById(data, (targetType == 1) ? targetId : 'driverId'));  
+                      
+                        if(tableData.length === 1){                                                      
+                            tableData[0].LAY_CHECKED = true;                 
+                        }   
+                        else{    
+                            $.each(tableData, function(i, d) {
+                                if(d.accountNo == accountNo){
+                                    tableData[i].LAY_CHECKED = true;                                                               
+                                }                                
+                            });
+                        }      
+                                               
+                        table.reload('dataReload', {data:  tableData});                 
+                        form.render();                       
+                    }else{
+                        form.on('checkbox(chooseSup)', function(elm) {
+                            var id = $(this).attr('name');
+                            if(elm.elem.checked){   
+                                tableData = tableData.concat(groupArrById(data, id));                                                                                       
+                            }else{ 
+                                tableData = removeTableData(tableData, groupArrById(data, id));
+                            }    
+
+                            table.reload('dataReload', {data:  tableData});  
+                        }); 
+                    }  
+                }
+            });
+        }
+
+        form.on('submit(submit)', function(elm) {
+            var ck = table.checkStatus('dataReload').data;
+            var flag = true;
+            $.each(ck, function(i, d) {             
+                if(d.status === null || d.status === ''){
+                    d.status = 1;
+                }
+                $.each(ck, function(i2, d2) {
+                    if(i !== i2){
+                        if(d.targetId === d2.targetId){
+                            flag = false;
+                        } 
+                    }                                             
+                });              
+            });
+
+            if(!flag){
+                parent.layer.alert('每个司机或供应商只能选择一条结算信息！');
+                return false;
+            }
+            if(dodo === 'edit' && !ck.length){
+                parent.layer.alert('请选择一条结算信息！');
+                return false;
+            }
+
+            $(doc).find('.ckObj').text('').text(JSON.stringify(ck));   
+            parent.layer.closeAll();    
+            return false;
+        });   
+
+        $('.btn-close').click(function(){
+            parent.layer.closeAll();
+        });       
+    
+    });
+</script>
+
+<script type="text/html" id="channelTypeTpl">
+    {{# if(d.channelType == 0){ }}
+    <div>银行</div>
+    {{# }else if(d.channelType == 1){ }}
+    <div>支付宝</div>
+    {{# }else if(d.channelType == 2){ }}
+    <div>微信</div>
+    {{# } }}
+</script>
+
+</html>

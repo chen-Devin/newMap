@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>订单明细 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+    <style>
+      body {margin:20px;}
+      /* .layui-form-label {width:120px;}
+      .layui-input-inline {padding-top: 10px;} */
+      span{height: 36px;line-height:36px}
+      /* .wrList {padding: 0 17px;} */
+      .layui-form-item {
+        margin-bottom: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+        <legend>订单信息</legend>
+      </fieldset>
+      <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="layui-col-sm4">
+                <label class="layui-form-label">运输作业号</label>
+                <div class="layui-input-block">
+                    <span id="jobNo" name="jobNo"></span>
+                </div>
+            </div>
+            <div class="layui-col-sm4">
+                <label class="layui-form-label">客户</label>
+                <div class="layui-input-block">
+                    <span id="customerName" name="customerName"></span>
+                </div>
+            </div>
+            <div class="layui-col-sm4">
+                <label class="layui-form-label">装卸地</label>
+                <div class="layui-input-block">
+                    <span id="address" name="address"></span>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-sm4">
+                <label class="layui-form-label">S/O</label>
+                <div class="layui-input-block">
+                    <span id="soNumber" name="soNumber"></span>
+                </div>
+            </div>
+            <div class="layui-col-sm4">
+                <label class="layui-form-label">供应商/车队</label>
+                <div class="layui-input-block">
+                    <span id="driverCompany" name="driverCompany"></span>
+                </div>
+            </div>
+            <div class="layui-col-sm4">
+                <label class="layui-form-label">司机</label>
+                <div class="layui-input-block">
+                    <span id="driverName" name="driverName"></span>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-sm4">
+                <label class="layui-form-label">拖车车牌</label>
+                <div class="layui-input-block">
+                    <span id="carNo" name="carNo"></span>
+                </div>
+            </div>
+            <div class="layui-col-sm4">
+                <label class="layui-form-label">箱号/箱型</label>
+                <div class="layui-input-block">
+                    <span id="arkNo" name="arkNo"></span>/
+                    <span id="arkType" name="arkType"></span>
+                </div>
+            </div>
+            <div class="layui-col-sm4">
+                <label class="layui-form-label">做柜日期</label>
+                <div class="layui-input-block">
+                    <span id="doarkDate" name="doarkDate"></span>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-sm4">
+                <label class="layui-form-label">运费限价</label>
+                <div class="layui-input-block">
+                    <span id="freightPrice" name="freightPrice"></span>
+                </div>
+            </div>
+            <div class="layui-col-sm4">
+                <label class="layui-form-label">审核状态</label>
+                <div class="layui-input-block">
+                    <span id="auditStatus" name="auditStatus"></span>
+                </div>
+            </div>
+            <div class="layui-col-sm4">
+                <label class="layui-form-label">核销状态</label>
+                <div class="layui-input-block">
+                    <span id="confirmStatus" name="confirmStatus"></span>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-sm12">
+                <label class="layui-form-label">审核备注</label>
+                <div class="layui-input-block">
+                    <span id="auditRemarks" name="auditRemarks"></span>
+                </div>
+            </div>
+        </div>
+      </div>
+
+      <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+        <legend>应收费用</legend>
+      </fieldset>
+
+      <div class="layui-tab layui-tab-card">
+          <ul class="layui-tab-title"></ul>
+          <div class="layui-tab-content"></div>
+      </div>
+    
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+        <legend>应付费用</legend>
+      </fieldset>
+
+      <table class="layui-table" id="handleFreight" lay-size="sm">
+        <colgroup>
+            <col width="80">
+            <col width="100">
+            <col width="100">
+            <col width="80">
+            <col width="100">
+            <col width="100">
+            <col width="80">
+            <col width="100">
+            <col width="100">
+            <col width="80">
+            <col width="100">
+            <col width="100">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>序号</th>
+                <th>费用</th>
+                <th class="b">金额</th>
+                <th>序号</th>
+                <th>费用</th>
+                <th class="b">金额</th>
+                <th>序号</th>
+                <th>费用</th>
+                <th class="b">金额</th>
+                <th>序号</th>
+                <th>费用</th>
+                <th>金额</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+  
+      <div class="layui-row">
+        <div class="layui-col-sm4">
+          <label class="layui-form-label">现金结算</label>
+            <div class="layui-input-block">
+              <span id="handleType" name="handleType"></span>
+            </div>
+        </div>  
+        <div class="layui-col-sm4">
+            <label class="layui-form-label">预付费用</label>
+              <div class="layui-input-block">
+                <span id="prepaidFreight" name="prepaidFreight"></span>
+              </div>
+          </div>
+        <div class="layui-col-sm4">
+          <label class="layui-form-label">应付备注</label>
+            <div class="layui-input-block">
+              <span id="handleRemarks" name="handleRemarks"></span>
+            </div>
+        </div>
+    </div>
+      <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+        <legend>车辆成本</legend>
+      </fieldset>
+
+      <table class="layui-table" id="carFreight" lay-size="sm">
+        <colgroup>
+            <col width="80">
+            <col width="100">
+            <col width="100">
+            <col width="80">
+            <col width="100">
+            <col width="100">
+            <col width="80">
+            <col width="100">
+            <col width="100">
+            <col width="80">
+            <col width="100">
+            <col width="100">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>序号</th>
+                <th>费用</th>
+                <th class="b">金额</th>
+                <th>序号</th>
+                <th>费用</th>
+                <th class="b">金额</th>
+                <th>序号</th>
+                <th>费用</th>
+                <th class="b">金额</th>
+                <th>序号</th>
+                <th>费用</th>
+                <th>金额</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate', 'element'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery,
+        element = layui.element;
+
+        var $jobNo = $.trim(getUrlParam('jobNo'));
+        var $id = $.trim(getUrlParam('id'));
+        roleStatu($jobNo,$id);
+            //渲染页面
+      function roleStatu($jobNo,$id){
+        var $saveData = {
+          jobNo: $jobNo,
+          id: $id
+        }
+        $.ajax({
+          type:'POST', 
+          url:'/ucenter/general/finance/receivedBills/searchReturnDetail.shtml', 
+          dataType:"json",
+          contentType: "application/json",
+          data:JSON.stringify($saveData),
+          success:function(d){
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+            if($code === 'SUCCESS'){
+                $('span[name="jobNo"]').html($objects.receiptResult.jobNo);
+                $('span[name="customerName"]').html($objects.receiptResult.customerName);
+                $('span[name="address"]').html($objects.receiptResult.address);
+                $('span[name="soNumber"]').html($objects.receiptResult.soNumber);
+                $('span[name="arkType"]').html($objects.receiptResult.arkType);
+                $('span[name="driverName"]').html($objects.receiptResult.driverName);
+                $('span[name="carNo"]').html($objects.receiptResult.carNo);
+                $('span[name="arkNo"]').html($objects.receiptResult.arkNo);
+                $('span[name="doarkDate"]').html($objects.myReceiptResult.doarkDate == '' ? '' : new Date($objects.myReceiptResult.doarkDate).format('MM-dd'));
+                if($objects.myReceiptResult.confirmStatus == 0){
+                  $("#confirmStatus").html("未核销");
+                }else if($objects.myReceiptResult.confirmStatus == 1){
+                  $("#confirmStatus").html("部分核销");
+                }else{
+                  $("#confirmStatus").html("全部核销");
+                };
+                $("#auditStatus").html($objects.myReceiptResult.auditStatus == 0 ? "未审核" : "已审核");
+                $('span[name="auditRemarks"]').html($objects.myReceiptResult.auditRemarks);
+                $('span[name="driverCompany"]').html($objects.receiptResult.driverCompany);
+                $('span[name="receivedType"]').html($objects.myReceiptResult.receivedType);
+                $('span[name="handleType"]').html($objects.myReceiptResult.handleType == null ? '' : (($objects.myReceiptResult.handleType == 0) ? '否':'是'));
+                $('span[name="prepaidFreight"]').html($objects.receiptResult.prepaidFreight);
+                $('span[name="handleRemarks"]').html($objects.myReceiptResult.handleRemarks);
+                $('span[name="receivedRemarks"]').html($objects.myReceiptResult.receivedRemarks);
+                // wrList应收
+                // 应收费用
+                var layuiTabTitle = $('.layui-tab .layui-tab-title'),
+                    layuiTabContent = $('.layui-tab .layui-tab-content');
+                  if ($objects.myReceiptResult.rrcList != null && $objects.myReceiptResult.rrcList.length > 0) {
+                        for (var i = 0; i < $objects.myReceiptResult.rrcList.length; i++) {
+                            //添加多客户标签
+                            layuiTabTitle.append('<li>' + $objects.myReceiptResult.rrcList[i].customerName + '</li>');
+                            //添加多客户内容
+                            layuiTabContent.append('<div class="layui-tab-item"></div>');
+                            //默认第一个选中
+                            if (i == 0) {
+                                layuiTabTitle.find('li:first-child').addClass('layui-this');
+                                layuiTabContent.find('.layui-tab-item:first-child').addClass('layui-show');
+                            }
+                            // 开始画客户内容表
+                            var customerId = $objects.myReceiptResult.rrcList[i].customerId;
+                                var receiveTableHtml = [
+                                    '<div id="reveiveTable', customerId, '">',
+                                    '<table class="layui-table" id="receiveFreight', customerId, '" lay-size="sm" style="margin:0;">',
+                                    '    <colgroup>',
+                                    // '        <col width="80">',
+                                    '        <col width="100">',
+                                    '        <col width="100">',
+                                    '        <col width="100">',
+                                    // '        <col width="80">',
+                                    '        <col width="100">',
+                                    '        <col width="100">',
+                                    '        <col width="100">',
+                                    // '        <col width="80">',
+                                    '        <col width="100">',
+                                    '        <col width="100">',
+                                    '        <col width="100">',
+                                    // '        <col width="80">',
+                                    '        <col width="100">',
+                                    '        <col width="100">',
+                                    '        <col width="100">',
+                                    '    </colgroup>',
+                                    '    <thead>',
+                                    '        <tr>',
+                                    '            <th>序号</th>',
+                                    '            <th>费用</th>',
+                                    '            <th>金额</th>',
+                                    // '            <th class="b">开发票</th>',
+                                    '            <th>序号</th>',
+                                    '            <th>费用</th>',
+                                    '            <th>金额</th>',
+                                    // '            <th class="b">开发票</th>',
+                                    '            <th>序号</th>',
+                                    '            <th>费用</th>',
+                                    '            <th>金额</th>',
+                                    // '            <th class="b">开发票</th>',
+                                    '            <th>序号</th>',
+                                    '            <th>费用</th>',
+                                    '            <th>金额</th>',
+                                    // '            <th>开发票</th>',
+                                    '        </tr>',
+                                    '    </thead>',
+                                    '    <tbody></tbody>',
+                                    '</table>',
+                                    '<div class="layui-row message-box">',
+                                    '    <div class="layui-col-sm3 layui-col-xs3">',
+                                    '        客户单号：<span name="customerWaybillNo', customerId, '"></span>',
+                                    '    </div>',
+                                    '    <div class="layui-col-sm3 layui-col-xs3">',
+                                    '        现金结算：<span name="receivableCashFlag', customerId, '"></span>',
+                                    '    </div>',
+                                    '    <div class="layui-col-sm6 layui-col-xs6">',
+                                    '        应收备注：<span name="receivableCostRemark', customerId, '"></span>',
+                                    '    </div>',
+                                    '</div>',
+                                    '</div>'
+                                ].join('');
+                                layuiTabContent.find('.layui-tab-item').eq(i).append(receiveTableHtml);
+                                //应收费用客户单号、备注、现金结算
+                                $('span[name="customerWaybillNo' + customerId + '"]').html($objects.myReceiptResult.rrcList[i].customerWaybillNo || '');
+                                $('span[name="receivableCostRemark' + customerId + '"]').html($objects.myReceiptResult.rrcList[i].receivableCostRemark || '');
+                                $('span[name="receivableCashFlag' + customerId + '"]').html(
+                                    $objects.myReceiptResult.rrcList[i].receivableCashFlag == null ? '' : (($objects.myReceiptResult.rrcList[i].receivableCashFlag == 1) ? '是' : '否')
+                                );
+                                //应收费用价格项
+                                var $wrArrs = $objects.myReceiptResult.rrcList[i].wrList;
+                                if ($wrArrs != null && $wrArrs.length > 0) {
+                                    setTableItem(1, '#receiveFreight' + customerId + ' tbody', 3, 4, $wrArrs);
+                                }
+                            }
+                        }
+                    }
+              // //应付费用备注、现金结算
+              // $('span[name="whRemark"]').html($objects.whRemark || '');
+              // $('span[name="whCash"]').html(
+              //     ($objects.whCash != null && $objects.whCash == 1) ? '是' : '否'
+            //   );
+
+              //初始化费用定义，1应收，2应付，3车辆
+              ($objects.receiptResult.whList != null) ? setTableItem(2, '#handleFreight tbody', 3, 4, $objects.receiptResult.whList): [];
+              ($objects.receiptResult.wcList != null) ? setTableItem(3, '#carFreight tbody', 3, 4, $objects.receiptResult.wcList): [];
+          }
+        });
+      }
+      function setTableItem(t, o, l, r, arrs) {
+        //var $tableItems = getCostItem(t),
+        var $tableItems = arrs,
+            $html = '',
+            className,  
+            $class = '';
+        if ($tableItems.length > 0) {
+            var hasCostTotal = 0;
+            for (var $i = 0; $i < $tableItems.length; $i++) {
+                var k = (hasCostTotal + 1) % r;
+                $html += (k == 1) ? '<tr>' : '';
+                var $rid, $wid, $name, $amount, $amount1, $hasInvoice;
+                switch (t) {
+                    case 1:
+                        $rid = $tableItems[$i].id;
+                        $wid = $tableItems[$i].recostItemId;
+                        $name = $tableItems[$i].recostName;
+                        $amount = $tableItems[$i].recostAmount == null ? 0: $tableItems[$i].recostAmount;
+                        $hasInvoice = $tableItems[$i].hasInvoice == 1 ? 'checked' : '';
+                        break;
+                    case 2:
+                        $rid = $tableItems[$i].id;
+                        $wid = $tableItems[$i].hacostItemId;
+                        $name = $tableItems[$i].hacostName;
+                        $amount = $tableItems[$i].hacostAmount == null ? 0: $tableItems[$i].hacostAmount;
+                        break;
+                    case 3:
+                        $rid = $tableItems[$i].id;
+                        $wid = $tableItems[$i].carcostItemId;
+                        $name = $tableItems[$i].carcostName;
+                        $amount = $tableItems[$i].carcostAmount == null ? 0: $tableItems[$i].carcostAmount;
+                        break;
+                    default:
+                        break;
+                }
+                className = '';
+                if($amount > 0){
+                  className = "green";
+                }else if($amount < 0){
+                  className = "red";
+                }
+                if (l == 4) {
+                    $class = (k == 0) ? '' : 'class="b"';
+                    $html += '<td>' + (hasCostTotal + 1) + '</td>' +
+                        '<td>' + $name + '</td>' +
+                        '<td class="amount">' + $amount + '</td>' +
+                        '<td ' + $class + '><input type="checkbox" name="hasInvoice' + $wid + '" lay-skin="primary" ' + $hasInvoice + ' disabled></td>';
+                } else if (l == 3) {
+                    // $class = (k == 0) ? 'class="amount"' : 'class="b amount"';
+                    $html += '<td>' + (hasCostTotal + 1) + '</td>' +
+                        '<td>' + $name + '</td>' +
+                        '<td class='+ className +'>'+ $amount  + '</td>';
+                }
+                $html += (k == 0 || (hasCostTotal + 1) == $tableItems.length) ? '</tr>' : '';
+                hasCostTotal++;
+                // }
+                $(o).html($html);
+            }
+
+            //补缺少的单元格
+            if (l == 4) form.render('checkbox');
+            var $totalCol = Math.ceil(hasCostTotal / r); //总行数
+            var $totalLen = $totalCol * r; //总列数
+            var $d = $totalLen - hasCostTotal;
+            var $sHtml = '';
+            if ($d > 0) {
+                for (var $n = 0; $n < $d; $n++) {
+                    if (l == 4) {
+                        $sHtml += ($n == $d - 1) ? '<td></td><td></td><td></td><td></td>' : '<td></td><td></td><td></td><td class="b"></td>';
+                    } else if (l == 3) {
+                        $sHtml += ($n == $d - 1) ? '<td></td><td></td><td></td>' : '<td></td><td></td><td class="b"></td>';
+                    }
+                }
+                $(o).find('tr:last-child').append($sHtml);
+            }
+        }
+      }
+  });
+  </script>
+</html>

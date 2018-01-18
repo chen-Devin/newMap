@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>登录 - TMS</title>
+    <link rel="icon" href="favicon.ico" />
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/login/login.css?v=1.0">
+    <!--[if lt IE 9]>
+      <script src="/view/frame/static/js/html5shiv.min.js"></script>
+      <script src="/view/frame/static/js/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <div class="panel-login">
+        <div class="login-title">
+            <span>
+                <img src="/view/frame/static/images/logo4.png">
+            </span>
+        </div>
+        <div class="login-body">
+            <div class="body-title">账号登录</div>
+            <form method="post" autocomplete="off" id="form-login" class="layui-form">
+                <div class="layui-fluid">
+                    <div class="layui-row">
+                        <div class="layui-col-sm12">
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <input type="text" class="layui-input username" id="username" name="username" maxlength="20" placeholder="手机号/用户名">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-row">
+                        <div class="layui-col-sm12">
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <input type="password" class="layui-input password" id="password" name="password" maxlength="20" placeholder="登录密码">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-row" id="vcode-box">
+                        <div class="layui-col-sm6">
+                            <div class="layui-form-item">
+                                <div class="layui-input-block" style="margin-right: 10px;">
+                                    <input type="text" class="layui-input vcode" id="vcode" name="vcode" maxlength="4" placeholder="验证码">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-sm3">
+                            <div class="layui-form-item">
+                                <div class="vcode-img">
+                                    <img src="/valicode.shtml?v=1.0" id="vcodeImg">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-sm3">
+                            <div class="layui-form-item">
+                                <div class="vcode-txt">
+                                    <a id="checkVcode">换一张</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-row">
+                        <div class="layui-col-sm12">
+                            <div class="layui-form-item">
+                                <div class="layui-input-block check-box">
+                                    <input type="checkbox" name="remember" id="remember" lay-skin="primary" title="记住账号">
+                                    <!--<a href="getPassword.html" class="find-password">找回密码？</a>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-row">
+                        <div class="layui-col-sm12">
+                            <div class="layui-form-item">
+                                <div class="layui-input-block error-msg">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-row">
+                        <div class="layui-col-sm12">
+                            <div class="layui-form-item">
+                                <div class="layui-input-block" style="margin-top: -5px;">
+                                    <button type="button" class="layui-btn layui-btn-normal form-submit">登录</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-row">
+                        <div class="layui-col-sm12">
+                            <div class="layui-form-item">
+                                <div class="layui-input-block register" style="margin-top: -10px;">
+                                    还没有账号？
+                                    <a href="/view/regist/index.html#step1">去注册</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="login-mask"></div>
+    </div>
+    <div class="footer">
+        <div class="footer-body">
+            <div class="body-content">
+                <div class="lefter">
+                    <p class="txt1">热线电话： 0755-82789239
+                        <span>9:00-20:00，周一至周五</span>
+                    </p>
+                    <p class="txt2">
+                        <a href="http://www.hcwanli.com/gongsijianjie/" target="_blank">关于我们</a>
+                        <a href="http://www.hcwanli.com/xinpinshangxian/" target="_blank">新闻动态</a>
+                        <a href="http://www.hcwanli.com/lianxiwomen/" target="_blank">联系我们</a>
+                        <a href="http://www.hcwanli.com/bangzhuzhongxin/" target="_blank">帮助中心</a>
+                    </p>
+                    <p class="txt3">&copy; 2017 - 2020 广东航程科技有限公司. All Rights Reserved
+                        <a href="http://www.miitbeian.gov.cn" target="_blank">粤ICP备17154150号-11</a>
+                    </p>
+                </div>
+                <div class="righter">
+                    <ul>
+                        <li>
+                            <img src="/view/frame/static/images/qr_code.gif">
+                            <span>微信公众号</span>
+                        </li>
+                        <li>
+                            <img src="/view/frame/static/images/qr_code.gif">
+                            <span>APP下载</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-mask"></div>
+    </div>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script type="text/javascript" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+<script type="text/javascript" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<script type="text/javascript" src="/view/frame/static/js/HC.js"></script>
+<script type="text/javascript" src="/view/login/login.js?v=1.0"></script>
+<script>
+    layui.use('form', function () {
+        var form = layui.form;
+
+        //设置checkbox背景透明
+        $('.layui-form-checkbox i').text('');
+        form.on('checkbox', function (data) {
+            if ($(data.elem).is(':checked')) {
+                $('.layui-form-checkbox i').text('').css('background', '#5FB878');
+            } else {
+                $('.layui-form-checkbox i').text('').css('background', 'transparent');
+            }
+        });
+
+        autoMargin();
+
+        //窗口调整事件
+        $(window).resize(function () {
+            autoMargin();
+        });
+
+        //自适应间距
+        function autoMargin() {
+            var winHeight = $(window).height();
+            var marginTop = (winHeight - $('.panel-login').height() - $('.footer').height()) / 2;
+            if (marginTop <= 20) {
+                marginTop = 20;
+            }
+            $('.panel-login').css({
+                'margin': marginTop + 'px auto'
+            });
+        }
+
+    });
+</script>
+
+</html>

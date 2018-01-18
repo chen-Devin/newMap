@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>关联收款单号 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      <h4>收款总额：<span class="countResult"></span></h4>
+      <!--start:表格列表-->
+      <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+      <!--end:表格列表-->
+    </form>
+  </body>
+  <script type="text/html" id="createDateTpl">
+    {{new Date(d.createDate).format("yyyy-MM-dd hh:mm:ss")}}
+</script>
+<script type="text/html" id="billMonthTpl">
+    {{new Date(d.billMonth).format("yyyy-MM")}}
+</script>
+<script type="text/html" id="revenueDateTpl">
+    {{new Date(d.revenueDate).format("yyyy-MM")}}
+</script>
+  <script type="text/html" id="statusTpl">
+    {{# if(d.status == 1){ }}
+    <p>已到账</p>
+    {{# }else{ }}
+    <p>撤销</p>
+    {{# } }}
+  </script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    var $billId = $.trim(getUrlParam("billId"));
+    var $receivedCost = $.trim(getUrlParam("receivedCost"));
+    setTableData($billId);
+    $('.countResult').html($receivedCost);
+
+    //方法级渲染
+    function setTableData($billId){
+      var $pageSize = 15;
+
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/revenueRecord/search.shtml?billId=' + $billId,
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total', //数据总数的字段名称，默认：count
+          dataName: 'objects'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {field:'revenueNo', title: '收款单号', width:150, },
+          {field:'billNo', title: '账单号', width:100},
+          {field:'billMonth', title: '账期', width:100, templet:"#billMonthTpl"},
+          {field:'accountNo', title: '收款账号', width:100},
+          {field:'price', title: '收款金额', width:100, },
+          {field:'revenueDate', title: '收款日期', width:100, templet:"#revenueDateTpl"},
+          {field:'described', title: '摘要', width:100},
+          {field:'status', title: '状态', width:100, templet:"#statusTpl"},
+          {field:'creator', title: '创建人', width:130},
+          {field:'createDate', title: '创建时间', width:200, templet:"#createDateTpl"}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){}
+      });
+    }
+  });
+  </script>
+</html>
